@@ -350,10 +350,14 @@ trie_p trie_insert_rec(trie_p t, char len, char arr[], int value)
     return t;
 }
 
+void trie_delete(trie_p *t, char arr[])
+{
+    *t = trie_delete_rec(*t, LEN, arr);
+}
+
 void trie_insert(trie_p *t, char arr[], int value)
 {
-    if(value == 0)  *t = trie_delete_rec(*t, LEN, arr);
-    else            *t = trie_insert_rec(*t, LEN, arr, value);
+    *t = value ? trie_insert_rec(*t, LEN, arr, value) : trie_delete_rec(*t, LEN, arr);
 }
 
 
@@ -372,10 +376,13 @@ int main()
     
     arr[4] = 0;
     trie_insert(&t, arr, 3);
+    trie_display(t);
     
     arr[2] = 3;
     trie_insert(&t, arr, 4);
+    trie_display(t);
 
+    trie_delete(&t, arr);
     trie_display(t);
 
 
