@@ -167,10 +167,25 @@ void trie_fork_connect(trie_p t1, trie_p t2, int key)
     TF(t1)->next[key] = t2;
 }
 
+void trie_fork_disconnect(trie_p t, int key)
+{
+    assert(t->type == FORK);
+
+    (TF(t)->connected)--;
+    if(key != TF(t)->least) return;
+
+    int i;
+    for(i=TF(t)->least; i<MAX && !(TF(t)->next[i]); i++);
+    TF(t)->least = i;
+}
+
+
+
 trie_p trie_fork_create()
 {
     trie_fork_p t = calloc(1, sizeof(trie_fork_t));
     assert(t);
+    t->least = MAX;
     return T(t);
 }
 
