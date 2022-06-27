@@ -278,8 +278,6 @@ trie_p trie_join(trie_p t1, trie_p t2)
 trie_p trie_delete_rec(trie_p t, char len, char arr[])
 {
     if(!t) return NULL;
-    assert(len || t->type == LEAF);
-
     switch (t->type)
     {
         case FORK:;
@@ -319,6 +317,7 @@ trie_p trie_delete_rec(trie_p t, char len, char arr[])
         break;
 
         case LEAF:
+        assert(!len);
         free(t);
         return NULL;
     }
