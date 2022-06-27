@@ -26,17 +26,26 @@ STRUCT(string)
     char arr[0];
 };
 
-void string_cpy(string_p str1, string_p str2)
+void string_display(string_p str) {
+    printf("\nstr: %d |", str->len);
+    for(int i=0; i<str->len; i++)
+        printf(" %d", str->arr[i]);
+}
+
+void _string_cpy(string_p str1, string_p str2)
 {
     memcpy(str1, str2, str2->len + 1);
 }
 
-int string_cmp(string_p str1, string_p str2)
+int string_cmp(string_p str1, char len, char arr[])
 {
-    int i, len = (str1->len < str2->len) ? str1->len : str2->len;
-    for(i=0; i<len && str1->arr[i] == str2->arr[i]; i++);
+    int i;
+    if(str1->len < len) len = str1->len;
+    for(i=0; i<len && str1->arr[i] == arr[i]; i++);
     return i;
 }
+
+
 
 STRUCT(trie)
 {
@@ -69,14 +78,31 @@ void pointer_display(void *p)
     else            printf("%p", p);
 }
 
-void trie_fork_display(trie_p t)
-{
-    printf("\ntrie (FORK): %p", t);
-    printf("\nconnected: %d\tleast: %d", TF(t)->connected, TF(t)->least);
-    for(int i=0; i<MAX; i++)
-    if(TF(t)->next[i])
+
+void trie_display_single(trie_p t) {
+    printf("\ntrie: ");pointer_display(t);
+    if(t == NULL) return;
+
+    switch (t->type)
     {
-        printf("\n\t%d: %p", i, TF(t)->next[i]);
+        case FORK:
+        printf("\t(FORK)");
+        printf("\nconnected: %d\tleast: %d", TF(t)->connected, TF(t)->least);
+        for(int i=0; i<MAX; i++)
+        if(TF(t)->next[i])
+            printf("\n\t%d: %p", i, TF(t)->next[i]);
+        break;
+    
+        case PATH:
+        printf("\t(PATH)");
+        printf("\nnext: ");pointer_display(TP(t)->next);
+        string_display(&(TP(t)->str));
+        break;
+
+        case LEAF:
+        printf("\t(LEAF)");
+        printf("\nvalue: %d", TL(t)->value);
+        break;
     }
 }
 
@@ -124,12 +150,7 @@ void trie_display(trie_p t)
     printf("\n");
 }
 
-trie_p trie_fork_create()
-{
-    trie_fork_p t = calloc(1, sizeof(trie_fork_t));
-    assert(t);
-    return T(t);
-}
+
 
 void trie_fork_connect(trie_p t1, trie_p t2, int key)
 {
@@ -143,29 +164,39 @@ void trie_fork_connect(trie_p t1, trie_p t2, int key)
     TF(t1)->next[key] = t2;
 }
 
-trie_p trie_path_create_force(string_p str, trie_p next)
+trie_p trie_fork_create()
 {
-    trie_path_p t = malloc(sizeof(trie_path_t) - 7 + str->len);
+    trie_fork_p t = calloc(1, sizeof(trie_fork_t));
+    assert(t);
+    return T(t);
+}
+
+trie_p trie_path_create_force(char len, char arr[], trie_p next)
+{
+    assert(len > 0);
+
+    trie_path_p t = malloc(sizeof(trie_path_t) - 7 + len);
     assert(t);
 
     t->t.type = PATH;
     t->next = next;
-    string_cpy(&(t->str), str);
+    t->str.len = len;
+    memcpy(&(t->str.arr), arr, len);
     return T(t);
 }
 
-trie_p trie_path_create(string_p str, trie_p next)
+trie_p trie_path_create(char len, char arr[], trie_p next)
 {
-    if(str->len == 0) return next;
+    if(len == 0) return next;
 
-    if(str->len == 1)
+    if(len == 1)
     {
         trie_p t = trie_fork_create();
-        trie_fork_connect(t, next, str->arr[0]);
+        trie_fork_connect(t, next, arr[0]);
         return t;
     }
 
-    return trie_path_create_force(str, next);
+    return trie_path_create_force(len, arr, next);
 }
 
 trie_p trie_leaf_create(int value)
@@ -177,72 +208,75 @@ trie_p trie_leaf_create(int value)
     return (trie_p)t;
 }
 
-trie_p trie_path_break(trie_p t, int len)
+trie_p trie_path_break(trie_p t, char len)
 {
-    string_p str = &(TP(t)->str);
-    char str_aux[2] = {1, str->arr[len]};
-    str->arr[len] = str->len - len - 1;
-    str->len = len;
+    assert(len < TP(t)->str.len);
 
-    trie_p t_aux = trie_path_create((string_p)(&(str->arr[len])),TP(t)->next);
-    t_aux = trie_path_create((string_p)str_aux, t_aux);
-    return  trie_path_create(str, t_aux);
+    string_p str = &(TP(t)->str);
+    char *arr = str->arr;
+
+    trie_p t_aux = TP(t)->next;
+    t_aux = trie_path_create(str->len - len - 1, &(arr[len+1]), t_aux);
+    t_aux = trie_path_create(1, &(arr[len]), t_aux);
+    return  trie_path_create(len, arr, t_aux);
 }
 
-trie_p trie_delete_rec(trie_p t, string_p str)
+
+
+trie_p trie_delete_rec(trie_p t, char len, char arr[])
 {
     return NULL;
 }
 
-trie_p trie_insert_rec(trie_p t, string_p str, int value)
+trie_p trie_insert_rec(trie_p t, char len, char arr[], int value)
 {
     if(t == NULL)
     {
         t = trie_leaf_create(value);
-        return trie_path_create(str, t);
+        return trie_path_create(len, arr, t);
     }
 
     if(t->type == PATH)
     {
-        int index = string_cmp(&(TP(t)->str), str);
-        t = trie_path_break(t, index);
+        int index = string_cmp(&(TP(t)->str), len, arr);
+        if(index < TP(t)->str.len) t = trie_path_break(t, index);
         if(t->type == PATH)
         {
-            str->arr[index-1] = str->len - index;
-            TP(t)->next = trie_insert_rec(TP(t)->next, (string_p)&(str->arr[index-1]), value);
+            TP(t)->next = trie_insert_rec(TP(t)->next, len - index, &(arr[index]), value);
             return t;
         }
     }
 
-    int key = str->arr[0];
-    str->arr[0] = str->len - 1;
-    TF(t)->next[key] = trie_insert_rec(TF(t)->next[key], (string_p)&(str->arr), value);
+    int key = arr[0];
+    TF(t)->next[key] = trie_insert_rec(TF(t)->next[key], len - 1, &(arr[1]), value);
     return t;
 }
 
-void trie_insert(trie_p *t, string_p str, int value)
+void trie_insert(trie_p *t, char arr[], int value)
 {
-    if(value == 0)  *t = trie_delete_rec(*t, str);
-    else            *t = trie_insert_rec(*t, str, value);
+    if(value == 0)  *t = trie_delete_rec(*t, LEN, arr);
+    else            *t = trie_insert_rec(*t, LEN, arr, value);
 }
 
 
 
 int main()
 {
+    setbuf(stdout, NULL);
+    
     trie_p t = NULL;
 
-    char arr[] = {8, 1, 2, 3, 4, 5, 6, 7, 8};
-    trie_insert(&t, (string_p)arr, 1);
+    char arr[] = {1, 2, 3, 4, 5, 6, 7, 8};
+    trie_insert(&t, arr, 1);
     
-    arr[3] = 0;
-    trie_insert(&t, (string_p)arr, 2);
+    arr[2] = 0;
+    trie_insert(&t, arr, 2);
     
-    arr[5] = 0;
-    trie_insert(&t, (string_p)arr, 3);
+    arr[4] = 0;
+    trie_insert(&t, arr, 3);
     
-    arr[3] = 3;
-    trie_insert(&t, (string_p)arr, 4);
+    arr[2] = 3;
+    trie_insert(&t, arr, 4);
 
     trie_display(t);
 

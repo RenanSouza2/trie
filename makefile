@@ -12,7 +12,7 @@ run: $(TGT)
 build: $(TGT)
 
 $(TGT): $(SRC)
-	gcc $(SRC) -o $(TGT) -Wall -g
+	gcc $(SRC) -o $(TGT) -Wall -g -Wno-char-subscripts
 
 clean:
 	rm -f $(TGT)
