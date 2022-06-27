@@ -13,6 +13,9 @@
 #define TP(POINTER) ((trie_path_p)(POINTER))
 #define TL(POINTER) ((trie_leaf_p)(POINTER))
 
+#define FALSE 0
+#define TRUE  1
+
 #define FORK 0
 #define PATH 1
 #define LEAF 2
@@ -181,7 +184,7 @@ trie_p trie_path_create_force(char len, char arr[], trie_p next)
     t->t.type = PATH;
     t->next = next;
     t->str.len = len;
-    memcpy(&(t->str.arr), arr, len);
+    memcpy(t->str.arr, arr, len);
     return T(t);
 }
 
@@ -216,16 +219,95 @@ trie_p trie_path_break(trie_p t, char len)
     char *arr = str->arr;
 
     trie_p t_aux = TP(t)->next;
-    t_aux = trie_path_create(str->len - len - 1, &(arr[len+1]), t_aux);
+    t_aux = trie_path_create(str->len - len-1, &(arr[len+1]), t_aux);
     t_aux = trie_path_create(1, &(arr[len]), t_aux);
     return  trie_path_create(len, arr, t_aux);
 }
 
+trie_p trie_fork_convert(trie_p t)
+{
+    assert(t->type == FORK);
+    assert(TF(t)->connected == 1);
+
+    char key = TF(t)->least;
+    trie_p t_next = TF(t)->next[TF(t)->least];
+    return trie_path_create_force(1, &key, t_next);
+}
+
+
+int trie_joinnable(trie_p t)
+{
+    if(t->type == PATH) return TRUE;
+    if(t->type == LEAF) return FALSE;
+    return TF(t)->connected == 1;
+}
+
+trie_p trie_join(trie_p t1, trie_p t2)
+{
+    if(t1->type == FORK) t1 = trie_fork_convert(t1);
+    if(t2->type == FORK) t2 = trie_fork_convert(t2);
+
+    char len1 = TP(t1)->str.len;
+    char len2 = TP(t2)->str.len;
+    char len  = len1 + len2;
+    t1 = realloc(t1, sizeof(trie_path_t) - 7 + len);
+    TP(t1)->str.len = len;
+    TP(t1)->next = TP(t2)->next;
+    memcpy(&(TP(t1)->str.arr[len1]), TP(t2)->str.arr, len2);
+
+    free(t2);
+    return t1;
+}
 
 
 trie_p trie_delete_rec(trie_p t, char len, char arr[])
 {
-    return NULL;
+    if(!t) return NULL;
+    assert(len || t->type == LEAF);
+
+    switch (t->type)
+    {
+        case FORK:;
+        int key = arr[0];
+        trie_p t_bef = TF(t)->next[key];
+        if(!t_bef) return t;
+
+        trie_p t_aft = trie_delete_rec(t_bef, len-1, &arr[1]);
+        if(t_aft)   TF(t)->next[key] = t_aft;
+        else       
+        {
+            trie_fork_disconnect(t, key);
+            if(!(TF(t)->connected))
+            {
+                free(t);
+                return NULL;
+            }
+        }
+
+        if(TF(t)->connected == 1)
+        if(trie_joinnable(TF(t)->next[TF(t)->least]))
+            return trie_join(t, TF(t)->next[TF(t)->least]);
+        break;
+    
+        case PATH:;
+        int path_len = TP(t)->str.len;
+        trie_p t_next = trie_delete_rec(TP(t)->next, len-path_len, &arr[path_len]);
+        
+        if(!t_next)
+        {
+            free(t);
+            return NULL;
+        }
+
+        if(trie_joinnable(t_next))
+            return trie_join(t, t_next);
+        break;
+
+        case LEAF:
+        free(t);
+        return NULL;
+    }
+    return t;
 }
 
 trie_p trie_insert_rec(trie_p t, char len, char arr[], int value)
@@ -242,13 +324,13 @@ trie_p trie_insert_rec(trie_p t, char len, char arr[], int value)
         if(index < TP(t)->str.len) t = trie_path_break(t, index);
         if(t->type == PATH)
         {
-            TP(t)->next = trie_insert_rec(TP(t)->next, len - index, &(arr[index]), value);
+            TP(t)->next = trie_insert_rec(TP(t)->next, len-index, &(arr[index]), value);
             return t;
         }
     }
 
     int key = arr[0];
-    TF(t)->next[key] = trie_insert_rec(TF(t)->next[key], len - 1, &(arr[1]), value);
+    TF(t)->next[key] = trie_insert_rec(TF(t)->next[key], len-1, &(arr[1]), value);
     return t;
 }
 
