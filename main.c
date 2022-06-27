@@ -250,6 +250,7 @@ trie_p trie_fork_convert(trie_p t)
 }
 
 
+
 int trie_joinnable(trie_p t)
 {
     if(t->type == PATH) return TRUE;
@@ -273,6 +274,7 @@ trie_p trie_join(trie_p t1, trie_p t2)
     free(t2);
     return t1;
 }
+
 
 
 trie_p trie_delete_rec(trie_p t, char len, char arr[])
