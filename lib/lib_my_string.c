@@ -9,10 +9,9 @@ void string_display(string_p str) {
     printf(" }");
 }
 
-int string_cmp(string_p str1, char len, char arr[])
+int string_cmp(string_p str, char arr[])
 {
-    int i;
-    if(str1->len < len) len = str1->len;
-    for(i=0; i<len && str1->arr[i] == arr[i]; i++);
+    int i, len = str->len;
+    for(i=0; i<len && str->arr[i] == arr[i]; i++);
     return i;
 }
