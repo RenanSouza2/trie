@@ -25,11 +25,11 @@ clean:
 rebuild:
 	make clean build
 
-$(OBJ)/lib_my_string.so: $(OBJ)/my_string.o
-	gcc -shared -o $(OBJ)/lib_my_string.so $(OBJ)/my_string.o
+$(OBJ)/%.so: $(OBJ)/%.o
+	gcc -shared -o $@ $<
 
-$(OBJ)/my_string.o: $(LIB)/my_string.c
-	gcc -fpic -c $(LIB)/my_string.c -o $(OBJ)/my_string.o
+$(OBJ)/%.o: $(LIB)/%.c
+	gcc -fpic -c -o $@ $<
 
 time: $(TGT)
 	clear
