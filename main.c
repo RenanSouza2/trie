@@ -3,6 +3,8 @@
 #include <string.h>
 #include <assert.h>
 
+#include "lib/lib_my_string.h"
+
 #define STRUCT(NAME)                    \
     typedef struct _##NAME NAME##_t;    \
     typedef NAME##_t *NAME##_p;         \
@@ -19,32 +21,6 @@
 
 #define MAX 10
 #define LEN 8
-
-STRUCT(string)
-{
-    char len;
-    char arr[0];
-};
-
-void string_display(string_p str) {
-    printf("\nstr: %d |", str->len);
-    for(int i=0; i<str->len; i++)
-        printf(" %d", str->arr[i]);
-}
-
-void _string_cpy(string_p str1, string_p str2)
-{
-    memcpy(str1, str2, str2->len + 1);
-}
-
-int string_cmp(string_p str1, char len, char arr[])
-{
-    int i;
-    if(str1->len < len) len = str1->len;
-    for(i=0; i<len && str1->arr[i] == arr[i]; i++);
-    return i;
-}
-
 
 
 STRUCT(trie)
@@ -89,7 +65,7 @@ void trie_display_single(trie_p t) {
         printf("\t(FORK)");
         printf("\nconnected: %d\tleast: %d", TF(t)->connected, TF(t)->least);
         for(int i=0; i<MAX; i++)
-        if(TF(t)->next[i])
+        if(TF(t)->next[i])  
             printf("\n\t%d: %p", i, TF(t)->next[i]);
         break;
     
