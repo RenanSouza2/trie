@@ -1,10 +1,11 @@
 NAME = main
-SRC = $(SRCF)/$(NAME).c
-TGT = $(BIN)/$(NAME).o
 BIN=bin
 LIB=lib
 OBJ=obj
 SRCF=src
+
+SRC = $(SRCF)/$(NAME).c
+TGT = $(BIN)/$(NAME).o
 
 runClear: 
 	clear
