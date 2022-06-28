@@ -3,9 +3,10 @@
 #include "lib_my_string.h"
 
 void string_display(string_p str) {
-    printf("\nstr: %d |", str->len);
+    printf("\nstr: %d | {", str->len);
     for(int i=0; i<str->len; i++)
         printf(" %d", str->arr[i]);
+    printf(" }");
 }
 
 int string_cmp(string_p str1, char len, char arr[])
