@@ -15,7 +15,7 @@ run: $(TGT)
 build: $(TGT)
 
 $(TGT): $(SRC) $(OBJ)/lib_my_string.so
-	gcc $(SRC) -o $(TGT) -Wall -Wno-char-subscripts -L./$(OBJ) -l_my_string
+	gcc $(SRC) -fpic -o $(TGT) -Wall -Wno-char-subscripts -L./$(OBJ) -l_my_string -Wl,-rpath=./obj
 
 clean:
 	rm -f $(OBJ)/* $(BIN)/*
