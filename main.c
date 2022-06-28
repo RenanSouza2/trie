@@ -3,7 +3,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include "lib_my_string.h"
+#include "lib/lib_my_string.h"
 
 #define STRUCT(NAME)                    \
     typedef struct _##NAME NAME##_t;    \

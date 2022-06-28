@@ -10,4 +10,4 @@ STRUCT(string)
 };
 
 void string_display(string_p str);
-int string_cmp(string_p str1, char len, char arr[]);
+int  string_cmp(string_p str1, char len, char arr[]);
