@@ -4,7 +4,7 @@ SRCF=src
 
 SRC = $(SRCF)/$(NAME).c
 OBJ = obj/main.o
-TGT = $(BIN)/$(NAME)
+TGT = $(BIN)/$(NAME).o
 
 LIB_FLAGS = -L./obj -l:lib_trie -l:lib_my_string -Wl,-rpath=obj
 

@@ -318,7 +318,7 @@ int trie_querie_rec(trie_p t, char len, char arr[])
         case FORK:
         return trie_querie_rec(TF(t)->next[arr[0]], len-1, &arr[1]);
         
-        case PATH:
+        case PATH:;
         int index = string_cmp(&TP(t)->str, arr);
         if(index < TP(t)->str.len) return 0;
 
