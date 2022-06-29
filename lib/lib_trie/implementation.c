@@ -4,7 +4,7 @@
 #include <assert.h>
 
 #include "lib_trie.h"
-#include "lib_my_string.h"
+#include "../lib_my_string/lib_my_string.h"
 
 
 void pointer_display(void *p)
@@ -244,7 +244,7 @@ trie_p trie_delete_rec(trie_p t, char len, char arr[])
     
         case PATH:;
         int path_len = TP(t)->str.len;
-        int index = string_cmp(&TP(t)->str, len, arr);
+        int index = string_cmp(&TP(t)->str, arr);
         if(index < path_len) return t;
 
         t_next = trie_delete_rec(TP(t)->next, len-path_len, &arr[path_len]);

@@ -1,3 +1,6 @@
+#ifndef LIB_TRIE_H
+#define LIB_TRIE_H
+
 #include "../struct.h"
 #include "../lib_my_string/lib_my_string.h"
 
@@ -46,3 +49,5 @@ void trie_delete(trie_p *t, char arr[]);
 void trie_insert(trie_p *t, char arr[], int value);
 
 int trie_querie(trie_p t, char arr[]);
+
+#endif

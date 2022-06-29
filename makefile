@@ -5,32 +5,32 @@ SRCF=src
 SRC = $(SRCF)/$(NAME).c
 TGT = $(BIN)/$(NAME).o
 
-LIB_FLAGS = -L./obj -l_my_string -Wl,-rpath=./obj
+LIB_FLAGS = -Wl,-rpath=./obj
 
 runClear: 
 	clear
-	make run
+	$(MAKE) run
 
 run: $(TGT)
 	./$(TGT)
 
 build: $(TGT)
 
-$(TGT): $(SRC) obj/lib_my_string.so
-	gcc $(SRC) -fpic -o $(TGT) -Wall -Wno-char-subscripts $(LIB_FLAGS)
+$(TGT): $(SRC) obj/lib_trie.so
+	gcc $(LIB_FLAGS) $(SRC) -o $(TGT) -Wall -Wno-char-subscripts 
 
 clean:
 	rm -f obj/* $(BIN)/*
-	(cd lib/lib_my_string && $(MAKE) clean)
+	cd lib/lib_my_string && $(MAKE) clean
 
 rebuild:
 	$(MAKE) clean 
 	clear
 	$(MAKE) build
 
-obj/%.so: # ./lib/$*/implementation.c"
+obj/%.so: 
 	echo "compiling ./lib/$*/implementation.c"
-	(cd ./lib/$* && $(MAKE))
+	cd ./lib/$* && $(MAKE)
 
 time: $(TGT)
 	clear
