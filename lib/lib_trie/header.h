@@ -2,7 +2,7 @@
 #define LIB_TRIE_H
 
 #include "../struct.h"
-#include "../lib_my_string/lib_my_string.h"
+#include "../lib_my_string/header.h"
 
 #define T(POINTER)  ((trie_p)(POINTER))
 #define TF(POINTER) ((trie_fork_p)(POINTER))

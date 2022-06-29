@@ -3,8 +3,8 @@
 #include <string.h>
 #include <assert.h>
 
-#include "lib_trie.h"
-#include "../lib_my_string/lib_my_string.h"
+#include "header.h"
+#include "../lib_my_string/header.h"
 
 
 void pointer_display(void *p)
@@ -584,26 +584,4 @@ void test()
 
     printf("\nTests successfull\n");
     exit(EXIT_SUCCESS);
-}
-
-
-
-int main()
-{
-    test();
-    setbuf(stdout, NULL);
-        
-    // arr[4] = 0;
-    // trie_insert(&t, arr, 3);
-    // trie_display(t);
-    
-    // arr[2] = 3;
-    // trie_insert(&t, arr, 4);
-    // trie_display(t);
-
-    // trie_delete(&t, arr);
-    // trie_display(t);
-
-    // printf("\n");
-    return 0;
 }

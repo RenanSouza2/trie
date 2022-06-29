@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "lib_my_string.h"
+#include "header.h"
 
 void string_display(string_p str) {
     printf("\nstr: %d | {", str->len);

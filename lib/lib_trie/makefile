@@ -1,26 +1,27 @@
 NAME = lib_trie
-SRC = implementation.c
-OBJ = $(NAME).o
-TGT = $(NAME).so
 
-LIB_STR = ../lib_my_string/lib_my_string.so
-LIB_FLAGS = -Wl,-rpath=../../obj
+IMP = implementation.c
+OBJ = object.o
+TGT = library.so
+END = $(LIB_FLDR)/$(NAME).so
+
+LIB_FLDR = ../../obj
 
 copy: $(TGT)
-	cp $(TGT) ../../obj
+	cp $(TGT) $(END)
 
 build: $(TGT)
 
-$(TGT): $(SRC) $(LIB_STR)
-	gcc -fpic -c $(LIB_FLAGS) -o $(OBJ) $(SRC)
-	gcc -shared -o $(TGT) $(OBJ) 
+$(TGT): $(IMP) $(LIB)
+	gcc -fpic -o $(OBJ) -c $(IMP) 
+	gcc -fpic -o $(TGT) $(OBJ) -shared -L. -Wl,-soname,$(NAME)
 
-$(LIB_STR): ../lib_my_string/implementation.c
+$(LIB): 
 	cd ../lib_my_string && $(MAKE)
 
 clean:
 	rm -f $(TGT) $(OBJ)
-	cd ../lib_my_string && $(MAKE) clean
 
 rebuild:
-	make clean build
+	$(MAKE) clean
+	$(MAKE) build

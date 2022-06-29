@@ -1,19 +1,22 @@
 NAME = lib_my_string
-SRC = implementation.c
-OBJ = $(NAME).o
-TGT = $(NAME).so
+
+IMP = implementation.c
+OBJ = object.o
+TGT = library.so
+END = ../../obj/$(NAME).so
 
 copy: $(TGT)
-	cp $(TGT) ../../obj
+	cp $(TGT) $(END)
 
 build: $(TGT)
 
-$(TGT): $(SRC)
-	gcc -fpic -c -o $(OBJ) $(SRC)
-	gcc -shared -o $(TGT) $(OBJ)
+$(TGT): $(IMP)
+	gcc -fpic -o $(OBJ) -c $(IMP) 
+	gcc -fpic -o $(TGT) $(OBJ) -shared -Wl,-soname,$(NAME)
 
 clean:
 	rm -f $(TGT) $(OBJ)
 
 rebuild:
-	make clean build
+	$(MAKE) clean
+	$(MAKE) build

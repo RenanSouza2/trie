@@ -3,9 +3,10 @@ BIN=bin
 SRCF=src
 
 SRC = $(SRCF)/$(NAME).c
-TGT = $(BIN)/$(NAME).o
+OBJ = obj/main.o
+TGT = $(BIN)/$(NAME)
 
-LIB_FLAGS = -Wl,-rpath=./obj
+LIB_FLAGS = -L./obj -l:lib_trie -l:lib_my_string -Wl,-rpath=obj
 
 runClear: 
 	clear
@@ -16,12 +17,15 @@ run: $(TGT)
 
 build: $(TGT)
 
-$(TGT): $(SRC) obj/lib_trie.so
-	gcc $(LIB_FLAGS) $(SRC) -o $(TGT) -Wall -Wno-char-subscripts 
+$(TGT): $(SRC) obj/lib_trie.so obj/lib_my_string.so
+	# gcc -Iobj -o $(OBJ) $(SRC)  $(LIB_FLAGS)
+	# # gcc -o $(TGT) $(OBJ) $(LIB_FLAGS)
+	gcc src/main.c -o bin/main.o -L./obj -l:lib_trie.so -l:lib_my_string.so
 
 clean:
 	rm -f obj/* $(BIN)/*
 	cd lib/lib_my_string && $(MAKE) clean
+	cd lib/lib_trie && $(MAKE) clean
 
 rebuild:
 	$(MAKE) clean 
@@ -29,7 +33,7 @@ rebuild:
 	$(MAKE) build
 
 obj/%.so: 
-	echo "compiling ./lib/$*/implementation.c"
+	echo copying ./lib/$*/implementation.c
 	cd ./lib/$* && $(MAKE)
 
 time: $(TGT)
