@@ -3,49 +3,9 @@
 #include <string.h>
 #include <assert.h>
 
-#include "../lib/struct.h"
-#include "../lib/lib_my_string.h"
+#include "header.h"
+#include "../lib_my_string/header.h"
 
-#define T(POINTER)  ((trie_p)(POINTER))
-#define TF(POINTER) ((trie_fork_p)(POINTER))
-#define TP(POINTER) ((trie_path_p)(POINTER))
-#define TL(POINTER) ((trie_leaf_p)(POINTER))
-
-#define FALSE 0
-#define TRUE  1
-
-#define FORK 0
-#define PATH 1
-#define LEAF 2
-
-#define MAX 10
-#define LEN 8
-
-
-STRUCT(trie)
-{
-    int type;
-};
-
-STRUCT(trie_fork)
-{
-    trie_t t;
-    int connected, least;
-    trie_p next[MAX];
-};
-
-STRUCT(trie_path)
-{
-    trie_t t;
-    trie_p next;
-    string_t str;
-};
-
-STRUCT(trie_leaf)
-{
-    trie_t t;
-    int value;
-};
 
 void pointer_display(void *p)
 {
@@ -284,7 +244,7 @@ trie_p trie_delete_rec(trie_p t, char len, char arr[])
     
         case PATH:;
         int path_len = TP(t)->str.len;
-        int index = string_cmp(&TP(t)->str, len, arr);
+        int index = string_cmp(&TP(t)->str, arr);
         if(index < path_len) return t;
 
         t_next = trie_delete_rec(TP(t)->next, len-path_len, &arr[path_len]);
@@ -324,7 +284,7 @@ trie_p trie_insert_rec(trie_p t, char len, char arr[], int value)
 
     if(t->type == PATH)
     {
-        int index = string_cmp(&TP(t)->str, len, arr);
+        int index = string_cmp(&TP(t)->str, arr);
         if(index < TP(t)->str.len) t = trie_path_break(t, index);
         if(t->type == PATH)
         {
@@ -349,6 +309,31 @@ void trie_insert(trie_p *t, char arr[], int value)
     *t = value ? trie_insert_rec(*t, LEN, arr, value) : trie_delete_rec(*t, LEN, arr);
 }
 
+int trie_querie_rec(trie_p t, char len, char arr[])
+{
+    if(!t) return 0;
+
+    switch (t->type)
+    {
+        case FORK:
+        return trie_querie_rec(TF(t)->next[arr[0]], len-1, &arr[1]);
+        
+        case PATH:;
+        int index = string_cmp(&TP(t)->str, arr);
+        if(index < TP(t)->str.len) return 0;
+
+        return trie_querie_rec(TP(t)->next, len-index, &arr[index]);
+
+        case LEAF:
+        assert(!len);
+        return TL(t)->value;
+    }
+}
+
+int trie_querie(trie_p t, char arr[])
+{
+    return trie_querie_rec(t, LEN, arr);
+}
 
 
 void assert_trie_path_string(trie_p t, char arr[], char len)
@@ -599,26 +584,4 @@ void test()
 
     printf("\nTests successfull\n");
     exit(EXIT_SUCCESS);
-}
-
-
-
-int main()
-{
-    test();
-    setbuf(stdout, NULL);
-        
-    // arr[4] = 0;
-    // trie_insert(&t, arr, 3);
-    // trie_display(t);
-    
-    // arr[2] = 3;
-    // trie_insert(&t, arr, 4);
-    // trie_display(t);
-
-    // trie_delete(&t, arr);
-    // trie_display(t);
-
-    // printf("\n");
-    return 0;
 }

@@ -1,36 +1,16 @@
-NAME = main
-BIN=bin
-LIB=lib
-OBJ=obj
-SRCF=src
+LIB_TRIE=lib_trie/lib.so
 
-SRC = $(SRCF)/$(NAME).c
-TGT = $(BIN)/$(NAME).o
+run: main.o
+	./main.o
 
-runClear: 
-	clear
-	make run
+build: main.o
 
-run: $(TGT)
-	./$(TGT)
+main.o: main.c $(LIB_TRIE)
+	gcc main.c -o main.o -L. -l:$(LIB_TRIE) -Wl,-rpath,.
 
-build: $(TGT)
-
-$(TGT): $(SRC) $(OBJ)/lib_my_string.so
-	gcc $(SRC) -fpic -o $(TGT) -Wall -Wno-char-subscripts -L./$(OBJ) -l_my_string -Wl,-rpath=./obj
+$(LIB_TRIE):
+	cd lib_trie && $(MAKE)
 
 clean:
-	rm -f $(OBJ)/* $(BIN)/*
-
-rebuild:
-	make clean build
-
-$(OBJ)/lib_my_string.so: $(OBJ)/my_string.o
-	gcc -shared -o $(OBJ)/lib_my_string.so $(OBJ)/my_string.o
-
-$(OBJ)/my_string.o: $(LIB)/my_string.c
-	gcc -fpic -c $(LIB)/my_string.c -o $(OBJ)/my_string.o
-
-time: $(TGT)
-	clear
-	time ./$(TGT)
+	rm -rf main.o
+	cd lib_trie && $(MAKE) clean
