@@ -22,3 +22,6 @@ clean:
 rebuild:
 	$(MAKE) clean 
 	$(MAKE) build
+
+test:
+	cd lib_my_string && $(MAKE) test

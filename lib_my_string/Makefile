@@ -5,3 +5,9 @@ lib.so: code.c
 
 clean:
 	rm -f lib.so $(OBJ)
+	cd test && $(MAKE) clean
+
+test:
+	cd test && $(MAKE)
+
+.PHONY: test

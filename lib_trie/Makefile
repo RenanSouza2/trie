@@ -11,3 +11,6 @@ $(LIB_STRING):
 clean:
 	rm -f lib.so
 	cd ../lib_my_string && $(MAKE) clean
+
+test:
+	cd lib_my_string && $(MAKE) test
