@@ -1,6 +1,8 @@
 LIBS=lib_trie lib_my_string
+
 TRIE_PATH=lib/lib_trie
 TRIE_FILE=$(TRIE_PATH)/lib.o
+
 STR_PATH=lib/lib_my_string
 STR_FILE=$(STR_PATH)/lib.o
 

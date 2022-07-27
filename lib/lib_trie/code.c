@@ -88,7 +88,7 @@ void trie_display(trie_p t)
 
 
 
-void trie_fork_connect(trie_p t1, trie_p t2, char key)
+void trie_fork_connect(trie_p t1, trie_p t2, int key)
 {
     assert(t1->type == FORK);
 
@@ -100,7 +100,7 @@ void trie_fork_connect(trie_p t1, trie_p t2, char key)
     TF(t1)->next[key] = t2;
 }
 
-void trie_fork_disconnect(trie_p t, char key)
+void trie_fork_disconnect(trie_p t, int key)
 {
     assert(t->type == FORK);
     assert(TF(t)->next[key] != NULL);
@@ -170,7 +170,7 @@ int trie_joinnable(trie_p t)
     return TF(t)->connected == 1;
 }
 
-trie_p trie_path_break(trie_p t, char len)
+trie_p trie_path_break(trie_p t, int len)
 {
     assert(len < TP(t)->str.len);
 
@@ -191,9 +191,12 @@ trie_p trie_fork_convert(trie_p t)
     assert(t->type == FORK);
     assert(TF(t)->connected == 1);
 
-    char key = TF(t)->least;
+    int key = TF(t)->least;
     trie_p t_next = TF(t)->next[key];
-    return trie_path_create_force(1, &key, t_next);
+    free(t);
+
+    char arr[] = {key};
+    return trie_path_create_force(1, arr, t_next);
 }
 
 trie_p trie_join(trie_p t1, trie_p t2)
@@ -201,9 +204,9 @@ trie_p trie_join(trie_p t1, trie_p t2)
     if(t1->type == FORK) t1 = trie_fork_convert(t1);
     if(t2->type == FORK) t2 = trie_fork_convert(t2);
 
-    char len1 = TP(t1)->str.len;
-    char len2 = TP(t2)->str.len;
-    char len  = len1 + len2;
+    int len1 = TP(t1)->str.len;
+    int len2 = TP(t2)->str.len;
+    int len  = len1 + len2;
     t1 = realloc(t1, sizeof(trie_path_t) - 7 + len);
     TP(t1)->str.len = len;
     TP(t1)->next = TP(t2)->next;
@@ -223,7 +226,7 @@ trie_p trie_delete_rec(trie_p t, char len, char arr[])
     switch (t->type)
     {
         case FORK:;
-        char key = arr[0];
+        int key = arr[0];
         trie_p t_bef = TF(t)->next[key];
         if(!t_bef) return t;
 
@@ -293,7 +296,7 @@ trie_p trie_insert_rec(trie_p t, char len, char arr[], int value)
         }
     }
 
-    char key = arr[0];
+    int key = arr[0];
     trie_p t_next = trie_insert_rec(TF(t)->next[key], len-1, &arr[1], value);
     trie_fork_connect(t, t_next, key);
     return t;
@@ -306,7 +309,9 @@ void trie_delete(trie_p *t, char arr[])
 
 void trie_insert(trie_p *t, char arr[], int value)
 {
-    *t = value ? trie_insert_rec(*t, LEN, arr, value) : trie_delete_rec(*t, LEN, arr);
+    *t = (value != 0) 
+        ? trie_insert_rec(*t, LEN, arr, value) 
+        : trie_delete_rec(*t, LEN, arr);
 }
 
 int trie_querie_rec(trie_p t, char len, char arr[])
@@ -316,7 +321,7 @@ int trie_querie_rec(trie_p t, char len, char arr[])
     switch (t->type)
     {
         case FORK:
-        return trie_querie_rec(TF(t)->next[arr[0]], len-1, &arr[1]);
+        return trie_querie_rec(TF(t)->next[(int)arr[0]], len-1, &arr[1]);
         
         case PATH:;
         int index = string_cmp(&TP(t)->str, arr);
@@ -328,260 +333,10 @@ int trie_querie_rec(trie_p t, char len, char arr[])
         assert(!len);
         return TL(t)->value;
     }
+    assert(FALSE);
 }
 
 int trie_querie(trie_p t, char arr[])
 {
     return trie_querie_rec(t, LEN, arr);
-}
-
-
-void assert_trie_path_string(trie_p t, char arr[], char len)
-{   
-    assert(t->type == PATH);
-    assert(TP(t)->str.len == len);
-    assert(!memcmp(TP(t)->str.arr, arr, len));
-}
-
-void unit_test()
-{
-    trie_p t;
-    t = trie_fork_create();
-    assert(t->type == FORK);
-    assert(TF(t)->connected == 0);
-    assert(TF(t)->least == MAX);
-    for(int i=0; i<MAX; i++)
-        assert(TF(t)->next[i] == NULL);
-
-    trie_fork_connect(t, t, 5);
-    assert(TF(t)->connected == 1);
-    assert(TF(t)->least == 5);
-    assert(TF(t)->next[5] == t);
-    
-    trie_fork_connect(t, t, 7);
-    assert(TF(t)->connected == 2);
-    assert(TF(t)->least == 5);
-    assert(TF(t)->next[7] == t);
-    
-    trie_fork_connect(t, t, 3);
-    assert(TF(t)->connected == 3);
-    assert(TF(t)->least == 3);
-    assert(TF(t)->next[3] == t);
-
-    trie_fork_disconnect(t, 3);
-    assert(TF(t)->connected == 2);
-    assert(TF(t)->least == 5);
-    assert(TF(t)->next[3] == NULL);
-
-    trie_fork_disconnect(t, 7);
-    assert(TF(t)->connected == 1);
-    assert(TF(t)->least == 5);
-    assert(TF(t)->next[7] == NULL);
-    
-    trie_fork_disconnect(t, 5);
-    assert(TF(t)->connected == 0);
-    assert(TF(t)->least == MAX);
-    assert(TF(t)->next[5] == NULL);
-    free(t);
-
-    trie_p t_next = t;
-    char arr[] = {0, 1, 2, 3, 4, 5, 6, 7};
-    t = trie_path_create(0, arr, t_next);
-    assert(t == t_next);
-
-    t = trie_path_create(1, arr, t_next);
-    assert(t->type == FORK);
-    assert(TF(t)->next[0] == t_next);
-    free(t);
-
-    t = trie_path_create(2, arr, t_next);
-    assert(t->type == PATH);
-    assert(TP(t)->next == t_next);
-    assert(TP(t)->str.len == 2);
-    assert(!memcmp(TP(t)->str.arr, arr, 2));
-    free(t);
-
-    t = trie_leaf_create(1);
-    assert(t->type == LEAF);
-    assert(TL(t)->value == 1);
-    free(t);
-
-    t = trie_path_create(2, arr, t_next);
-    assert(trie_joinnable(t) == TRUE);
-    assert_trie_path_string(t, arr, 2);
-    free(t);
-
-    t = trie_leaf_create(1);
-    assert(trie_joinnable(t) == FALSE);
-    free(t);
-
-    t = trie_fork_create();
-    trie_fork_connect(t, t, 5);
-    assert(trie_joinnable(t) == TRUE);
-
-    trie_fork_connect(t, t, 6);
-    assert(trie_joinnable(t) == FALSE);
-    free(t);
-
-    trie_p t_leaf = trie_leaf_create(1);
-    t = trie_path_create(4, arr, t_leaf);
-    t = trie_path_break(t, 0);
-    assert(t->type == FORK);
-    assert(TF(t)->next[0] != NULL);
-
-    trie_p t_aux = TF(t)->next[0];
-    assert(t_aux->type == PATH);
-    assert(TP(t_aux)->next == t_leaf);
-    assert_trie_path_string(t_aux, &arr[1], 3);
-    free(t_aux);
-    free(t);
-
-    t = trie_path_create(4, arr, t_leaf);
-    t = trie_path_break(t, 1);
-    assert(t->type == FORK);
-    assert(TF(t)->next[0] != NULL);
-
-    t_aux = TF(t)->next[0];
-    assert(t_aux->type == FORK);
-    assert(TF(t_aux)->next[1] != NULL);
-
-    t_aux = TF(t_aux)->next[1];
-    assert(t_aux->type == PATH);
-    assert(TP(t_aux)->next == t_leaf);
-    assert_trie_path_string(t_aux, &arr[2], 2);
-    free(t_aux);
-    free(TF(t)->next[0]);
-    free(t);
-
-    t = trie_path_create(4, arr, t_leaf);
-    t = trie_path_break(t, 2);
-    assert(t->type == PATH);
-    assert_trie_path_string(t, arr, 2);
-
-    t_aux = TP(t)->next;
-    assert(t_aux->type == FORK);
-    assert(TF(t_aux)->next[2] != NULL);
-
-    t_aux = TF(t_aux)->next[2];
-    assert(t_aux->type == FORK);
-    assert(TF(t_aux)->next[3] == t_leaf);
-    free(t_aux);
-    free(TP(t)->next);
-    free(t);
-
-    t = trie_path_create(4, arr, t_leaf);
-    t = trie_path_break(t, 3);
-    assert(t->type == PATH);
-    assert_trie_path_string(t, arr, 3);
-
-    t_aux = TP(t)->next;
-    assert(t_aux->type == FORK);
-    assert(TF(t_aux)->next[3] == t_leaf);
-    free(t_leaf);
-    free(t_aux);
-    free(t);
-}
-
-void integration_test()
-{
-    trie_p t = NULL;
-    char arr[] = {0, 1, 2, 3, 4, 5, 6, 7};
-
-
-    trie_insert(&t, arr, 1);
-    assert(t->type == PATH);
-    assert_trie_path_string(t, arr, 8);
-
-    trie_p t_aux = TP(t)->next;
-    assert(t_aux->type == LEAF);
-    assert(TL(t_aux)->value == 1);
-
-    trie_insert(&t, arr, 2);
-    assert(t->type == PATH);
-    t_aux = TP(t)->next;
-    assert(t_aux->type == LEAF);
-    assert(TL(t_aux)->value == 2);
-
-    arr[2] = 4;
-    trie_insert(&t, arr, 3);
-    assert(t->type == PATH);
-    assert_trie_path_string(t, arr, 2);
-
-    t_aux = TP(t)->next;
-    assert(t_aux->type == FORK);
-    assert(TF(t_aux)->connected == 2);
-    assert(TF(t_aux)->next[2] != NULL);
-    assert(TF(t_aux)->next[4] != NULL);
-
-    t_aux = TF(t_aux)->next[4];
-    assert(t->type == PATH);
-    assert_trie_path_string(t_aux, &arr[3], 5);
-
-    t_aux = TP(t_aux)->next;
-    assert(t_aux->type == LEAF);
-    assert(TL(t_aux)->value == 3);
-
-    arr[2] = 6;
-    trie_insert(&t, arr, 4);
-    assert(t->type == PATH);
-    assert_trie_path_string(t, arr, 2);
-
-    t_aux = TP(t)->next;
-    assert(t_aux->type == FORK);
-    assert(TF(t_aux)->connected == 3);
-    assert(TF(t_aux)->next[2] != NULL);
-    assert(TF(t_aux)->next[4] != NULL);
-    assert(TF(t_aux)->next[6] != NULL);
-
-    t_aux = TF(t_aux)->next[6];
-    assert(t->type == PATH);
-    assert_trie_path_string(t_aux, &arr[3], 5);
-
-    t_aux = TP(t_aux)->next;
-    assert(t_aux->type == LEAF);
-    assert(TL(t_aux)->value == 4);
-
-    arr[1] = 3;
-    trie_delete(&t, arr);
-
-    arr[1] = 1;
-    assert(t->type == PATH);
-    assert_trie_path_string(t, arr, 2);
-
-    arr[2] = 5;
-    trie_delete(&t, arr);
-    assert_trie_path_string(t, arr, 2);
-
-    t_aux = TP(t)->next;
-    assert(t_aux->type == FORK);
-    assert(TF(t_aux)->connected == 3);
-
-    arr[2] = 6;
-    trie_delete(&t, arr);
-    
-    t_aux = TP(t)->next;
-    assert(t_aux->type == FORK);
-    assert(TF(t_aux)->connected == 2);
-    assert(TF(t_aux)->next[6] == NULL);
-
-    arr[2] = 4;
-    trie_delete(&t, arr);
-    assert(t->type == PATH);
-
-    arr[2] = 2;
-    assert_trie_path_string(t, arr, 8);
-
-    trie_delete(&t, arr);
-    assert(t == NULL);
-}
-
-void test()
-{
-    setbuf(stdout, NULL);
-
-    unit_test();
-    integration_test();
-
-    printf("\nTests successfull\n");
-    exit(EXIT_SUCCESS);
 }
