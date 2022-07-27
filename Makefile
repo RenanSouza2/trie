@@ -1,7 +1,11 @@
-LIB_TRIE=lib_trie/lib.so
+TRIE_PATH=lib/lib_trie
+TRIE_FILE=$(TRIE_PATH)/lib.o
+STR_PATH=lib/lib_my_string
+STR_FILE=$(STR_PATH)/lib.o
 
 debug: 
-	cd lib_trie && $(MAKE)
+	cd $(TRIE_PATH) && $(MAKE)
+	$(MAKE) build
 	./main.o
 
 run: main.o
@@ -9,19 +13,23 @@ run: main.o
 
 build: main.o
 
-main.o: main.c $(LIB_TRIE)
-	gcc main.c -o main.o -L. -l:$(LIB_TRIE) -Wl,-rpath,.
+main.o: main.c $(TRIE_FILE) $(STR_FILE)
+	gcc -o main.o main.c $(TRIE_FILE) $(STR_FILE)
 
-$(LIB_TRIE):
-	cd lib_trie && $(MAKE)
+$(TRIE_FILE):
+	cd $(TRIE_PATH) && $(MAKE)
+
+
+$(STR_FILE):
+	cd $(STR_PATH) && $(MAKE)
 
 clean:
 	rm -rf main.o
-	cd lib_trie && $(MAKE) clean
+	cd lib && $(MAKE) clean
 
 rebuild:
 	$(MAKE) clean 
 	$(MAKE) build
 
 test:
-	cd lib_my_string && $(MAKE) test
+	cd lib && $(MAKE) test
