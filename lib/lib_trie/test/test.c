@@ -229,38 +229,6 @@ void test_path_operation()
 }
 
 
-// trie_p trie_insert_rec(trie_p t, char len, char arr[], int value)
-// {
-//     if(t == NULL)
-//     {
-//         t = trie_leaf_create(value);
-//         return trie_path_create(len, arr, t);
-//     }
-//
-//     if(t->type == LEAF)
-//     {
-//         assert(!len);
-//         TL(t)->value = value;
-//         return t;
-//     }
-//
-//     if(t->type == PATH)
-//     {
-//         int index = string_cmp(&TP(t)->str, arr);
-//         if(index < TP(t)->str.len) t = trie_path_break(t, index);
-//         if(t->type == PATH)
-//         {
-//             TP(t)->next = trie_insert_rec(TP(t)->next, len-index, &arr[index], value);
-//             return t;
-//         }
-//     }
-//
-//     char key = arr[0];
-//     trie_p t_next = trie_insert_rec(TF(t)->next[key], len-1, &arr[1], value);
-//     trie_fork_connect(t, t_next, key);
-//     return t;
-// }
-
 
 void test_insert()
 {
@@ -315,7 +283,63 @@ void test_insert()
 
 void test_delete()
 {
+    trie_p t = NULL;
+    char arr[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+    trie_insert(&t, arr, 1);
 
+    arr[4] = 0;
+    trie_insert(&t, arr, 2);
+
+    arr[5] = 0;
+    trie_insert(&t, arr, 3);
+
+    arr[6] = 0;
+    trie_insert(&t, arr, 4);
+
+    arr[6] = 1;
+    trie_insert(&t, arr, 5);
+    trie_delete(&t, arr);
+    arr[6] = 0;
+
+    trie_p t1 = TP(t)->next;
+    t1 = TF(t1)->next[0];
+    t1 = TF(t1)->next[0];
+    assert_fork(t1, 0, NULL);
+    assert(TF(t1)->next[1] == NULL);
+    
+    trie_delete(&t, arr);
+    arr[6] = 6;
+    
+    t1 = TP(t)->next;
+    t1 = TF(t1)->next[0];
+    t1 = TF(t1)->next[0];
+    assert_path(t1, NULL, 2, &arr[6]);
+
+    trie_delete(&t, arr);
+    arr[5] = 5;
+    assert_path(t, NULL, 4, arr);
+
+    t1 = TP(t)->next;
+    assert_fork(t1, 0, NULL);
+    assert(TF(t1)->connected == 2);
+
+    t1 = TF(t1)->next[0];
+    assert_path(t1, NULL, 3, &arr[5]);
+
+    trie_delete(&t, arr);
+    arr[4] = 4;
+    assert_path(t, NULL, 8, arr);
+
+    arr[4] = 1;
+    trie_delete(&t, arr);
+    arr[4] = 4;
+    assert_path(t, NULL, 8, arr);
+
+    trie_delete(&t, arr);
+    assert(t == NULL);
+
+    trie_delete(&t, arr);
+    assert(t == NULL);
 }
 
 void test_integration()

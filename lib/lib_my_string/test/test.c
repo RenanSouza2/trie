@@ -28,6 +28,6 @@ int test_string_cmp()
 int main() {
     setbuf(stdout, NULL);
     test_string_cmp();
-    printf("Test successful\n");
+    printf("\tTest successful\n");
     return 0;
 }

@@ -220,7 +220,7 @@ trie_p trie_join(trie_p t1, trie_p t2)
 
 trie_p trie_delete_rec(trie_p t, char len, char arr[])
 {
-    if(!t) return NULL;
+    if(t == NULL) return NULL;
 
     trie_p t_next;
     switch (t->type)
@@ -228,11 +228,10 @@ trie_p trie_delete_rec(trie_p t, char len, char arr[])
         case FORK:;
         int key = arr[0];
         trie_p t_bef = TF(t)->next[key];
-        if(!t_bef) return t;
-
         trie_p t_aft = trie_delete_rec(t_bef, len-1, &arr[1]);
-        if(t_aft)   TF(t)->next[key] = t_aft;
-        else       
+        if(t_bef == t_aft) return t;
+
+        if(t_aft == NULL)  
         {
             trie_fork_disconnect(t, key);
             if(!TF(t)->connected)
@@ -241,7 +240,8 @@ trie_p trie_delete_rec(trie_p t, char len, char arr[])
                 return NULL;
             }
         }
-
+        
+        TF(t)->next[key] = t_aft;
         t_next = TF(t)->next[TF(t)->least];
         break;
     
@@ -250,12 +250,16 @@ trie_p trie_delete_rec(trie_p t, char len, char arr[])
         int index = string_cmp(&TP(t)->str, arr);
         if(index < path_len) return t;
 
-        t_next = trie_delete_rec(TP(t)->next, len-path_len, &arr[path_len]);
-        if(!t_next)
+        t_bef = TP(t)->next;
+        t_aft = trie_delete_rec(t_bef, len-path_len, &arr[path_len]);
+        if(t_bef == t_aft) return t;
+
+        if(t_aft == NULL)
         {
             free(t);
             return NULL;
         }
+        t_next = TP(t)->next = t_aft;
         break;
 
         case LEAF:
@@ -316,7 +320,7 @@ void trie_insert(trie_p *t, char arr[], int value)
 
 int trie_querie_rec(trie_p t, char len, char arr[])
 {
-    if(!t) return 0;
+    if(t == NULL) return 0;
 
     switch (t->type)
     {
