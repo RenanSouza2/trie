@@ -1,5 +1,9 @@
 LIB_TRIE=lib_trie/lib.so
 
+debug: 
+	cd lib_trie && $(MAKE)
+	./main.o
+
 run: main.o
 	./main.o
 
@@ -14,3 +18,7 @@ $(LIB_TRIE):
 clean:
 	rm -rf main.o
 	cd lib_trie && $(MAKE) clean
+
+rebuild:
+	$(MAKE) clean 
+	$(MAKE) build

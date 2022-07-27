@@ -5,7 +5,3 @@ lib.so: code.c
 
 clean:
 	rm -f lib.so $(OBJ)
-
-rebuild:
-	$(MAKE) clean
-	$(MAKE) build
