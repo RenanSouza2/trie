@@ -17,9 +17,9 @@ int test_string_cmp()
 
     for(int i=0; i<3; i++)
     {
-        arr[0] = 0;
+        arr[i] = 0;
         int res = string_cmp(str, arr);
-        arr[0] = 1;
+        arr[i] = 1;
         
         assert(res == i);
     }
