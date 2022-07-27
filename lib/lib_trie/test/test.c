@@ -4,21 +4,6 @@
 
 #include "../code.c"
 
-// STRUCT(trie_fork)
-// {
-//     trie_t t;
-//     int connected, least;
-//     trie_p next[MAX];
-// };
-
-// STRUCT(trie_path)
-// {
-//     trie_t t;
-//     trie_p next;
-//     string_t str;
-// };
-
-
 void assert_str(trie_p t, int len, char arr[])
 {
     assert(TP(t)->str.len == len);

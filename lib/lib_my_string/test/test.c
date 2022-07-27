@@ -4,9 +4,8 @@
 
 #include "../code.c"
 
-int test_string_cmp()
+void test_string_cmp()
 {
-    int len = 3;
     string_p str = malloc(sizeof(string_t) + 3);
     str->len = 3;
     str->arr[0] = 1;

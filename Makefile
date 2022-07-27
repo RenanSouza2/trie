@@ -12,7 +12,7 @@ run: main.o
 build: main.o
 
 main.o: main.c $(TRIE_FILE) $(STR_FILE)
-	gcc -o main.o $^
+	gcc -o main.o $^ -Wall
 
 $(TRIE_FILE):
 	cd $(TRIE_PATH) && $(MAKE)
