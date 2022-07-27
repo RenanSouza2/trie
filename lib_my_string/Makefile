@@ -5,7 +5,9 @@ lib.so: code.c
 
 clean:
 	rm -f lib.so $(OBJ)
+	cd test && $(MAKE) clean
 
-rebuild:
-	$(MAKE) clean
-	$(MAKE) build
+test:
+	cd test && $(MAKE)
+
+.PHONY: test
