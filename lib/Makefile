@@ -1,7 +1,7 @@
 clean:
-	cd lib_my_string && $(MAKE) clean
-	cd lib_trie && $(MAKE) clean
+	$(MAKE) clean --directory=lib_my_string
+	$(MAKE) clean --directory=lib_trie
 
 test:
-	cd lib_my_string && $(MAKE) test
-	cd lib_trie && $(MAKE) test
+	$(MAKE) test --directory=lib_my_string
+	$(MAKE) test --directory=lib_trie
