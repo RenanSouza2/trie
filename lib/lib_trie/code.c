@@ -7,12 +7,12 @@
 #include "../lib_my_string/header.h"
 
 
+
 void pointer_display(void *p)
 {
     if(p == NULL)   printf("NULL");
     else            printf("%p", p);
 }
-
 
 
 void trie_display_single(trie_p t) {
@@ -40,6 +40,7 @@ void trie_display_single(trie_p t) {
         printf("\nvalue: %d", TL(t)->value);
         break;
     }
+    printf("\n");
 }
 
 void trie_display_rec(trie_p t, int len, int res[])
@@ -72,6 +73,26 @@ void trie_display_rec(trie_p t, int len, int res[])
     }
 }
 
+void trie_display_structure_rec(trie_p t)
+{
+    if(t == NULL) return;
+
+    trie_display_single(t);
+    switch (t->type)
+    {
+        case FORK:
+        for(int i=0; i<MAX; i++)
+            trie_display_structure_rec(TF(t)->next[i]);
+        break;
+
+        case PATH:
+        trie_display_structure_rec(TP(t)->next);
+        break;
+    }
+}
+
+
+
 void trie_display(trie_p t)
 {
     if(t == NULL)
@@ -86,9 +107,20 @@ void trie_display(trie_p t)
     printf("\n");
 }
 
+void trie_display_structure(trie_p t)
+{
+    if(t == NULL)
+    {
+        printf("\nEmpty trie");
+        return;
+    }
+
+    trie_display_structure_rec(t);
+}
 
 
-void trie_fork_connect(trie_p t1, trie_p t2, int key)
+
+trie_p trie_fork_connect(trie_p t1, trie_p t2, int key)
 {
     assert(t1->type == FORK);
 
@@ -98,20 +130,22 @@ void trie_fork_connect(trie_p t1, trie_p t2, int key)
         if(key < TF(t1)->least) TF(t1)->least = key;
     }
     TF(t1)->next[key] = t2;
+    return t1;
 }
 
-void trie_fork_disconnect(trie_p t, int key)
+trie_p trie_fork_disconnect(trie_p t, int key)
 {
     assert(t->type == FORK);
     assert(TF(t)->next[key] != NULL);
 
     TF(t)->next[key] = NULL;
     (TF(t)->connected)--;
-    if(key != TF(t)->least) return;
+    if(key != TF(t)->least) return t;
 
     int i;
     for(i=TF(t)->least; i<MAX && !(TF(t)->next[i]); i++);
     TF(t)->least = i;
+    return t;
 }
 
 
@@ -227,11 +261,9 @@ trie_p trie_delete_rec(trie_p t, char len, char arr[])
     {
         case FORK:;
         int key = arr[0];
-        trie_p t_bef = TF(t)->next[key];
-        trie_p t_aft = trie_delete_rec(t_bef, len-1, &arr[1]);
-        if(t_bef == t_aft) return t;
+        trie_p tn = trie_delete_rec(TF(t)->next[key], len-1, &arr[1]);
 
-        if(t_aft == NULL)  
+        if(tn == NULL)  
         {
             trie_fork_disconnect(t, key);
             if(!TF(t)->connected)
@@ -241,7 +273,7 @@ trie_p trie_delete_rec(trie_p t, char len, char arr[])
             }
         }
         
-        TF(t)->next[key] = t_aft;
+        TF(t)->next[key] = tn;
         t_next = TF(t)->next[TF(t)->least];
         break;
     
@@ -252,7 +284,6 @@ trie_p trie_delete_rec(trie_p t, char len, char arr[])
 
         t_bef = TP(t)->next;
         t_aft = trie_delete_rec(t_bef, len-path_len, &arr[path_len]);
-        if(t_bef == t_aft) return t;
 
         if(t_aft == NULL)
         {
