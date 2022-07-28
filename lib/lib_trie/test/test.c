@@ -272,7 +272,7 @@ void test_insert()
     assert_leaf(TP(t1)->next, 5);
 }
 
-void test_delete()
+void test_delete_1()
 {
     trie_p t = NULL;
     char arr[8] = {0, 1, 2, 3, 4, 5, 6, 7};
@@ -333,6 +333,27 @@ void test_delete()
     assert(t == NULL);
 }
 
+void test_delete_2()
+{
+    char arr[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    
+    trie_p t = NULL;
+    trie_insert(&t, arr, 1);
+
+    arr[5] = 1;
+    trie_insert(&t, arr, 2);
+
+    arr[7] = 1;
+    trie_insert(&t, arr, 3);
+    trie_delete(&t, arr);
+
+    assert_path(t, NULL, 5, arr);
+    trie_p t1 = TP(t)->next;
+    assert_fork(t1, 1, NULL);
+    t1 = TF(t1)->next[1];
+    assert_path(t1, NULL, 2, arr);
+}
+
 void test_querie()
 {
     char arr[8] = {0, 1, 2, 3, 4, 5, 6, 7};
@@ -358,8 +379,10 @@ void test_querie()
 void test_integration()
 {
     test_insert();
-    test_delete();
     test_querie();
+
+    test_delete_1();
+    test_delete_2();
 }
 
 void test_trie()
@@ -367,6 +390,8 @@ void test_trie()
     test_unit();
     test_integration();
 }
+
+
 
 int main() {
     setbuf(stdout, NULL);
