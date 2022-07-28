@@ -327,29 +327,6 @@ void test_delete()
     assert(t == NULL);
 }
 
-
-// int trie_querie_rec(trie_p t, char len, char arr[])
-// {
-//     if(t == NULL) return 0;
-//
-//     switch (t->type)
-//     {
-//         case FORK:
-//         return trie_querie_rec(TF(t)->next[(int)arr[0]], len-1, &arr[1]);
-//   
-//         case PATH:;
-//         int index = string_cmp(&TP(t)->str, arr);
-//         if(index < TP(t)->str.len) return 0;
-//
-//         return trie_querie_rec(TP(t)->next, len-index, &arr[index]);
-//
-//         case LEAF:
-//         assert(!len);
-//         return TL(t)->value;
-//     }
-//     assert(FALSE);
-// }
-
 void test_querie()
 {
     char arr[8] = {0, 1, 2, 3, 4, 5, 6, 7};
