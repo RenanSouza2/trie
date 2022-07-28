@@ -5,9 +5,9 @@ lib.o: code.c
 
 clean:
 	rm -f lib.o $(OBJ)
-	$(MAKE) clean --directory=lib_trie
+	$(MAKE) clean --directory=test
 
 .PHONY: test
 test:
-	$(MAKE) --directory=lib_trie
+	$(MAKE) --directory=test
 
