@@ -4,6 +4,8 @@
 
 #include "../code.c"
 
+
+
 void assert_str(trie_p t, int len, char arr[])
 {
     assert(TP(t)->str.len == len);
@@ -34,6 +36,8 @@ void assert_leaf(trie_p t, int value)
     assert(t->type == LEAF);
     assert(TL(t)->value == value);
 }
+
+
 
 void test_create()
 {
@@ -205,8 +209,10 @@ void test_join()
     assert_path(t, tn2, 3, arr);
 }
 
-void test_path_operation()
+void test_unit()
 {
+    test_create();
+    test_connection();
     test_joinable();
     test_path_break();
     test_fork_convert();
@@ -358,9 +364,7 @@ void test_integration()
 
 void test_trie()
 {
-    test_create();
-    test_connection();
-    test_path_operation();
+    test_unit();
     test_integration();
 }
 
