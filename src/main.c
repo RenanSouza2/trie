@@ -24,8 +24,7 @@ int main()
     trie_insert(&t, arr, 4);
 
     trie_display(t);
-
-
+    
     printf("\n");
     return 0;
 }
