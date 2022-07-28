@@ -7,7 +7,7 @@ clean:
 	rm -f lib.o $(OBJ)
 	cd test && $(MAKE) clean
 
+.PHONY: test
 test:
 	cd test && $(MAKE)
 
-.PHONY: test

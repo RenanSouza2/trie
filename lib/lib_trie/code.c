@@ -6,14 +6,36 @@
 #include "header.h"
 #include "../lib_my_string/header.h"
 
+#ifdef DEBUG
 
+int trie_allocated = 0;
+int trie_freed = 0;
+
+void trie_free_single(trie_p t)
+{
+    trie_freed++;
+    free(t);
+}
+
+void snapshot(char s[])
+{
+    printf("\n");
+    printf("\nSnapshot %s", s);
+    printf("\ntrie_allocated: %d", trie_allocated);
+    printf("\ntrie_freed: %d", trie_freed);
+    printf("\ntrie_current: %d", trie_allocated - trie_freed);
+}
+
+void assert_memory()
+{
+    assert(trie_allocated == trie_freed);
+}
 
 void pointer_display(void *p)
 {
     if(p == NULL)   printf("NULL");
     else            printf("%p", p);
 }
-
 
 void trie_display_single(trie_p t) {
     printf("\ntrie: ");pointer_display(t);
@@ -42,6 +64,41 @@ void trie_display_single(trie_p t) {
     }
     printf("\n");
 }
+
+void trie_display_structure_rec(trie_p t)
+{
+    if(t == NULL) return;
+
+    trie_display_single(t);
+    switch (t->type)
+    {
+        case FORK:
+        for(int i=0; i<MAX; i++)
+            trie_display_structure_rec(TF(t)->next[i]);
+        break;
+
+        case PATH:
+        trie_display_structure_rec(TP(t)->next);
+        break;
+    }
+}
+
+void trie_display_structure(trie_p t)
+{
+    if(t == NULL)
+    {
+        printf("\nEmpty trie");
+        return;
+    }
+
+    trie_display_structure_rec(t);
+}
+
+#else
+#define trie_free_single(POINTER) free(POINTER)
+#endif 
+
+
 
 void trie_display_rec(trie_p t, int len, int res[])
 {
@@ -73,49 +130,12 @@ void trie_display_rec(trie_p t, int len, int res[])
     }
 }
 
-void trie_display_structure_rec(trie_p t)
-{
-    if(t == NULL) return;
-
-    trie_display_single(t);
-    switch (t->type)
-    {
-        case FORK:
-        for(int i=0; i<MAX; i++)
-            trie_display_structure_rec(TF(t)->next[i]);
-        break;
-
-        case PATH:
-        trie_display_structure_rec(TP(t)->next);
-        break;
-    }
-}
-
-
-
 void trie_display(trie_p t)
 {
-    if(t == NULL)
-    {
-        printf("\nEMPTY TRIE");
-    }
-    else
-    {
-        int res[LEN];
-        trie_display_rec(t, 0, res);
-    }
+    int res[LEN];
+    if(t == NULL)   printf("\nEMPTY TRIE");
+    else            trie_display_rec(t, 0, res);
     printf("\n");
-}
-
-void trie_display_structure(trie_p t)
-{
-    if(t == NULL)
-    {
-        printf("\nEmpty trie");
-        return;
-    }
-
-    trie_display_structure_rec(t);
 }
 
 
@@ -154,6 +174,10 @@ trie_p trie_fork_create()
 {
     trie_fork_p t = calloc(1, sizeof(trie_fork_t));
     assert(t);
+#ifdef DEBUG            
+    trie_allocated++;       
+#endif
+
     t->least = MAX;
     return T(t);
 }
@@ -164,6 +188,9 @@ trie_p trie_path_create_force(char len, char arr[], trie_p next)
 
     trie_path_p t = malloc(sizeof(trie_path_t) - 7 + len);
     assert(t);
+#ifdef DEBUG            
+    trie_allocated++;       
+#endif
 
     t->t.type = PATH;
     t->next = next;
@@ -190,6 +217,9 @@ trie_p trie_leaf_create(int value)
 {
     trie_leaf_p t = malloc(sizeof(trie_leaf_t));
     assert(t);
+#ifdef DEBUG            
+    trie_allocated++;       
+#endif
 
     *t = (trie_leaf_t){{LEAF}, value};
     return (trie_p)t;
@@ -216,7 +246,7 @@ trie_p trie_path_break(trie_p t, int len)
     t_aux = trie_path_create(1, &arr[len], t_aux);
     t_aux = trie_path_create(len, arr, t_aux);
 
-    free(t);
+    trie_free_single(t);
     return t_aux;
 }
 
@@ -227,7 +257,7 @@ trie_p trie_fork_convert(trie_p t)
 
     int key = TF(t)->least;
     trie_p t_next = TF(t)->next[key];
-    free(t);
+    trie_free_single(t);
 
     char arr[] = {key};
     return trie_path_create_force(1, arr, t_next);
@@ -246,7 +276,7 @@ trie_p trie_join(trie_p t1, trie_p t2)
     TP(t1)->next = TP(t2)->next;
     memcpy(&TP(t1)->str.arr[len1], TP(t2)->str.arr, len2);
 
-    free(t2);
+    trie_free_single(t2);
     return t1;
 }
 
@@ -268,7 +298,7 @@ trie_p trie_delete_rec(trie_p t, char len, char arr[])
             trie_fork_disconnect(t, key);
             if(!TF(t)->connected)
             {
-                free(t);
+                trie_free_single(t);
                 return NULL;
             }
         }
@@ -286,7 +316,7 @@ trie_p trie_delete_rec(trie_p t, char len, char arr[])
 
         if(tn == NULL)
         {
-            free(t);
+            trie_free_single(t);
             return NULL;
         }
         t_next = TP(t)->next = tn;
@@ -294,7 +324,7 @@ trie_p trie_delete_rec(trie_p t, char len, char arr[])
 
         case LEAF:
         assert(!len);
-        free(t);
+        trie_free_single(t);
         return NULL;
     }
 
@@ -375,4 +405,24 @@ void trie_delete(trie_p *t, char arr[])
 int trie_querie(trie_p t, char arr[])
 {
     return trie_querie_rec(t, LEN, arr);
+}
+
+
+
+void trie_free(trie_p t)
+{
+    if(t == NULL) return;
+
+    switch (t->type)
+    {
+        case FORK:
+        for(int i=0; i<MAX; i++)
+            trie_free(TF(t)->next[i]);
+        break;
+    
+        case PATH:
+        trie_free(TP(t)->next);
+        break;
+    }
+    trie_free_single(t);
 }

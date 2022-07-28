@@ -44,10 +44,10 @@ STRUCT(trie_leaf)
     int value;
 };
 
-void trie_display(trie_p t);
 void trie_delete(trie_p *t, char arr[]);
 void trie_insert(trie_p *t, char arr[], int value);
 
+void trie_display(trie_p t);
 int trie_querie(trie_p t, char arr[]);
 
 #endif
