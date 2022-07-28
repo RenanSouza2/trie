@@ -9,7 +9,7 @@ test.o: test.c ../code.c $(STR_FILE)
 
 .PHONY: $(STR_FILE)
 $(STR_FILE):
-	cd $(STR_PATH) && $(MAKE)
+	$(MAKE) --directory=$(STR_PATH)
 
 clean:
 	rm -f test.o

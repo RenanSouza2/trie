@@ -16,11 +16,11 @@ $(OBJ): $(SRC) $(TRIE_FILE)
 
 .PHONY: $(TRIE_FILE)
 $(TRIE_FILE):
-	cd $(TRIE_PATH) && $(MAKE)
+	$(MAKE) --directory=$(TRIE_PATH)
 
 clean:
 	rm -rf $(OBJ)
-	cd lib && $(MAKE) clean
+	$(MAKE) clean --directory=lib
 
 rebuild:
 	$(MAKE) clean 
@@ -28,4 +28,4 @@ rebuild:
 
 .PHONY: test
 test: 
-	cd lib && $(MAKE) test
+	$(MAKE) test --directory=lib

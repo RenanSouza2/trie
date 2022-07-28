@@ -11,13 +11,13 @@ tmp.o: code.c
 
 .PHONY: $(STR_FILE)
 $(STR_FILE):
-	cd $(STR_PATH) && $(MAKE)
+	$(MAKE) --directory=$(STR_PATH)
 
 clean:
 	rm -f *.o
-	cd test && $(MAKE) clean
+	$(MAKE) clean --directory=test
 
 .PHONY: test
 test:
-	cd test && $(MAKE)
+	$(MAKE) --directory=test
 
