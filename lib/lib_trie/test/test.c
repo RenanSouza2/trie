@@ -345,24 +345,12 @@ void test_delete_2()
 
     arr[7] = 1;
     trie_insert(&t, arr, 3);
-    
-    trie_display(t);
-    trie_display_structure(t);
-
     trie_delete(&t, arr);
-        
-    trie_display(t);
-    trie_display_structure(t);
-
 
     assert_path(t, NULL, 5, arr);
     trie_p t1 = TP(t)->next;
     assert_fork(t1, 1, NULL);
     t1 = TF(t1)->next[1];
-
-    printf("\nAQUI");
-    trie_display_single(t1);
-
     assert_path(t1, NULL, 2, arr);
 }
 

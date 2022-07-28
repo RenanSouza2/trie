@@ -282,15 +282,14 @@ trie_p trie_delete_rec(trie_p t, char len, char arr[])
         int index = string_cmp(&TP(t)->str, arr);
         if(index < path_len) return t;
 
-        t_bef = TP(t)->next;
-        t_aft = trie_delete_rec(t_bef, len-path_len, &arr[path_len]);
+        tn = trie_delete_rec(TP(t)->next, len-path_len, &arr[path_len]);
 
-        if(t_aft == NULL)
+        if(tn == NULL)
         {
             free(t);
             return NULL;
         }
-        t_next = TP(t)->next = t_aft;
+        t_next = TP(t)->next = tn;
         break;
 
         case LEAF:
