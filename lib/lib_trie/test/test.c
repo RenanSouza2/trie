@@ -327,10 +327,33 @@ void test_delete()
     assert(t == NULL);
 }
 
+void test_querie()
+{
+    char arr[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+    trie_p t = NULL;
+    
+    int res = trie_querie(t, arr);
+    assert(res == 0);
+
+    trie_insert(&t, arr, 1);
+    res = trie_querie(t, arr);
+    assert(res == 1);
+
+    arr[4] = 0;
+    trie_insert(&t, arr, 2);
+    res = trie_querie(t, arr);
+    assert(res == 2);
+
+    arr[2] = 0;
+    res = trie_querie(t, arr);
+    assert(res == 0);
+}
+
 void test_integration()
 {
     test_insert();
     test_delete();
+    test_querie();
 }
 
 void test_trie()
