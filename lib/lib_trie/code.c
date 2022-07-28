@@ -306,18 +306,6 @@ trie_p trie_insert_rec(trie_p t, char len, char arr[], int value)
     return t;
 }
 
-void trie_delete(trie_p *t, char arr[])
-{
-    *t = trie_delete_rec(*t, LEN, arr);
-}
-
-void trie_insert(trie_p *t, char arr[], int value)
-{
-    *t = (value != 0) 
-        ? trie_insert_rec(*t, LEN, arr, value) 
-        : trie_delete_rec(*t, LEN, arr);
-}
-
 int trie_querie_rec(trie_p t, char len, char arr[])
 {
     if(t == NULL) return 0;
@@ -338,6 +326,20 @@ int trie_querie_rec(trie_p t, char len, char arr[])
         return TL(t)->value;
     }
     assert(FALSE);
+}
+
+
+
+void trie_insert(trie_p *t, char arr[], int value)
+{
+    *t = (value != 0) 
+        ? trie_insert_rec(*t, LEN, arr, value) 
+        : trie_delete_rec(*t, LEN, arr);
+}
+
+void trie_delete(trie_p *t, char arr[])
+{
+    *t = trie_delete_rec(*t, LEN, arr);
 }
 
 int trie_querie(trie_p t, char arr[])

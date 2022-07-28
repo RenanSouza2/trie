@@ -327,10 +327,56 @@ void test_delete()
     assert(t == NULL);
 }
 
+
+// int trie_querie_rec(trie_p t, char len, char arr[])
+// {
+//     if(t == NULL) return 0;
+//
+//     switch (t->type)
+//     {
+//         case FORK:
+//         return trie_querie_rec(TF(t)->next[(int)arr[0]], len-1, &arr[1]);
+//   
+//         case PATH:;
+//         int index = string_cmp(&TP(t)->str, arr);
+//         if(index < TP(t)->str.len) return 0;
+//
+//         return trie_querie_rec(TP(t)->next, len-index, &arr[index]);
+//
+//         case LEAF:
+//         assert(!len);
+//         return TL(t)->value;
+//     }
+//     assert(FALSE);
+// }
+
+void test_querie()
+{
+    char arr[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+    trie_p t = NULL;
+    
+    int res = trie_querie(t, arr);
+    assert(res == 0);
+
+    trie_insert(&t, arr, 1);
+    res = trie_querie(t, arr);
+    assert(res == 1);
+
+    arr[4] = 0;
+    trie_insert(&t, arr, 2);
+    res = trie_querie(t, arr);
+    assert(res == 2);
+
+    arr[2] = 0;
+    res = trie_querie(t, arr);
+    assert(res == 0);
+}
+
 void test_integration()
 {
     test_insert();
     test_delete();
+    test_querie();
 }
 
 void test_trie()
