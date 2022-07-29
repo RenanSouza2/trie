@@ -5,9 +5,9 @@ build: lib.o
 
 lib.o: tmp.o $(STR_FILE)
 	ld -r -o lib.o $^
-
+	
 tmp.o: code.c
-	gcc -o tmp.o code.c -c -Wall
+	gcc -o tmp.o code.c -c -Wall -Werror -Wfatal-errors
 
 .PHONY: $(STR_FILE)
 $(STR_FILE):
@@ -15,9 +15,5 @@ $(STR_FILE):
 
 clean:
 	rm -f *.o
-	$(MAKE) clean --directory=test
-
-.PHONY: test
-test:
-	$(MAKE) --directory=test
+	$(MAKE) clean --directory=$(STR_PATH)
 

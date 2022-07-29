@@ -3,7 +3,7 @@ OBJ=bin/main.o
 
 LIBS=lib_trie lib_my_string
 
-TRIE_PATH=lib/lib_trie
+TRIE_PATH=lib/lib_value_int
 TRIE_FILE=$(TRIE_PATH)/lib.o
 
 run: $(OBJ)
@@ -12,7 +12,7 @@ run: $(OBJ)
 build: $(OBJ)
 	
 $(OBJ): $(SRC) $(TRIE_FILE)
-	gcc -o $(OBJ) $^ -Wall
+	gcc -o $(OBJ) $^ -Wall -Wall -Werror -Wfatal-errors
 
 .PHONY: $(TRIE_FILE)
 $(TRIE_FILE):
