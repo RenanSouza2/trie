@@ -137,7 +137,7 @@ void trie_display_structure(value_info_p vi, trie_p t)
 
 
 
-void trie_display_rec(value_info_p vi, trie_p t, int len, int res[])
+void trie_display_rec(value_info_p vi, trie_p t, int len, char res[])
 {
     switch(t->type)
     {
@@ -166,7 +166,7 @@ void trie_display_rec(value_info_p vi, trie_p t, int len, int res[])
 
 void trie_display(value_info_p vi, trie_p t)
 {
-    int res[LEN];
+    char res[LEN];
     if(t == NULL)   printf("\nEMPTY TRIE");
     else            trie_display_rec(vi, t, 0, res);
     printf("\n");
