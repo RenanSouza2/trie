@@ -31,11 +31,11 @@ void assert_path(trie_p t, trie_p tn, int len, char arr[])
     assert_str(t, len, arr);
 }
 
-void assert_leaf(trie_p t, int value)
+void assert_leaf(abs_value_p value_info, trie_p t, value_p value)
 {
     assert(t != NULL);
     assert(t->type == LEAF);
-    assert(TL(t)->value == value);
+    assert(memcmp(VP(t), value, value_info->size) == 0);
 }
 
 
