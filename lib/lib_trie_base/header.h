@@ -18,6 +18,18 @@ STRUCT(value_info)
     void_value value_print;
 };
 
+STRUCT(pointer);
+struct(node);
+
+typedef node_p (*node_pointer)(pointer_p);
+
+STRUCT(trie_info);
+{
+    int max, len;
+    int pointer_size;
+    value_info_t vi;
+}
+
 void trie_delete(value_info_p vi, trie_p *t, char arr[]);
 void trie_insert(value_info_p vi, trie_p *t, char arr[], value_p value);
 

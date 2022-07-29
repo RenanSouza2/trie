@@ -27,7 +27,7 @@ STRUCT(trie_fork)
 {
     trie_t t;
     int connected, least;
-    trie_p next[MAX];
+    trie_p next[0];
 };
 
 STRUCT(trie_path)
@@ -136,6 +136,10 @@ void trie_display_structure(value_info_p vi, trie_p t)
 #endif 
 
 
+pointer_p node_fork_next(node_p node, int index)
+{
+    for
+}
 
 void trie_display_rec(value_info_p vi, trie_p t, int len, char res[])
 {
@@ -418,7 +422,6 @@ value_p trie_querie_rec(trie_p t, char len, char arr[])
         return trie_querie_rec(TP(t)->next, len-index, &arr[index]);
 
         case LEAF:
-        assert(!len);
         return VP(t);
     }
     assert(FALSE);
