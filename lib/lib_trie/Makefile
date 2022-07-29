@@ -5,9 +5,15 @@ build: lib.o
 
 lib.o: tmp.o $(STR_FILE)
 	ld -r -o lib.o $^
+	
+test.o: tmp_test.o $(STR_FILE)
+	ld -r -o lib.o $^
 
 tmp.o: code.c
 	gcc -o tmp.o code.c -c -Wall
+
+tmp_test.o:
+	gcc -o tmp.o code.c -c -Wall -D DEBUG
 
 .PHONY: $(STR_FILE)
 $(STR_FILE):

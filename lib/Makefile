@@ -4,4 +4,4 @@ clean:
 
 test:
 	$(MAKE) test --directory=lib_my_string
-	$(MAKE) test --directory=lib_trie
+	$(MAKE) test --directory=lib_value_1

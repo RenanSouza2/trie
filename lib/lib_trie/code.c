@@ -74,7 +74,7 @@ void pointer_display(void *p)
     else            printf("%p", p);
 }
 
-void trie_display_single(abs_value_p value_info, trie_p t) {
+void trie_display_single(value_info_p value_info, trie_p t) {
     printf("\ntrie: ");pointer_display(t);
     if(t == NULL) return;
 
@@ -102,7 +102,7 @@ void trie_display_single(abs_value_p value_info, trie_p t) {
     printf("\n");
 }
 
-void trie_display_structure_rec(abs_value_p value_info, trie_p t)
+void trie_display_structure_rec(value_info_p value_info, trie_p t)
 {
     if(t == NULL) return;
 
@@ -120,7 +120,7 @@ void trie_display_structure_rec(abs_value_p value_info, trie_p t)
     }
 }
 
-void trie_display_structure(abs_value_p value_info, trie_p t)
+void trie_display_structure(value_info_p value_info, trie_p t)
 {
     if(t == NULL)
     {
@@ -240,7 +240,7 @@ trie_p trie_path_create(char len, char arr[], trie_p next)
     return trie_path_create_force(len, arr, next);
 }
 
-trie_p trie_leaf_create(abs_value_p value_info, value_p value)
+trie_p trie_leaf_create(value_info_p value_info, value_p value)
 {
     trie_leaf_p t = malloc(sizeof(trie_leaf_t) + value_info->size);
     assert(t);
@@ -310,7 +310,7 @@ trie_p trie_join(trie_p t1, trie_p t2)
 
 
 
-trie_p trie_delete_rec(abs_value_p value_info, trie_p t, char len, char arr[])
+trie_p trie_delete_rec(value_info_p value_info, trie_p t, char len, char arr[])
 {
     if(t == NULL) return NULL;
 
@@ -362,7 +362,7 @@ trie_p trie_delete_rec(abs_value_p value_info, trie_p t, char len, char arr[])
     return t;
 }
 
-trie_p trie_insert_rec(abs_value_p value_info, trie_p t, char len, char arr[], value_p value)
+trie_p trie_insert_rec(value_info_p value_info, trie_p t, char len, char arr[], value_p value)
 {
     if(t == NULL)
     {
@@ -418,14 +418,14 @@ value_p trie_querie_rec(trie_p t, char len, char arr[])
 
 
 
-void trie_insert(abs_value_p value_info, trie_p *t, char arr[], value_p value)
+void trie_insert(value_info_p value_info, trie_p *t, char arr[], value_p value)
 {
     *t = (value != 0) 
         ? trie_insert_rec(value_info, *t, LEN, arr, value) 
         : trie_delete_rec(value_info, *t, LEN, arr);
 }
 
-void trie_delete(abs_value_p value_info, trie_p *t, char arr[])
+void trie_delete(value_info_p value_info, trie_p *t, char arr[])
 {
     *t = trie_delete_rec(value_info, *t, LEN, arr);
 }
