@@ -74,7 +74,7 @@ void pointer_display(void *p)
     else            printf("%p", p);
 }
 
-void trie_display_single(value_info_p value_info, trie_p t) {
+void trie_display_single(value_info_p vi, trie_p t) {
     printf("\ntrie: ");pointer_display(t);
     if(t == NULL) return;
 
@@ -96,31 +96,31 @@ void trie_display_single(value_info_p value_info, trie_p t) {
 
         case LEAF:
         printf("\t(LEAF)");
-        value_info->value_print(VP(t));
+        vi->value_print(VP(t));
         break;
     }
     printf("\n");
 }
 
-void trie_display_structure_rec(value_info_p value_info, trie_p t)
+void trie_display_structure_rec(value_info_p vi, trie_p t)
 {
     if(t == NULL) return;
 
-    trie_display_single(value_info, t);
+    trie_display_single(vi, t);
     switch (t->type)
     {
         case FORK:
         for(int i=0; i<MAX; i++)
-            trie_display_structure_rec(value_info, TF(t)->next[i]);
+            trie_display_structure_rec(vi, TF(t)->next[i]);
         break;
 
         case PATH:
-        trie_display_structure_rec(value_info, TP(t)->next);
+        trie_display_structure_rec(vi, TP(t)->next);
         break;
     }
 }
 
-void trie_display_structure(value_info_p value_info, trie_p t)
+void trie_display_structure(value_info_p vi, trie_p t)
 {
     if(t == NULL)
     {
@@ -128,7 +128,7 @@ void trie_display_structure(value_info_p value_info, trie_p t)
         return;
     }
 
-    trie_display_structure_rec(value_info, t);
+    trie_display_structure_rec(vi, t);
 }
 
 #else
@@ -137,7 +137,7 @@ void trie_display_structure(value_info_p value_info, trie_p t)
 
 
 
-void trie_display_rec(trie_p t, int len, int res[])
+void trie_display_rec(value_info_p vi, trie_p t, int len, int res[])
 {
     switch(t->type)
     {
@@ -146,22 +146,29 @@ void trie_display_rec(trie_p t, int len, int res[])
         if(TF(t)->next[i])
         {
             res[len] = i;
-            trie_display_rec(TF(t)->next[i], len+1, res);
+            trie_display_rec(vi, TF(t)->next[i], len+1, res);
         }
         break;
 
         case PATH:
         memcpy(&res[len], &(TP(t)->str.arr), TP(t)->str.len);
-        trie_display_rec(TP(t)->next, len + TP(t)->str.len, res);
+        trie_display_rec(vi, TP(t)->next, len + TP(t)->str.len, res);
+        break;
+
+        case LEAF:
+        printf("\n");
+        for(int i=0; i<len; i++)
+            printf(" %2d", res[i]);
+        printf("\t->\t"); vi->value_print(VP(t));
         break;
     }
 }
 
-void trie_display(trie_p t)
+void trie_display(value_info_p vi, trie_p t)
 {
     int res[LEN];
     if(t == NULL)   printf("\nEMPTY TRIE");
-    else            trie_display_rec(t, 0, res);
+    else            trie_display_rec(vi, t, 0, res);
     printf("\n");
 }
 
@@ -240,16 +247,17 @@ trie_p trie_path_create(char len, char arr[], trie_p next)
     return trie_path_create_force(len, arr, next);
 }
 
-trie_p trie_leaf_create(value_info_p value_info, value_p value)
+trie_p trie_leaf_create(value_info_p vi, value_p value)
 {
-    trie_leaf_p t = malloc(sizeof(trie_leaf_t) + value_info->size);
+    trie_leaf_p t = malloc(sizeof(trie_leaf_t) + vi->size);
     assert(t);
 #ifdef DEBUG            
     trie_allocated++;       
 #endif
 
     T(t)->type = LEAF;
-    memcpy(VP(t), value, value_info->size);
+    memcpy(VP(t), value, vi->size);
+
     return T(t);
 }
 
@@ -310,7 +318,7 @@ trie_p trie_join(trie_p t1, trie_p t2)
 
 
 
-trie_p trie_delete_rec(value_info_p value_info, trie_p t, char len, char arr[])
+trie_p trie_delete_rec(value_info_p vi, trie_p t, char len, char arr[])
 {
     if(t == NULL) return NULL;
 
@@ -319,7 +327,7 @@ trie_p trie_delete_rec(value_info_p value_info, trie_p t, char len, char arr[])
     {
         case FORK:;
         int key = arr[0];
-        trie_p tn = trie_delete_rec(value_info, TF(t)->next[key], len-1, &arr[1]);
+        trie_p tn = trie_delete_rec(vi, TF(t)->next[key], len-1, &arr[1]);
 
         if(tn == NULL)  
         {
@@ -340,7 +348,7 @@ trie_p trie_delete_rec(value_info_p value_info, trie_p t, char len, char arr[])
         int index = string_cmp(&TP(t)->str, arr);
         if(index < path_len) return t;
 
-        tn = trie_delete_rec(value_info, TP(t)->next, len-path_len, &arr[path_len]);
+        tn = trie_delete_rec(vi, TP(t)->next, len-path_len, &arr[path_len]);
 
         if(tn == NULL)
         {
@@ -362,18 +370,18 @@ trie_p trie_delete_rec(value_info_p value_info, trie_p t, char len, char arr[])
     return t;
 }
 
-trie_p trie_insert_rec(value_info_p value_info, trie_p t, char len, char arr[], value_p value)
+trie_p trie_insert_rec(value_info_p vi, trie_p t, char len, char arr[], value_p value)
 {
     if(t == NULL)
     {
-        t = trie_leaf_create(value_info, value);
+        t = trie_leaf_create(vi, value);
         return trie_path_create(len, arr, t);
     }
 
     if(t->type == LEAF)
     {
         assert(!len);
-        memcpy(VP(t), value, value_info->size);
+        memcpy(VP(t), value, vi->size);
         return t;
     }
 
@@ -383,20 +391,20 @@ trie_p trie_insert_rec(value_info_p value_info, trie_p t, char len, char arr[], 
         if(index < TP(t)->str.len) t = trie_path_break(t, index);
         if(t->type == PATH)
         {
-            TP(t)->next = trie_insert_rec(value_info, TP(t)->next, len-index, &arr[index], value);
+            TP(t)->next = trie_insert_rec(vi, TP(t)->next, len-index, &arr[index], value);
             return t;
         }
     }
 
     int key = arr[0];
-    trie_p t_next = trie_insert_rec(value_info, TF(t)->next[key], len-1, &arr[1], value);
+    trie_p t_next = trie_insert_rec(vi, TF(t)->next[key], len-1, &arr[1], value);
     trie_fork_connect(t, t_next, key);
     return t;
 }
 
 value_p trie_querie_rec(trie_p t, char len, char arr[])
 {
-    if(t == NULL) return 0;
+    if(t == NULL) return NULL;
 
     switch (t->type)
     {
@@ -418,16 +426,16 @@ value_p trie_querie_rec(trie_p t, char len, char arr[])
 
 
 
-void trie_insert(value_info_p value_info, trie_p *t, char arr[], value_p value)
+void trie_insert(value_info_p vi, trie_p *t, char arr[], value_p value)
 {
     *t = (value != 0) 
-        ? trie_insert_rec(value_info, *t, LEN, arr, value) 
-        : trie_delete_rec(value_info, *t, LEN, arr);
+        ? trie_insert_rec(vi, *t, LEN, arr, value) 
+        : trie_delete_rec(vi, *t, LEN, arr);
 }
 
-void trie_delete(value_info_p value_info, trie_p *t, char arr[])
+void trie_delete(value_info_p vi, trie_p *t, char arr[])
 {
-    *t = trie_delete_rec(value_info, *t, LEN, arr);
+    *t = trie_delete_rec(vi, *t, LEN, arr);
 }
 
 value_p trie_querie(trie_p t, char arr[])

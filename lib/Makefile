@@ -1,6 +1,7 @@
 clean:
 	$(MAKE) clean --directory=lib_my_string
-	$(MAKE) clean --directory=lib_trie
+	$(MAKE) clean --directory=lib_trie_base
+	$(MAKE) clean --directory=lib_value_int
 
 test:
 	$(MAKE) test --directory=lib_my_string
