@@ -8,9 +8,12 @@
 
 #define T(POINTER)  ((trie_p)(POINTER))
 #define TF(POINTER) ((trie_fork_p)(POINTER))
-#define TP(POINTER) ((trie_path_p)(POINTER))
-#define TL(POINTER) ((trie_leaf_p)(POINTER))
-#define VP(POINTER) ((value_t*)(TL(POINTER) + 1))
+#define TP(POINTER) ((trie_padding_p)(POINTER))
+#define HP(POINTER) ((char*)(TP(POINTER) + 1))
+#define NP(POINTER) ((char*)(TF(POINTER) + 1))
+#define VP(POINTER) ((value_p)(HP(POINTER)))
+
+#define P(POINTER) ((pointer_p)(POINTER))
 
 #define FALSE 0
 #define TRUE  1
@@ -27,17 +30,10 @@ STRUCT(trie_fork)
 {
     trie_t t;
     int connected, least;
-    trie_p next[0];
+    int padding;
 };
 
-STRUCT(trie_path)
-{
-    trie_t t;
-    trie_p next;
-    string_t str;
-};
-
-STRUCT(trie_leaf)
+STRUCT(trie_padding)
 {
     trie_t t;
     int padding;
@@ -96,7 +92,7 @@ void trie_display_single(value_info_p vi, trie_p t) {
 
         case LEAF:
         printf("\t(LEAF)");
-        vi->value_print(VP(t));
+        vi->value_print(HP(t));
         break;
     }
     printf("\n");
@@ -136,43 +132,59 @@ void trie_display_structure(value_info_p vi, trie_p t)
 #endif 
 
 
-pointer_p node_fork_next(node_p node, int index)
+pointer_p trie_fork_next(trie_info_p ti, trie_p t, int index)
 {
-    for
+    return P(NP(t) + index * ti->pointer_size);
 }
 
-void trie_display_rec(value_info_p vi, trie_p t, int len, char res[])
+pointer_p trie_path_next(trie_p t)
 {
+    return P(HP(t));
+}
+
+string_p trie_path_str(trie_info_p ti, trie_p t)
+{
+    return (string_p)(HP(t) + ti->pointer_size);
+}
+
+void trie_display_rec(trie_info_p ti, pointer_p p, int len, char res[])
+{
+    trie_p t = ti->get_trie(p);
     switch(t->type)
     {
         case FORK:
         for(int i=0; i<MAX; i++)
-        if(TF(t)->next[i])
         {
+            pointer_p next = trie_fork_next(ti, t, i);
+            if(ti->pointer_is_null(next)) continue;
+            
             res[len] = i;
-            trie_display_rec(vi, TF(t)->next[i], len+1, res);
+            trie_display_rec(ti, next, len+1, res);
         }
         break;
 
-        case PATH:
-        memcpy(&res[len], &(TP(t)->str.arr), TP(t)->str.len);
-        trie_display_rec(vi, TP(t)->next, len + TP(t)->str.len, res);
+        case PATH:;
+        string_p str = trie_path_str(ti, t);
+        memcpy(&res[len], str->arr, str->len);
+
+        pointer_p next = trie_path_next(t);
+        trie_display_rec(ti, next, len + str->len, res);
         break;
 
         case LEAF:
         printf("\n");
         for(int i=0; i<len; i++)
             printf(" %2d", res[i]);
-        printf("\t->\t"); vi->value_print(VP(t));
+        printf("\t->\t"); ti->vi.value_print(VP(t));
         break;
     }
 }
 
-void trie_display(value_info_p vi, trie_p t)
+void trie_display(trie_info_p ti, value_info_p vi, pointer_p p)
 {
     char res[LEN];
-    if(t == NULL)   printf("\nEMPTY TRIE");
-    else            trie_display_rec(vi, t, 0, res);
+    if(ti->pointer_is_null(p))   printf("\nEMPTY TRIE");
+    else            trie_display_rec(ti, p, 0, res);
     printf("\n");
 }
 
@@ -260,7 +272,7 @@ trie_p trie_leaf_create(value_info_p vi, value_p value)
 #endif
 
     T(t)->type = LEAF;
-    memcpy(VP(t), value, vi->size);
+    memcpy(HP(t), value, vi->size);
 
     return T(t);
 }
@@ -385,7 +397,7 @@ trie_p trie_insert_rec(value_info_p vi, trie_p t, char len, char arr[], value_p 
     if(t->type == LEAF)
     {
         assert(!len);
-        memcpy(VP(t), value, vi->size);
+        memcpy(HP(t), value, vi->size);
         return t;
     }
 
