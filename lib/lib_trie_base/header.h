@@ -18,10 +18,10 @@ STRUCT(value_info)
     void_value value_print;
 };
 
-STRUCT(pointer);
+STRUCT(trie_pointer);
 
-typedef trie_p(*trie_pointer)(pointer_p);
-typedef int(*int_pointer)(pointer_p);
+typedef trie_p(*trie_pointer)(trie_pointer_p);
+typedef int(*int_pointer)(trie_pointer_p);
 
 STRUCT(trie_info)
 {
@@ -36,7 +36,7 @@ STRUCT(trie_info)
 void trie_delete(value_info_p vi, trie_p *t, char arr[]);
 void trie_insert(value_info_p vi, trie_p *t, char arr[], value_p value);
 
-void trie_display(trie_info_p ti, value_info_p vi, pointer_p p);
+void trie_display(trie_info_p ti, value_info_p vi, trie_pointer_p p);
 value_p trie_querie(trie_p t, char arr[]);
 
 void trie_free(trie_p t);

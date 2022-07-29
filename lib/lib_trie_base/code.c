@@ -13,7 +13,7 @@
 #define NP(POINTER) ((char*)(TF(POINTER) + 1))
 #define VP(POINTER) ((value_p)(HP(POINTER)))
 
-#define P(POINTER) ((pointer_p)(POINTER))
+#define P(POINTER) ((trie_pointer_p)(POINTER))
 
 #define FALSE 0
 #define TRUE  1
@@ -21,10 +21,6 @@
 #define FORK 0
 #define PATH 1
 #define LEAF 2
-
-#define MAX 10
-#define LEN 8
-
 
 STRUCT(trie_fork)
 {
@@ -132,12 +128,12 @@ void trie_display_structure(value_info_p vi, trie_p t)
 #endif 
 
 
-pointer_p trie_fork_next(trie_info_p ti, trie_p t, int index)
+trie_pointer_p trie_fork_next(trie_info_p ti, trie_p t, int index)
 {
     return P(NP(t) + index * ti->pointer_size);
 }
 
-pointer_p trie_path_next(trie_p t)
+trie_pointer_p trie_path_next(trie_p t)
 {
     return P(HP(t));
 }
@@ -147,15 +143,15 @@ string_p trie_path_str(trie_info_p ti, trie_p t)
     return (string_p)(HP(t) + ti->pointer_size);
 }
 
-void trie_display_rec(trie_info_p ti, pointer_p p, int len, char res[])
+void trie_display_rec(trie_info_p ti, trie_pointer_p p, int len, char res[])
 {
     trie_p t = ti->get_trie(p);
     switch(t->type)
     {
         case FORK:
-        for(int i=0; i<MAX; i++)
+        for(int i = 0; i < ti->max; i++)
         {
-            pointer_p next = trie_fork_next(ti, t, i);
+            trie_pointer_p next = trie_fork_next(ti, t, i);
             if(ti->pointer_is_null(next)) continue;
             
             res[len] = i;
@@ -167,7 +163,7 @@ void trie_display_rec(trie_info_p ti, pointer_p p, int len, char res[])
         string_p str = trie_path_str(ti, t);
         memcpy(&res[len], str->arr, str->len);
 
-        pointer_p next = trie_path_next(t);
+        trie_pointer_p next = trie_path_next(t);
         trie_display_rec(ti, next, len + str->len, res);
         break;
 
@@ -180,9 +176,9 @@ void trie_display_rec(trie_info_p ti, pointer_p p, int len, char res[])
     }
 }
 
-void trie_display(trie_info_p ti, value_info_p vi, pointer_p p)
+void trie_display(trie_info_p ti, value_info_p vi, trie_pointer_p p)
 {
-    char res[LEN];
+    char res[ti->len];
     if(ti->pointer_is_null(p))   printf("\nEMPTY TRIE");
     else            trie_display_rec(ti, p, 0, res);
     printf("\n");
