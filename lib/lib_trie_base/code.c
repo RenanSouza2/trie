@@ -25,8 +25,7 @@
 STRUCT(trie_fork)
 {
     trie_t t;
-    int connected, least;
-    int padding;
+    int connected;
 };
 
 STRUCT(trie_padding)
@@ -37,94 +36,81 @@ STRUCT(trie_padding)
 
 #ifdef DEBUG
 
-int trie_allocated = 0;
-int trie_freed = 0;
-
-void trie_free_single(trie_p t)
-{
-    trie_freed++;
-    free(t);
-}
-
-void snapshot(char s[])
-{
-    printf("\n");
-    printf("\nSnapshot %s", s);
-    printf("\ntrie_allocated: %d", trie_allocated);
-    printf("\ntrie_freed: %d", trie_freed);
-    printf("\ntrie_current: %d", trie_allocated - trie_freed);
-}
-
-void assert_memory()
-{
-    assert(trie_allocated == trie_freed);
-}
-
 void pointer_display(void *p)
 {
     if(p == NULL)   printf("NULL");
     else            printf("%p", p);
 }
 
-void trie_display_single(value_info_p vi, trie_p t) {
-    printf("\ntrie: ");pointer_display(t);
-    if(t == NULL) return;
+void trie_display_single(trie_info_p ti, trie_pointer_p tp) {
+    printf("\ntrie: ");
+    ti->pointer_display(tp);
+    if(ti->pointer_is_null(tp)) return;
 
+    trie_p t = ti->get_trie(tp);
     switch (t->type)
     {
         case FORK:
         printf("\t(FORK)");
-        printf("\nconnected: %d\tleast: %d", TF(t)->connected, TF(t)->least);
-        for(int i=0; i<MAX; i++)
-        if(TF(t)->next[i])  
-            printf("\n\t%d: %p", i, TF(t)->next[i]);
+        printf("\nconnected: %d", TF(t)->connected);
+        for(int i=0; i < ti->max; i++)
+        {
+            trie_pointer_p next = trie_fork_next(ti, t, i);
+            if(ti->pointer_is_null(next)) continue;
+
+            printf("\n\t%d: ", i);
+            ti->pointer_display(next);
+        }
         break;
     
-        case PATH:
+        case PATH:;
         printf("\t(PATH)");
-        string_display(&TP(t)->str);
-        printf("\nnext: ");pointer_display(TP(t)->next);
+
+        string_p str = trie_path_str(ti, t);
+        string_display(str);
+
+        printf("\nnext: ");
+        trie_pointer_p next = trie_path_next(t);
+        ti->pointer_display(next);
         break;
 
         case LEAF:
         printf("\t(LEAF)");
-        vi->value_print(HP(t));
+        ti->vi.value_print(HP(t));
         break;
     }
     printf("\n");
 }
 
-void trie_display_structure_rec(value_info_p vi, trie_p t)
+void trie_display_structure_rec(trie_info_p ti, trie_pointer_p tp)
 {
-    if(t == NULL) return;
+    if(ti->pointer_is_null(tp)) return;
 
-    trie_display_single(vi, t);
+    trie_p t = ti->get_trie(tp);
+    trie_display_single(ti, t);
     switch (t->type)
     {
         case FORK:
-        for(int i=0; i<MAX; i++)
-            trie_display_structure_rec(vi, TF(t)->next[i]);
+        for(int i=0; i < ti->max; i++)
+        {
+            trie_pointer_p next = trie_fork_next(ti, t, i);
+            trie_display_structure_rec(ti, next);
+        }
         break;
 
-        case PATH:
-        trie_display_structure_rec(vi, TP(t)->next);
+        case PATH:;
+        trie_pointer_p next = trie_path_next(t);
+        trie_display_structure_rec(ti, next);
         break;
     }
 }
 
-void trie_display_structure(value_info_p vi, trie_p t)
+void trie_display_structure(trie_info_p ti, trie_pointer_p tp)
 {
-    if(t == NULL)
-    {
-        printf("\nEmpty trie");
-        return;
-    }
-
-    trie_display_structure_rec(vi, t);
+    if(ti->pointer_is_null(tp)) printf("\nEmpty trie");
+    else                        trie_display_structure_rec(vi, tp);
 }
 
-#else
-#define trie_free_single(POINTER) free(POINTER)
 #endif 
 
 
@@ -143,9 +129,9 @@ string_p trie_path_str(trie_info_p ti, trie_p t)
     return (string_p)(HP(t) + ti->pointer_size);
 }
 
-void trie_display_rec(trie_info_p ti, trie_pointer_p p, int len, char res[])
+void trie_display_rec(trie_info_p ti, trie_pointer_p tp, int len, char res[])
 {
-    trie_p t = ti->get_trie(p);
+    trie_p t = ti->get_trie(tp);
     switch(t->type)
     {
         case FORK:
@@ -179,98 +165,11 @@ void trie_display_rec(trie_info_p ti, trie_pointer_p p, int len, char res[])
 void trie_display(trie_info_p ti, value_info_p vi, trie_pointer_p p)
 {
     char res[ti->len];
-    if(ti->pointer_is_null(p))   printf("\nEMPTY TRIE");
-    else            trie_display_rec(ti, p, 0, res);
+    if(ti->pointer_is_null(p))  
+        printf("\nEMPTY TRIE");
+    else                        
+        trie_display_rec(ti, p, 0, res);
     printf("\n");
-}
-
-
-
-trie_p trie_fork_connect(trie_p t1, trie_p t2, int key)
-{
-    assert(t1->type == FORK);
-
-    if(!(TF(t1)->next[key]))
-    {
-        (TF(t1)->connected)++;
-        if(key < TF(t1)->least) TF(t1)->least = key;
-    }
-    TF(t1)->next[key] = t2;
-    return t1;
-}
-
-trie_p trie_fork_disconnect(trie_p t, int key)
-{
-    assert(t->type == FORK);
-    assert(TF(t)->next[key] != NULL);
-
-    TF(t)->next[key] = NULL;
-    (TF(t)->connected)--;
-    if(key != TF(t)->least) return t;
-
-    int i;
-    for(i=TF(t)->least; i<MAX && !(TF(t)->next[i]); i++);
-    TF(t)->least = i;
-    return t;
-}
-
-
-
-trie_p trie_fork_create()
-{
-    trie_fork_p t = calloc(1, sizeof(trie_fork_t));
-    assert(t);
-#ifdef DEBUG            
-    trie_allocated++;       
-#endif
-
-    t->least = MAX;
-    return T(t);
-}
-
-trie_p trie_path_create_force(char len, char arr[], trie_p next)
-{
-    assert(len > 0);
-
-    trie_path_p t = malloc(sizeof(trie_path_t) - 7 + len);
-    assert(t);
-#ifdef DEBUG            
-    trie_allocated++;       
-#endif
-
-    t->t.type = PATH;
-    t->next = next;
-    t->str.len = len;
-    memcpy(t->str.arr, arr, len);
-    return T(t);
-}
-
-trie_p trie_path_create(char len, char arr[], trie_p next)
-{
-    if(len == 0) return next;
-
-    if(len == 1)
-    {
-        trie_p t = trie_fork_create();
-        trie_fork_connect(t, next, arr[0]);
-        return t;
-    }
-
-    return trie_path_create_force(len, arr, next);
-}
-
-trie_p trie_leaf_create(value_info_p vi, value_p value)
-{
-    trie_leaf_p t = malloc(sizeof(trie_leaf_t) + vi->size);
-    assert(t);
-#ifdef DEBUG            
-    trie_allocated++;       
-#endif
-
-    T(t)->type = LEAF;
-    memcpy(HP(t), value, vi->size);
-
-    return T(t);
 }
 
 
@@ -282,104 +181,119 @@ int trie_joinnable(trie_p t)
     return TF(t)->connected == 1;
 }
 
-trie_p trie_path_break(trie_p t, int len)
+trie_pointer_p trie_path_break(trie_info_p ti, trie_pointer_p tp, int len)
 {
-    assert(len < TP(t)->str.len);
+    trie_p t = ti->get_trie(tp);
+    string_p str = trie_path_str(ti, t);
+    assert(len < str->len);
 
-    string_p str = &TP(t)->str;
     char *arr = str->arr;
 
-    trie_p t_aux = TP(t)->next;
-    t_aux = trie_path_create(str->len - len-1, &arr[len+1], t_aux);
-    t_aux = trie_path_create(1, &arr[len], t_aux);
-    t_aux = trie_path_create(len, arr, t_aux);
+    trie_pointer_p t_aux = trie_path_next(t);
+    t_aux = ti->trie_path_create(str->len - len-1, &arr[len+1], t_aux);
+    t_aux = ti->trie_path_create(1, &arr[len], t_aux);
+    t_aux = ti->trie_path_create(len, arr, t_aux);
 
-    trie_free_single(t);
+    ti->trie_free_single(tp);
     return t_aux;
 }
 
-trie_p trie_fork_convert(trie_p t)
+trie_pointer_p trie_fork_convert(trie_info_p ti, trie_pointer_p tp)
 {
+    trie_p t = ti->get_trie(tp);
+    if(t->type == PATH) return tp;
+
     assert(t->type == FORK);
     assert(TF(t)->connected == 1);
 
-    int key = TF(t)->least;
-    trie_p t_next = TF(t)->next[key];
-    trie_free_single(t);
+    char key = ti->trie_fork_first_key(t);
+    trie_pointer_p next = trie_fork_next(ti, t, key);
+    ti->trie_free_single(tp);
 
     char arr[] = {key};
-    return trie_path_create_force(1, arr, t_next);
+    return ti->trie_path_create_force(1, arr, next);
 }
 
-trie_p trie_join(trie_p t1, trie_p t2)
+trie_pointer_p trie_join(trie_info_p ti, trie_pointer_p tp1, trie_pointer_p tp2)
 {
-    if(t1->type == FORK) t1 = trie_fork_convert(t1);
-    if(t2->type == FORK) t2 = trie_fork_convert(t2);
+    tp1 = trie_fork_convert(ti, tp1);
+    tp2 = trie_fork_convert(ti, tp2);
+    trie_p t1 = ti->get_trie(tp1);
+    trie_p t2 = ti->get_trie(tp2);
 
-    int len1 = TP(t1)->str.len;
-    int len2 = TP(t2)->str.len;
+    string_p str1 = trie_path_str(ti, t1);
+    string_p str2 = trie_path_str(ti, t2);
+    int len1 = str1->len;
+    int len2 = str2->len;
     int len  = len1 + len2;
-    t1 = realloc(t1, sizeof(trie_path_t) - 7 + len);
-    TP(t1)->str.len = len;
-    TP(t1)->next = TP(t2)->next;
-    memcpy(&TP(t1)->str.arr[len1], TP(t2)->str.arr, len2);
 
-    trie_free_single(t2);
-    return t1;
+    char arr[len];
+    memcpy( arr      , str1->arr, len1);
+    memcpy(&arr[len1], str2->arr, len2);
+
+    trie_pointer_p next = trie_path_next(t2);
+    trie_pointer_p tp = ti->trie_path_create(len, arr, next);
+
+    ti->trie_free_single(tp1);
+    ti->trie_free_single(tp2);
+    return tp;
 }
 
 
 
-trie_p trie_delete_rec(value_info_p vi, trie_p t, char len, char arr[])
+trie_pointer_p trie_delete_rec(trie_info_p ti, trie_pointer_p tp, char len, char arr[])
 {
-    if(t == NULL) return NULL;
+    if(ti->pointer_is_null(tp)) return NULL;
 
-    trie_p t_next;
+    trie_pointer_p tp_next;
+    trie_p t = ti->get_trie(tp);
     switch (t->type)
     {
         case FORK:;
         int key = arr[0];
-        trie_p tn = trie_delete_rec(vi, TF(t)->next[key], len-1, &arr[1]);
+        trie_pointer_p next = trie_fork_next(ti, t, key);
+        tp_next = trie_delete_rec(ti, next, len-1, &arr[1]);
 
-        if(tn == NULL)  
+        if(ti->pointer_is_null(tp_next) && TF(t)->connected == 1) 
         {
-            trie_fork_disconnect(t, key);
-            if(!TF(t)->connected)
-            {
-                trie_free_single(t);
-                return NULL;
-            }
+            ti->trie_free_single(tp);
+            return ti->null;
         }
-        
-        TF(t)->next[key] = tn;
-        t_next = TF(t)->next[TF(t)->least];
+
+        tp = ti->trie_fork_connect(tp, key, tp_next);
+        t  = ti->get_trie(tp);
+        if(TF(t)->connected > 1) return tp; 
+
+        key = ti->trie_fork_first_key(t);
+        tp_next = trie_fork_next(ti, t, key);
         break;
     
         case PATH:;
-        int path_len = TP(t)->str.len;
-        int index = string_cmp(&TP(t)->str, arr);
-        if(index < path_len) return t;
+        string_p str = trie_path_str(ti, t);
+        int path_len = str->len;
+        int index = string_cmp(str, arr);
+        if(index < path_len) return tp;
 
-        tn = trie_delete_rec(vi, TP(t)->next, len-path_len, &arr[path_len]);
+        next = trie_path_next(t);
+        tp_next = trie_delete_rec(ti, next, len - path_len, &arr[path_len]);
 
-        if(tn == NULL)
+        if(ti->pointer_is_null(tp_next))
         {
-            trie_free_single(t);
-            return NULL;
+            ti->trie_free_single(tp);
+            return ti->null;
         }
-        t_next = TP(t)->next = tn;
+
+        tp = ti->trie_path_connect(tp, tp_next);        
         break;
 
         case LEAF:
-        assert(!len);
-        trie_free_single(t);
-        return NULL;
+        assert(len == 0);
+        ti->trie_free_single(tp);
+        return ti->null;
     }
 
-    if(trie_joinnable(t))
-    if(trie_joinnable(t_next))
-        return trie_join(t, t_next);
-    return t;
+    trie_p t_next = ti->get_trie(tp_next);
+    return (trie_joinnable(t_next)) ? trie_join(ti, tp, tp_next) : tp;
 }
 
 trie_p trie_insert_rec(value_info_p vi, trie_p t, char len, char arr[], value_p value)
