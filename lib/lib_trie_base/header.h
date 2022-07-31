@@ -4,9 +4,21 @@
 #include "../struct.h"
 #include "../lib_my_string/header.h"
 
+#define FORK 0
+#define PATH 1
+#define LEAF 2
+
+#define TF(POINTER) ((trie_fork_p)(POINTER))
+
 STRUCT(trie)
 {
     int type;
+};
+
+STRUCT(trie_fork)
+{
+    trie_t t;
+    int connected;
 };
 
 STRUCT(value);
@@ -35,7 +47,6 @@ STRUCT(trie_info)
 {
     int max, len;
     int pointer_size;
-    int next_size;
     trie_pointer_p null;
 
     trie_pointer                get_trie;

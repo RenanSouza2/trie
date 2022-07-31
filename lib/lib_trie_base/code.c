@@ -7,105 +7,13 @@
 #include "../lib_my_string/header.h"
 
 #define T(POINTER)  ((trie_p)(POINTER))
-#define TF(POINTER) ((trie_fork_p)(POINTER))
-#define TP(POINTER) ((trie_padding_p)(POINTER))
-#define HP(POINTER) ((char*)(TP(POINTER) + 1))
 #define NP(POINTER) ((char*)(TF(POINTER) + 1))
-#define VP(POINTER) ((value_p)(HP(POINTER)))
+#define VP(POINTER) ((value_p)(NP(POINTER)))
 
 #define P(POINTER) ((trie_pointer_p)(POINTER))
 
 #define FALSE 0
 #define TRUE  1
-
-#define FORK 0
-#define PATH 1
-#define LEAF 2
-
-STRUCT(trie_fork)
-{
-    trie_t t;
-    int connected;
-};
-
-#ifdef DEBUG
-
-void pointer_display(void *p)
-{
-    if(p == NULL)   printf("NULL");
-    else            printf("%p", p);
-}
-
-void trie_display_single(trie_info_p ti, trie_pointer_p tp) {
-    printf("\ntrie: ");
-    ti->pointer_display(tp);
-    if(ti->pointer_is_null(tp)) return;
-
-    trie_p t = ti->get_trie(tp);
-    switch (t->type)
-    {
-        case FORK:
-        printf("\t(FORK)");
-        printf("\nconnected: %d", TF(t)->connected);
-        for(int i=0; i < ti->max; i++)
-        {
-            trie_pointer_p next = trie_fork_next(ti, t, i);
-            if(ti->pointer_is_null(next)) continue;
-
-            printf("\n\t%d: ", i);
-            ti->pointer_display(next);
-        }
-        break;
-    
-        case PATH:;
-        printf("\t(PATH)");
-
-        string_p str = trie_path_str(ti, t);
-        string_display(str);
-
-        printf("\nnext: ");
-        trie_pointer_p next = trie_path_next(t);
-        ti->pointer_display(next);
-        break;
-
-        case LEAF:
-        printf("\t(LEAF)");
-        ti->vi.value_print(HP(t));
-        break;
-    }
-    printf("\n");
-}
-
-void trie_display_structure_rec(trie_info_p ti, trie_pointer_p tp)
-{
-    if(ti->pointer_is_null(tp)) return;
-
-    trie_p t = ti->get_trie(tp);
-    trie_display_single(ti, t);
-    switch (t->type)
-    {
-        case FORK:
-        for(int i=0; i < ti->max; i++)
-        {
-            trie_pointer_p next = trie_fork_next(ti, t, i);
-            trie_display_structure_rec(ti, next);
-        }
-        break;
-
-        case PATH:;
-        trie_pointer_p next = trie_path_next(t);
-        trie_display_structure_rec(ti, next);
-        break;
-    }
-}
-
-void trie_display_structure(trie_info_p ti, trie_pointer_p tp)
-{
-    if(ti->pointer_is_null(tp)) printf("\nEmpty trie");
-    else                        trie_display_structure_rec(vi, tp);
-}
-
-#endif 
 
 
 trie_pointer_p trie_fork_next(trie_info_p ti, trie_p t, int index)
@@ -115,12 +23,12 @@ trie_pointer_p trie_fork_next(trie_info_p ti, trie_p t, int index)
 
 trie_pointer_p trie_path_next(trie_p t)
 {
-    return P(HP(t));
+    return P(NP(t));
 }
 
 string_p trie_path_str(trie_info_p ti, trie_p t)
 {
-    return (string_p)(HP(t) + ti->pointer_size);
+    return (string_p)(NP(t) + ti->pointer_size);
 }
 
 void trie_display_rec(trie_info_p ti, trie_pointer_p tp, int len, char res[])
