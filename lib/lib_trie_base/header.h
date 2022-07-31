@@ -23,11 +23,15 @@ STRUCT(trie_fork)
 
 STRUCT(value);
 typedef void (*void_value)(value_p);
+typedef int(*int_value)(value_p);
 
 STRUCT(value_info)
 {
     int size;
-    void_value value_print;
+    value_p null;
+
+    void_value  value_print;
+    int_value   value_is_null;
 };
 
 STRUCT(trie_pointer);
@@ -35,36 +39,33 @@ STRUCT(trie_pointer);
 typedef void(*void_pointer)(trie_pointer_p);
 typedef int(*int_pointer)(trie_pointer_p);
 typedef trie_p(*trie_pointer)(trie_pointer_p);
+typedef trie_pointer_p(*pointer_trie)(trie_p);
 typedef trie_pointer_p(*pointer_pointer_2)(trie_pointer_p,trie_pointer_p);
 typedef trie_pointer_p(*pointer_pointer_int)(trie_pointer_p,int);
+typedef trie_pointer_p(*pointer_pointer_value)(trie_pointer_p,value_p);
 typedef trie_pointer_p(*pointer_pointer_int_pointer)(trie_pointer_p,int,trie_pointer_p);
-typedef trie_pointer_p(*pointer_char_charv_pointer)(char,char[],trie_pointer_p);
-typedef trie_pointer_p(*pointer_value)(value_p);
 typedef int(*int_trie)(trie_p);
 
 
 STRUCT(trie_info)
 {
     int max, len;
-    int pointer_size;
+    int pointer_size, fork_size;
     trie_pointer_p null;
 
     trie_pointer                get_trie;
+    pointer_trie                get_pointer;
     int_pointer                 pointer_is_null;
     void_pointer                pointer_display;
     pointer_pointer_int_pointer trie_fork_connect;
     pointer_pointer_2           trie_path_connect;
     pointer_pointer_int         trie_fork_disconnect;
-    pointer_pointer_int         trie_fork_create;
-    pointer_char_charv_pointer  trie_path_create_force;
-    pointer_char_charv_pointer  trie_path_create;
-    pointer_value               trie_leaf_create;
+    pointer_pointer_value       trie_leaf_set_value;
     void_pointer                trie_free_single;
     void_pointer                trie_free;
     int_trie                    trie_fork_first_key;
-    void_pointer                pointer_free;
 
-    value_info_t vi;
+    value_info_p vi;
 };
 
 void trie_delete(trie_info_p ti, trie_pointer_p *tp, char arr[]);
