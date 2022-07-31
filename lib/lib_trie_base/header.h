@@ -51,16 +51,17 @@ STRUCT(trie_info)
     void_pointer                trie_free_single;
     void_pointer                trie_free;
     int_trie                    trie_fork_first_key;
+    void_pointer                pointer_free;
 
     value_info_t vi;
 };
 
-void trie_delete(value_info_p vi, trie_p *t, char arr[]);
-void trie_insert(value_info_p vi, trie_p *t, char arr[], value_p value);
+void trie_delete(trie_info_p ti, trie_pointer_p *tp, char arr[]);
+void trie_insert(trie_info_p ti, trie_pointer_p *tp, char arr[], value_p value);
 
 void trie_display(trie_info_p ti, value_info_p vi, trie_pointer_p p);
-value_p trie_querie(trie_p t, char arr[]);
+value_p trie_querie_rec(trie_info_p ti, trie_pointer_p tp, char len, char arr[]);
 
-void trie_free(trie_p t);
+void trie_free(trie_info_p ti, trie_pointer_p tp);
 
 #endif
