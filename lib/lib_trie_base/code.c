@@ -156,6 +156,17 @@ trie_pointer_p trie_path_break(trie_info_p ti, trie_pointer_p tp, int len)
     return t_aux;
 }
 
+int trie_fork_first_key(trie_info_p ti, trie_pointer_p tp)
+{
+    for(int i=0; i < ti->max; i++)
+    {
+        trie_pointer_p next = FN(tp,i);
+        if(ti->pointer_is_null(next)) continue;
+
+        return i;
+    }
+}
+
 trie_pointer_p trie_fork_convert(trie_info_p ti, trie_pointer_p tp)
 {
     trie_p t = ti->get_trie(tp);
@@ -164,7 +175,7 @@ trie_pointer_p trie_fork_convert(trie_info_p ti, trie_pointer_p tp)
     assert(t->type == FORK);
     assert(TF(t)->connected == 1);
 
-    char key = ti->trie_fork_first_key(t);
+    char key = trie_fork_first_key(ti, t);
     trie_pointer_p next = FN(t, key);
     ti->trie_free_single(tp);
 
@@ -218,7 +229,7 @@ trie_pointer_p trie_delete_rec(trie_info_p ti, trie_pointer_p tp, char len, char
         t = ti->get_trie(tp);
         if(TF(t)->connected > 1) return tp; 
 
-        key = ti->trie_fork_first_key(t);
+        key = trie_fork_first_key(ti, t);
         tp_next = FN(t, key);
         break;
     

@@ -19,13 +19,12 @@
 //     pointer_pointer_int         trie_fork_disconnect;
 //     pointer_pointer_value       trie_leaf_set_value;
 //     void_pointer                trie_free_single;
-//     void_pointer                trie_free;
-//     int_trie                    trie_fork_first_key;
 //
 //     value_info_p vi;
 // };
 
-#define MTP(POINTER) ((mem_trie_fork_p)(POINTER))
+#define MTF(POINTER) ((mem_trie_fork_p)(POINTER))
+#define MTP(POINTER) ((mem_path_fork_p)(POINTER))
 
 #define MAX 10
 
@@ -33,6 +32,12 @@ STRUCT(mem_trie_fork)
 {
     trie_fork_t t;
     trie_pointer_p next[MAX];
+};
+
+STRUCT(mem_path_fork)
+{
+    trie_fork_t t;
+    trie_pointer_p next;
 };
 
 trie_p mem_get_trie(trie_pointer_p tp)
@@ -58,7 +63,7 @@ void mem_trie_pointer_display(trie_pointer_p tp)
 
 trie_pointer_p mem_trie_fork_disconnect(trie_pointer_p tp, int key)
 {
-    if(MTP(tp)->next[key] == NULL) return tp;
+    if(MTF(tp)->next[key] == NULL) return tp;
 
     if(TF(tp)->connected == 1)
     {
@@ -74,23 +79,17 @@ trie_pointer_p mem_trie_fork_connect(trie_pointer_p tp, int key, trie_pointer_p 
 {
     if(tp_next == NULL) return mem_trie_fork_disconnect(tp, key);
 
-    if(MTP(tp)->next[key] == NULL) (TF(tp)->connected)++;
+    if(MTF(tp)->next[key] == NULL) (TF(tp)->connected)++;
 
-    MTP(tp)->next[key] = tp_next;
+    MTF(tp)->next[key] = tp_next;
     return tp;
 }
 
 trie_pointer_p mem_trie_path_connect(trie_pointer_p tp, trie_pointer_p tp_next)
 {
-    
+    MTP(tp)->next = tp_next;
+    return tp;
 }
 
-//     trie_path_connect;
-//     trie_fork_create;
-//     trie_path_create_force;
-//     trie_path_create;
-//     trie_leaf_create;
+//     pointer_pointer_value       trie_leaf_set_value;
 //     trie_free_single;
-//     trie_free;
-//     trie_fork_first_key;
-//     pointer_free;
