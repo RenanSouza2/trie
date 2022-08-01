@@ -1,9 +1,7 @@
 SRC=src/main.c
 OBJ=bin/main.o
 
-LIBS=lib_trie lib_my_string
-
-TRIE_PATH=lib/lib_value_int
+TRIE_PATH=lib/lib_mem_int_trie
 TRIE_FILE=$(TRIE_PATH)/lib.o
 
 run: $(OBJ)

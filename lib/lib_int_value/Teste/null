@@ -1,0 +1,10 @@
+make --directory=..
+make[1]: Entering directory '/home/renan-novacomp/docs/c/trie/lib/lib_int_value'
+make[1]: Nothing to be done for 'build'.
+make[1]: Leaving directory '/home/renan-novacomp/docs/c/trie/lib/lib_int_value'
+gcc -c -Wall -Werror -Wfatal-errors -o tmp.o test.c
+gcc -o test.o tmp.o ../lib.o
+./test.o 
+
+Hello: 4
+rm tmp.o

@@ -3,10 +3,7 @@
 
 #include "../struct.h"
 #include "../lib_my_string/header.h"
-
-#define FORK 0
-#define PATH 1
-#define LEAF 2
+#include "../lib_value_base/header.h"
 
 #define TF(POINTER) ((trie_fork_p)(POINTER))
 #define HP(POINTER) ((char*)(TF(POINTER) + 1))
@@ -21,19 +18,6 @@ STRUCT(trie_fork)
 {
     trie_t t;
     int connected;
-};
-
-STRUCT(value);
-typedef void (*void_value)(value_p);
-typedef int(*int_value)(value_p);
-
-STRUCT(value_info)
-{
-    int size;
-    value_p null;
-
-    void_value  value_print;
-    int_value   value_is_null;
 };
 
 STRUCT(trie_pointer);
@@ -70,8 +54,8 @@ STRUCT(trie_info)
 void trie_delete(trie_info_p ti, trie_pointer_p *tp, char arr[]);
 void trie_insert(trie_info_p ti, trie_pointer_p *tp, char arr[], value_p value);
 
-void trie_display(trie_info_p ti, value_info_p vi, trie_pointer_p p);
-value_p trie_querie_rec(trie_info_p ti, trie_pointer_p tp, char len, char arr[]);
+void trie_display(trie_info_p ti, trie_pointer_p p);
+value_p trie_querie(trie_info_p ti, trie_pointer_p tp, char arr[]);
 
 void trie_free(trie_info_p ti, trie_pointer_p tp);
 

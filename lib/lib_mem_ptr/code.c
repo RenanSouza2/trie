@@ -1,34 +1,19 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 
 #include "../lib_trie_base/header.h"
 #include "../utils/header.h"
 
-// STRUCT(trie_info)
-// {
-//     int max, len;
-//     int pointer_size, fork_size;
-//     trie_pointer_p null;
-//
-//     trie_pointer                get_trie;
-//     pointer_trie                get_pointer;
-//     int_pointer                 pointer_is_null;
-//     void_pointer                pointer_display;
-//     pointer_pointer_int_pointer trie_fork_connect;
-//     pointer_pointer_2           trie_path_connect;
-//     pointer_pointer_int         trie_fork_disconnect;
-//     pointer_pointer_value       trie_leaf_set_value;
-//     void_pointer                trie_free_single;
-//
-//     value_info_p vi;
-// };
-
-
-
 #define MTF(POINTER) ((mem_trie_fork_p)(POINTER))
 #define MTP(POINTER) ((mem_path_fork_p)(POINTER))
 
 #define MAX 10
+#define LEN 8
+#define PTR_SIZE 8
+
+#define FORK_SIZE (MAX*PTR_SIZE)
 
 STRUCT(mem_trie_fork)
 {
@@ -44,7 +29,7 @@ STRUCT(mem_path_fork)
 
 trie_p mem_get_trie(trie_pointer_p tp)
 {
-    return T(tp);
+    return (trie_p)tp;
 }
 
 trie_pointer_p mem_get_pointer(trie_p t)
@@ -55,12 +40,6 @@ trie_pointer_p mem_get_pointer(trie_p t)
 int mem_pointer_is_null(trie_pointer_p tp)
 {
     return tp == NULL;
-}
-
-void mem_trie_pointer_display(trie_pointer_p tp)
-{
-    trie_p t = mem_get_trie(tp);
-    mem_pointer_display(t);
 }
 
 trie_pointer_p mem_trie_fork_disconnect(trie_pointer_p tp, int key)
@@ -99,5 +78,31 @@ trie_pointer_p mem_trie_leaf_set_value(value_info_p vi, trie_pointer_p tp, value
     return tp;
 }
 
-//     pointer_pointer_value       trie_leaf_set_value;
-//     trie_free_single;
+
+void mem_trie_free_single(trie_pointer_p tp)
+{
+    free(tp);
+}
+
+trie_info_p mem_trie_info(value_info_p vi)
+{
+    trie_info_p ti = malloc(sizeof(trie_info_t));
+    *ti = (trie_info_t) {
+        MAX, LEN,
+        PTR_SIZE, FORK_SIZE,
+        NULL,
+
+        mem_get_trie,
+        mem_get_pointer,
+        mem_pointer_is_null,
+        (void_pointer)mem_pointer_display,
+        mem_trie_fork_connect,
+        mem_trie_path_connect,
+        mem_trie_fork_disconnect,
+        mem_trie_leaf_set_value,
+        mem_trie_free_single,
+
+        vi
+    };
+    return ti;
+} 

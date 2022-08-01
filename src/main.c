@@ -3,27 +3,27 @@
 #include <string.h>
 #include <assert.h>
 
-#include "../lib/lib_value_int/header.h"
+#include "../lib/lib_mem_int_trie/header.h"
 
 int main()
 {
     setbuf(stdout, NULL);
-    
-    trie_int_p t = NULL;
+
+    trie_pointer_p tp = NULL;
 
     char arr[] = {1, 2, 3, 4, 5, 6, 7, 8};
-    trie_int_insert(&t, arr, 1);
+    mem_int_trie_insert(&tp, arr, 1);
     
     arr[2] = 0;
-    trie_int_insert(&t, arr, 2);
+    mem_int_trie_insert(&tp, arr, 2);
     
     arr[4] = 0;
-    trie_int_insert(&t, arr, 3);
+    mem_int_trie_insert(&tp, arr, 3);
     
     arr[2] = 3;
-    trie_int_insert(&t, arr, 4);
+    mem_int_trie_insert(&tp, arr, 4);
 
-    trie_int_display(t);
+    mem_int_trie_display(tp);
     
     printf("\n");
     return 0;

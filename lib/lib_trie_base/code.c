@@ -13,6 +13,10 @@
 
 #define P(POINTER) ((trie_pointer_p)(POINTER))
 
+#define FORK 0
+#define PATH 1
+#define LEAF 2
+
 #define FALSE 0
 #define TRUE  1
 
@@ -50,7 +54,7 @@ void trie_display_rec(trie_info_p ti, trie_pointer_p tp, int len, char res[])
     }
 }
 
-void trie_display(trie_info_p ti, value_info_p vi, trie_pointer_p p)
+void trie_display(trie_info_p ti, trie_pointer_p p)
 {
     char res[ti->len];
     if(ti->pointer_is_null(p))  
@@ -332,9 +336,9 @@ void trie_delete(trie_info_p ti, trie_pointer_p *tp, char arr[])
     *tp = trie_delete_rec(ti, *tp, ti->len, arr);
 }
 
-value_p trie_querie(trie_info_p ti, trie_pointer_p *tp, char arr[])
+value_p trie_querie(trie_info_p ti, trie_pointer_p tp, char arr[])
 {
-    return trie_querie_rec(ti, *tp, ti->len, arr);
+    return trie_querie_rec(ti, tp, ti->len, arr);
 }
 
 
