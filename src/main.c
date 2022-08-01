@@ -9,20 +9,24 @@ int main()
 {
     setbuf(stdout, NULL);
 
-    trie_pointer_p tp = NULL;
+    trie_pointer_p tp = sizeof(void);
+    *(void**)tp = NULL;
 
     char arr[] = {1, 2, 3, 4, 5, 6, 7, 8};
-    mem_int_trie_insert(&tp, arr, 1);
+    mem_int_trie_insert(tp, arr, 1);
+    printf("\nInserted");
     
-    arr[2] = 0;
-    mem_int_trie_insert(&tp, arr, 2);
+    // arr[2] = 0;
+    // mem_int_trie_insert(&tp, arr, 2);
     
-    arr[4] = 0;
-    mem_int_trie_insert(&tp, arr, 3);
+    // arr[4] = 0;
+    // mem_int_trie_insert(&tp, arr, 3);
     
-    arr[2] = 3;
-    mem_int_trie_insert(&tp, arr, 4);
+    // arr[2] = 3;
+    // mem_int_trie_insert(&tp, arr, 4);
 
+
+    printf("\n");
     mem_int_trie_display(tp);
     
     printf("\n");

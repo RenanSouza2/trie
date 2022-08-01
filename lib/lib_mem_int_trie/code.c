@@ -14,22 +14,23 @@ trie_info_p get_mem_int_trie_info()
 }
 
 
-void mem_int_trie_delete(trie_pointer_p *tp, char arr[])
+void mem_int_trie_delete(trie_pointer_p tp, char arr[])
 {
     trie_info_p ti = get_mem_int_trie_info();
-    trie_delete(ti, tp, arr);
+    trie_delete(ti, &tp, arr);
 }
 
-void mem_int_trie_insert(trie_pointer_p *tp, char arr[], int value)
+void mem_int_trie_insert(trie_pointer_p tp, char arr[], int value)
 {
+    printf("\nmem_int_trie_insert");
     trie_info_p ti = get_mem_int_trie_info();
-    trie_insert(ti, tp, arr, (value_p)&value);
+    trie_insert(ti, &tp, arr, (value_p)&value);
 }
 
-void mem_int_trie_display(trie_pointer_p p)
+void mem_int_trie_display(trie_pointer_p tp)
 {
     trie_info_p ti = get_mem_int_trie_info();
-    trie_display(ti, p);
+    trie_display(ti, tp);
 }
 
 int mem_int_trie_querie(trie_pointer_p tp, char len, char arr[])

@@ -17,10 +17,10 @@ int int_value_is_null(value_p value)
 
 value_info_p int_value_info()
 {
-    int *null = malloc(sizeof(int));
+    int *null = calloc(1, sizeof(int));
     *null = 0;
 
-    value_info_p vi = malloc(sizeof(value_info_t));
+    value_info_p vi = calloc(1, sizeof(value_info_t));
     *vi = (value_info_t){SIZE, (value_p)null, int_value_print, int_value_is_null};
     return vi;
 }

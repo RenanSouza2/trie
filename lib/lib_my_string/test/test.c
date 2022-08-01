@@ -6,7 +6,7 @@
 
 void test_string_cmp()
 {
-    string_p str = malloc(sizeof(string_t) + 3);
+    string_p str = calloc(1, sizeof(string_t) + 3);
     str->len = 3;
     str->arr[0] = 1;
     str->arr[1] = 1;

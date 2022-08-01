@@ -18,63 +18,74 @@
 STRUCT(mem_trie_fork)
 {
     trie_fork_t t;
-    trie_pointer_p next[MAX];
+    trie_p next[MAX];
 };
 
 STRUCT(mem_path_fork)
 {
     trie_fork_t t;
-    trie_pointer_p next;
+    trie_p next;
 };
 
 trie_p mem_get_trie(trie_pointer_p tp)
 {
-    return (trie_p)tp;
+    return *(void**)tp;
 }
 
 trie_pointer_p mem_get_pointer(trie_p t)
 {
-    return (trie_pointer_p)t;
+    void **tp = calloc(1, sizeof(void*));
+    *tp = t;
+    return (trie_pointer_p)tp;
 }
 
 int mem_pointer_is_null(trie_pointer_p tp)
 {
-    return tp == NULL;
+    return mem_get_trie(tp) == NULL;
 }
 
 trie_pointer_p mem_trie_fork_disconnect(trie_pointer_p tp, int key)
 {
-    if(MTF(tp)->next[key] == NULL) return tp;
+    trie_p t = mem_get_trie(tp);
+    if(MTF(t)->next[key] == NULL) return tp;
 
-    if(TF(tp)->connected == 1)
+    if(TF(t)->connected == 1)
     {
-        free(tp);
+        free(t);
         return NULL;
     }
 
-    (TF(tp)->connected)--;
+    (TF(t)->connected)--;
     return tp;
 }
 
 trie_pointer_p mem_trie_fork_connect(trie_pointer_p tp, int key, trie_pointer_p tp_next)
 {
-    if(tp_next == NULL) return mem_trie_fork_disconnect(tp, key);
+    trie_p t_next = mem_get_trie(tp);
+    if(t_next == NULL) return mem_trie_fork_disconnect(tp, key);
 
-    if(MTF(tp)->next[key] == NULL) (TF(tp)->connected)++;
+    trie_p t = mem_get_trie(tp);
+    if(MTF(t)->next[key] == NULL) (TF(tp)->connected)++;
 
-    MTF(tp)->next[key] = tp_next;
+    MTF(t)->next[key] = t_next;
     return tp;
 }
 
+#define VOID(POINTER) ((void*)(POINTER))
+#define DIFF(POINTER1, POINTER2) ((VOID(POINTER1)) - (VOID(POINTER2)))
+#define OFFSET(STR, ARG) (DIFF(&(STR.ARG), &STR))
+
 trie_pointer_p mem_trie_path_connect(trie_pointer_p tp, trie_pointer_p tp_next)
 {
-    MTP(tp)->next = tp_next;
+    trie_p t = mem_get_trie(tp);
+    MTP(t)->next = mem_get_trie(tp_next);
     return tp;
 }
 
 trie_pointer_p mem_trie_leaf_set_value(value_info_p vi, trie_pointer_p tp, value_p value)
 {
-    memcpy(LV(tp), value, vi->size);
+    trie_p t = mem_get_trie(tp);
+    memcpy(LV(t), value, vi->size);
     return tp;
 }
 
@@ -86,11 +97,11 @@ void mem_trie_free_single(trie_pointer_p tp)
 
 trie_info_p mem_trie_info(value_info_p vi)
 {
-    trie_info_p ti = malloc(sizeof(trie_info_t));
+    trie_info_p ti = calloc(1, sizeof(trie_info_t));
     *ti = (trie_info_t) {
         MAX, LEN,
         PTR_SIZE, FORK_SIZE,
-        NULL,
+        mem_get_pointer(NULL),
 
         mem_get_trie,
         mem_get_pointer,

@@ -39,9 +39,8 @@ void trie_display_rec(trie_info_p ti, trie_pointer_p tp, int len, char res[])
 
         case PATH:;
         string_p str = PS(t);
-        memcpy(&res[len], str->arr, str->len);
-
         trie_pointer_p next = PN(t);
+        memcpy(&res[len], str->arr, str->len);
         trie_display_rec(ti, next, len + str->len, res);
         break;
 
@@ -49,18 +48,18 @@ void trie_display_rec(trie_info_p ti, trie_pointer_p tp, int len, char res[])
         printf("\n");
         for(int i=0; i<len; i++)
             printf(" %2d", res[i]);
-        printf("\t->\t"); ti->vi->value_print(LV(t));
+        printf("\t->\t"); 
+        ti->vi->value_print(LV(t));
         break;
     }
 }
 
-void trie_display(trie_info_p ti, trie_pointer_p p)
+void trie_display(trie_info_p ti, trie_pointer_p tp)
 {
     char res[ti->len];
-    if(ti->pointer_is_null(p))  
-        printf("\nEMPTY TRIE");
-    else                        
-        trie_display_rec(ti, p, 0, res);
+    printf("\nBefore test");
+    if(ti->pointer_is_null(tp)) printf("\nEMPTY TRIE");
+    else                        trie_display_rec(ti, tp, 0, res);
     printf("\n");
 }
 
@@ -68,7 +67,7 @@ void trie_display(trie_info_p ti, trie_pointer_p p)
 
 trie_pointer_p trie_fork_create(trie_info_p ti, trie_pointer_p tp_next, int key)
 {
-    trie_p t = malloc(ti->fork_size);
+    trie_p t = calloc(1, ti->fork_size);
     assert(t);
 
     t->type = FORK;
@@ -84,11 +83,17 @@ trie_pointer_p trie_fork_create(trie_info_p ti, trie_pointer_p tp_next, int key)
     return ti->trie_fork_connect(tp, key, tp_next);
 }
 
+#define VOID(POINTER) ((void*)(POINTER))
+#define DIFF(POINTER1, POINTER2) ((VOID(POINTER1)) - (VOID(POINTER2)))
+
 trie_pointer_p trie_path_create_force(trie_info_p ti, char len, char arr[], trie_pointer_p tp_next)
 {
+    printf("\nCreating path force");
+    printf("\ntp_next: %p", ti->get_trie(tp_next));
+
     assert(len > 0);
 
-    trie_p t = malloc(sizeof(trie_fork_p) + ti->pointer_size + len);
+    trie_p t = calloc(1, sizeof(trie_fork_p) + ti->pointer_size + len);
     assert(t);
 
     string_p str = PS(t);
@@ -98,9 +103,13 @@ trie_pointer_p trie_path_create_force(trie_info_p ti, char len, char arr[], trie
 
     trie_pointer_p next = PN(t);
     memcpy(next, ti->null, ti->pointer_size);
-
+    
     trie_pointer_p tp = ti->get_pointer(t);
-    return ti->trie_path_connect(tp, tp_next);
+    tp = ti->trie_path_connect(tp, tp_next);
+
+    t = ti->get_trie(tp);
+    next = PN(t);
+    return tp;
 }
 
 trie_pointer_p trie_path_create(trie_info_p ti, char len, char arr[], trie_pointer_p tp_next)
@@ -116,8 +125,10 @@ trie_pointer_p trie_path_create(trie_info_p ti, char len, char arr[], trie_point
 
 trie_pointer_p trie_leaf_create(trie_info_p ti, value_p value)
 {
-    trie_p t = malloc(sizeof(trie_fork_p) + ti->vi->size);
+    trie_p t = calloc(1, sizeof(trie_fork_p) + ti->vi->size);
     assert(t);
+
+    printf("\nleaf created: %p", t);
 
     value_p _value = LV(t);
     memcpy(_value, ti->vi->null, ti->vi->size);
@@ -261,10 +272,13 @@ trie_pointer_p trie_delete_rec(trie_info_p ti, trie_pointer_p tp, char len, char
 
 trie_pointer_p trie_insert_rec(trie_info_p ti, trie_pointer_p tp, char len, char arr[], value_p value)
 {
+    printf("\ntrie_insert_rec");
     if(ti->pointer_is_null(tp))
     {
+        printf("\nInside\n");
         tp = trie_leaf_create(ti, value);
-        return trie_path_create(ti, len, arr, tp);
+        tp = trie_path_create(ti, len, arr, tp);
+        return tp;
     }
 
     trie_p t = ti->get_trie(tp);
@@ -326,9 +340,10 @@ value_p trie_querie_rec(trie_info_p ti, trie_pointer_p tp, char len, char arr[])
 
 void trie_insert(trie_info_p ti, trie_pointer_p *tp, char arr[], value_p value)
 {
+    printf("\ntrie_insert");
     *tp = (ti->vi->value_is_null(value)) 
-        ? trie_insert_rec(ti, *tp, ti->len, arr, value) 
-        : trie_delete_rec(ti, *tp, ti->len, arr);
+        ? trie_delete_rec(ti, *tp, ti->len, arr)
+        : trie_insert_rec(ti, *tp, ti->len, arr, value);
 }
 
 void trie_delete(trie_info_p ti, trie_pointer_p *tp, char arr[])
