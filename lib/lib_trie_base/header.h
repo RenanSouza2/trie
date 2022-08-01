@@ -9,6 +9,8 @@
 #define LEAF 2
 
 #define TF(POINTER) ((trie_fork_p)(POINTER))
+#define HP(POINTER) ((char*)(TF(POINTER) + 1))
+#define LV(POINTER) ((value_p)(HP(POINTER)))
 
 STRUCT(trie)
 {
@@ -42,7 +44,7 @@ typedef trie_p(*trie_pointer)(trie_pointer_p);
 typedef trie_pointer_p(*pointer_trie)(trie_p);
 typedef trie_pointer_p(*pointer_pointer_2)(trie_pointer_p,trie_pointer_p);
 typedef trie_pointer_p(*pointer_pointer_int)(trie_pointer_p,int);
-typedef trie_pointer_p(*pointer_pointer_value)(trie_pointer_p,value_p);
+typedef trie_pointer_p(*pointer_pointer_value)(value_info,trie_pointer_p,value_p);
 typedef trie_pointer_p(*pointer_pointer_int_pointer)(trie_pointer_p,int,trie_pointer_p);
 
 

@@ -7,11 +7,9 @@
 #include "../lib_my_string/header.h"
 
 #define T(POINTER)  ((trie_p)(POINTER))
-#define HP(POINTER) ((char*)(TF(POINTER) + 1))
 #define FN(POINTER, INDEX) ((trie_pointer_p)(HP(POINTER) + INDEX * ti->pointer_size))
 #define PN(POINTER) ((trie_pointer_p)(HP(POINTER)))
 #define PS(POINTER) ((string_p)(HP(POINTER) + ti->pointer_size))
-#define LV(POINTER) ((value_p)(HP(POINTER)))
 
 #define P(POINTER) ((trie_pointer_p)(POINTER))
 
@@ -62,11 +60,6 @@ void trie_display(trie_info_p ti, value_info_p vi, trie_pointer_p p)
     printf("\n");
 }
 
-
-    // pointer_pointer_int         trie_fork_create;
-    // pointer_char_charv_pointer  trie_path_create_force;
-    // pointer_char_charv_pointer  trie_path_create;
-    // pointer_value               trie_leaf_create;
 
 
 trie_pointer_p trie_fork_create(trie_info_p ti, trie_pointer_p tp_next, int key)
@@ -240,7 +233,7 @@ trie_pointer_p trie_delete_rec(trie_info_p ti, trie_pointer_p tp, char len, char
         if(index < path_len) return tp;
 
         next = PN(t);
-        tp_next = trie_delete_rec(ti, next, len - path_len, &arr[path_len]);
+        tp_next = trie_delete_rec(ti, next, len-path_len, &arr[path_len]);
 
         if(ti->pointer_is_null(tp_next))
         {
@@ -272,9 +265,8 @@ trie_pointer_p trie_insert_rec(trie_info_p ti, trie_pointer_p tp, char len, char
     trie_p t = ti->get_trie(tp);
     if(t->type == LEAF)
     {
-        assert(!len);
-        ti->trie_free_single(tp);
-        return trie_leaf_create(ti, value);
+        assert(len == 0);
+        return ti->trie_leaf_set_value(ti->vi, tp, value);
     }
 
     if(t->type == PATH)
@@ -289,14 +281,14 @@ trie_pointer_p trie_insert_rec(trie_info_p ti, trie_pointer_p tp, char len, char
         if(t->type == PATH)
         {
             trie_pointer_p next = PN(t);
-            next = trie_insert_rec(ti, next, len - index, &arr[index], value);
+            next = trie_insert_rec(ti, next, len-index, &arr[index], value);
             return ti->trie_path_connect(tp, next);
         }
     }
 
     int key = arr[0];
     trie_pointer_p next = FN(t, key);
-    next = trie_insert_rec(ti, next, len - 1, &arr[1], value);
+    next = trie_insert_rec(ti, next, len-1, &arr[1], value);
     return ti->trie_fork_connect(tp, key, next);
 }
 

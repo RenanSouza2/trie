@@ -3,9 +3,33 @@
 #include "header.h"
 #include "../lib_trie_base/header.h"
 
-void value_print(value_p value)
+// STRUCT(value_info)
+// {
+//     int size;
+//     value_p null;
+
+//     void_value  value_print;
+//     int_value   value_is_null;
+// };
+
+void int_value_print(value_p value)
 {
     printf("%d", *(int*)value);
+}
+
+int int_value_is_null(value_p value)
+{
+    return *(int*)value == 0;
+}
+
+value_info_p get_value_info()
+{
+    int *null = malloc(sizeof(int));
+    *null = 0;
+
+    value_info_p vi = malloc(sizeof(value_info_t));
+    vi = {4, null, int_value_print, int_value_is_null};
+    return vi;
 }
 
 value_info_t value_int = (value_info_t){4, value_print};

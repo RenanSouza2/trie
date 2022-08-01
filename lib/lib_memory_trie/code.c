@@ -91,5 +91,7 @@ trie_pointer_p mem_trie_path_connect(trie_pointer_p tp, trie_pointer_p tp_next)
     return tp;
 }
 
+trie_pointer_p mem_trie_path_connect(trie_pointer_p tp, trie_pointer_p tp_next)
+
 //     pointer_pointer_value       trie_leaf_set_value;
 //     trie_free_single;
