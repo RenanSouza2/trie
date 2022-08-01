@@ -44,7 +44,7 @@ typedef trie_p(*trie_pointer)(trie_pointer_p);
 typedef trie_pointer_p(*pointer_trie)(trie_p);
 typedef trie_pointer_p(*pointer_pointer_2)(trie_pointer_p,trie_pointer_p);
 typedef trie_pointer_p(*pointer_pointer_int)(trie_pointer_p,int);
-typedef trie_pointer_p(*pointer_pointer_value)(value_info,trie_pointer_p,value_p);
+typedef trie_pointer_p(*pointer_value_pointer_value)(value_info_p,trie_pointer_p,value_p);
 typedef trie_pointer_p(*pointer_pointer_int_pointer)(trie_pointer_p,int,trie_pointer_p);
 
 
@@ -61,7 +61,7 @@ STRUCT(trie_info)
     pointer_pointer_int_pointer trie_fork_connect;
     pointer_pointer_2           trie_path_connect;
     pointer_pointer_int         trie_fork_disconnect;
-    pointer_pointer_value       trie_leaf_set_value;
+    pointer_value_pointer_value trie_leaf_set_value;
     void_pointer                trie_free_single;
 
     value_info_p vi;

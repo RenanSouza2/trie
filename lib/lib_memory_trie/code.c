@@ -23,6 +23,8 @@
 //     value_info_p vi;
 // };
 
+
+
 #define MTF(POINTER) ((mem_trie_fork_p)(POINTER))
 #define MTP(POINTER) ((mem_path_fork_p)(POINTER))
 
@@ -91,7 +93,11 @@ trie_pointer_p mem_trie_path_connect(trie_pointer_p tp, trie_pointer_p tp_next)
     return tp;
 }
 
-trie_pointer_p mem_trie_path_connect(trie_pointer_p tp, trie_pointer_p tp_next)
+trie_pointer_p mem_trie_leaf_set_value(value_info_p vi, trie_pointer_p tp, value_p value)
+{
+    memcpy(LV(tp), value, vi->size);
+    return tp;
+}
 
 //     pointer_pointer_value       trie_leaf_set_value;
 //     trie_free_single;

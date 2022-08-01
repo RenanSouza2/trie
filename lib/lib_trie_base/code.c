@@ -119,7 +119,7 @@ trie_pointer_p trie_leaf_create(trie_info_p ti, value_p value)
     memcpy(_value, ti->vi->null, ti->vi->size);
 
     trie_pointer_p tp = ti->get_pointer(t);
-    return ti->trie_leaf_set_value(tp, value);
+    return ti->trie_leaf_set_value(ti->vi, tp, value);
 }
 
 
@@ -130,6 +130,18 @@ int trie_joinnable(trie_p t)
     if(t->type == PATH) return TRUE;
     if(t->type == LEAF) return FALSE;
     return TF(t)->connected == 1;
+}
+
+int trie_fork_first_key(trie_info_p ti, trie_p t)
+{
+    for(int i=0; i < ti->max; i++)
+    {
+        trie_pointer_p next = FN(t,i);
+        if(ti->pointer_is_null(next)) continue;
+
+        return i;
+    }
+    assert(FALSE);
 }
 
 trie_pointer_p trie_path_break(trie_info_p ti, trie_pointer_p tp, int len)
@@ -147,17 +159,6 @@ trie_pointer_p trie_path_break(trie_info_p ti, trie_pointer_p tp, int len)
 
     ti->trie_free_single(tp);
     return t_aux;
-}
-
-int trie_fork_first_key(trie_info_p ti, trie_pointer_p tp)
-{
-    for(int i=0; i < ti->max; i++)
-    {
-        trie_pointer_p next = FN(tp,i);
-        if(ti->pointer_is_null(next)) continue;
-
-        return i;
-    }
 }
 
 trie_pointer_p trie_fork_convert(trie_info_p ti, trie_pointer_p tp)

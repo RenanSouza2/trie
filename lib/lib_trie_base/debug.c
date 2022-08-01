@@ -43,7 +43,7 @@ void trie_display_single(trie_info_p ti, trie_pointer_p tp) {
 
         case LEAF:
         printf("\t(LEAF)");
-        ti->vi.value_print(VP(t));
+        ti->vi->value_print(VP(t));
         break;
     }
     printf("\n");
