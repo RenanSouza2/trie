@@ -157,6 +157,7 @@ trie_pointer_p trie_leaf_create(trie_info_p ti, value_p value)
     assert(t);
 
     value_p _value = LV(t);
+    t->type = LEAF;
     memcpy(_value, value, ti->vi->size);
     free(value);
 

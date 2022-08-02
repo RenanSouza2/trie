@@ -14,17 +14,17 @@ trie_info_p get_mem_int_trie_info()
 }
 
 
-void mem_int_trie_delete(trie_pointer_p tp, char arr[])
+void mem_int_trie_delete(trie_pointer_p *tp, char arr[])
 {
     trie_info_p ti = get_mem_int_trie_info();
-    trie_delete(ti, &tp, arr);
+    trie_delete(ti, tp, arr);
 }
 
-void mem_int_trie_insert(trie_pointer_p tp, char arr[], int value)
+void mem_int_trie_insert(trie_pointer_p *tp, char arr[], int value)
 {
     trie_info_p ti = get_mem_int_trie_info();
     value_p vp = int_value_create(value);
-    trie_insert(ti, &tp, arr, vp);
+    trie_insert(ti, tp, arr, vp);
 }
 
 void mem_int_trie_display(trie_pointer_p tp)
