@@ -30,22 +30,20 @@ typedef void(*void_pointer_2)(trie_pointer_p,trie_pointer_p);
 typedef void(*void_pointer_int)(trie_pointer_p,int);
 typedef void(*void_value_pointer_value)(value_info_p,trie_pointer_p,value_p);
 typedef void(*void_pointer_int_pointer)(trie_pointer_p,int,trie_pointer_p);
+typedef trie_pointer_p(*pointer_pointer_trie)(trie_pointer_p,trie_p);
 
 
 STRUCT(trie_info)
 {
     int max, len;
-    int pointer_size, fork_size;
+    int pointer_size, fork_size, path_size, leaf_size;
     trie_pointer_p null;
 
     trie_pointer                get_trie;
     pointer_trie                get_pointer;
     int_pointer                 pointer_is_null;
     void_pointer                pointer_display;
-    void_pointer_int_pointer    trie_fork_connect;
-    void_pointer_2              trie_path_connect;
-    void_pointer_int            trie_fork_disconnect;
-    void_value_pointer_value    trie_leaf_set_value;
+    pointer_pointer_trie        trie_replace;
     void_pointer                trie_free_single;
 
     value_info_p vi;
