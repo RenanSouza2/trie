@@ -10,6 +10,7 @@
 #define FN(POINTER, INDEX) ((trie_pointer_p)(HP(POINTER) + INDEX * ti->pointer_size))
 #define PN(POINTER) ((trie_pointer_p)(HP(POINTER)))
 #define PS(POINTER) ((string_p)(HP(POINTER) + ti->pointer_size))
+#define TPC(POINTER1, POINTER2) (memcpy(POINTER1, POINTER2, ti->pointer_size))
 
 #define P(POINTER) ((trie_pointer_p)(POINTER))
 
@@ -20,6 +21,25 @@
 #define FALSE 0
 #define TRUE  1
 
+trie_pointer_p trie_fork_next(trie_info_p ti, trie_p t, int key)
+{
+    trie_pointer_p tp = calloc(1, sizeof(ti->pointer_size));
+    assert(tp);
+
+    trie_pointer_p next = FN(t, key);
+    TPC(tp, next);
+    return tp;
+}
+
+trie_pointer_p trie_path_next(trie_info_p ti, trie_p t)
+{
+    trie_pointer_p tp = calloc(1, sizeof(ti->pointer_size));
+    assert(tp);
+
+    trie_pointer_p next = PN(t);
+    TPC(tp, next);
+    return tp;
+}
 
 void trie_display_rec(trie_info_p ti, trie_pointer_p tp, int len, char res[])
 {
