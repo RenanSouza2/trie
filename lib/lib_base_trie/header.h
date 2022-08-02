@@ -3,7 +3,7 @@
 
 #include "../struct.h"
 #include "../lib_my_string/header.h"
-#include "../lib_value_base/header.h"
+#include "../lib_base_header/value.h"
 
 #define TF(POINTER) ((trie_fork_p)(POINTER))
 #define HP(POINTER) ((char*)(TF(POINTER) + 1))
@@ -40,7 +40,7 @@ STRUCT(trie_info)
     trie_pointer_p null;
 
     trie_pointer                get_trie;
-    pointer_trie                get_pointer;
+    pointer_trie                pointer_create;
     int_pointer                 pointer_is_null;
     void_pointer                pointer_display;
     pointer_pointer_trie        trie_replace;
