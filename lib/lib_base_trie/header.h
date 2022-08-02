@@ -22,15 +22,11 @@ STRUCT(trie_fork)
 
 STRUCT(trie_pointer);
 
-typedef void(*void_pointer)(trie_pointer_p);
 typedef int(*int_pointer)(trie_pointer_p);
+typedef void(*void_pointer)(trie_pointer_p);
 typedef trie_p(*trie_pointer)(trie_pointer_p);
 typedef trie_pointer_p(*pointer_trie)(trie_p);
-typedef void(*void_pointer_2)(trie_pointer_p,trie_pointer_p);
-typedef void(*void_pointer_int)(trie_pointer_p,int);
-typedef void(*void_value_pointer_value)(value_info_p,trie_pointer_p,value_p);
-typedef void(*void_pointer_int_pointer)(trie_pointer_p,int,trie_pointer_p);
-typedef trie_pointer_p(*pointer_pointer_trie)(trie_pointer_p,trie_p);
+typedef void(*void_pointer_trie)(trie_pointer_p,trie_p);
 
 
 STRUCT(trie_info)
@@ -39,12 +35,12 @@ STRUCT(trie_info)
     int pointer_size, fork_size, path_size, leaf_size;
     trie_pointer_p null;
 
-    trie_pointer                get_trie;
-    pointer_trie                pointer_create;
-    int_pointer                 pointer_is_null;
-    void_pointer                pointer_display;
-    pointer_pointer_trie        trie_replace;
-    void_pointer                trie_free_single;
+    trie_pointer        get_trie;
+    pointer_trie        pointer_create;
+    int_pointer         pointer_is_null;
+    void_pointer        pointer_display;
+    void_pointer_trie   trie_replace;
+    void_pointer        trie_free_single;
 
     value_info_p vi;
 };

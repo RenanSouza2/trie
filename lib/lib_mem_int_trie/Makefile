@@ -4,7 +4,7 @@ INT_FILE=$(INT_PATH)/lib.o
 MEM_PATH=../lib_mem_ptr
 MEM_FILE=$(MEM_PATH)/lib.o
 
-BASE_PATH=../lib_trie_base
+BASE_PATH=../lib_base_trie
 BASE_FILE=$(BASE_PATH)/lib.o
 
 FLAGS=-c -Wall -Werror -Wfatal-errors

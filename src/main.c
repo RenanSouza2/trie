@@ -9,11 +9,10 @@ int main()
 {
     setbuf(stdout, NULL);
 
-    trie_pointer_p tp = sizeof(void);
-    *(void**)tp = NULL;
+    trie_pointer_p tp = NULL;
 
     char arr[] = {1, 2, 3, 4, 5, 6, 7, 8};
-    mem_int_trie_insert(tp, arr, 1);
+    mem_int_trie_insert(&tp, arr, 1);
     printf("\nInserted");
     
     // arr[2] = 0;

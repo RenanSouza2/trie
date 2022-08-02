@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "header.h"
 
@@ -13,7 +14,16 @@ void int_value_print(value_p value)
 int int_value_is_null(value_p value)
 {
     return *(int*)value == 0;
-} 
+}
+
+value_p int_value_create(int value)
+{
+    value_p vp = malloc(sizeof(int));
+    assert(vp);
+
+    *(int*)vp = value;
+    return vp;
+}
 
 value_info_p int_value_info()
 {

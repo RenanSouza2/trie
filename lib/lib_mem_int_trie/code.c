@@ -22,9 +22,9 @@ void mem_int_trie_delete(trie_pointer_p tp, char arr[])
 
 void mem_int_trie_insert(trie_pointer_p tp, char arr[], int value)
 {
-    printf("\nmem_int_trie_insert");
     trie_info_p ti = get_mem_int_trie_info();
-    trie_insert(ti, &tp, arr, (value_p)&value);
+    value_p vp = int_value_create(value);
+    trie_insert(ti, &tp, arr, vp);
 }
 
 void mem_int_trie_display(trie_pointer_p tp)
