@@ -5,4 +5,6 @@
     typedef NAME##_t *NAME##_p;         \
     struct _##NAME
 
+#define PLACEHOLDER(NAME) typedef struct _##NAME *NAME##_p
+
 #endif
