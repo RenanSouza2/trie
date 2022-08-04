@@ -43,6 +43,7 @@ void assert_leaf(trie_p t, int value)
 
 void test_create()
 {
+    printf("\ntest_create");
     trie_p t = trie_fork_create();
     assert(t->type == FORK);
     assert(TF(t)->connected == 0);
@@ -74,13 +75,16 @@ void test_create()
     trie_free_single(t);
 
     int value = 1;
-    t = trie_leaf_create(&value_int, VALUE(value));
+    value_info_p vi = get_int_value_info();
+    value_p v = value_int(value);
+    t = trie_leaf_create(vi, v);
     assert_leaf(t, value);
     trie_free_single(t);
 }
 
 void test_connection()
 {
+    printf("\ntest_connection");
     trie_p t = trie_fork_create();
     
     trie_fork_connect(t, t, 5);
@@ -123,7 +127,9 @@ void test_joinable()
 {
     int value = 1;
 
-    trie_p t = trie_leaf_create(&value_int, (value_p)(&value));
+    value_info_p vi = get_int_value_info();
+    value_p vp = value_int(value);
+    trie_p t = trie_leaf_create(vi, vp);
     assert(trie_joinnable(t) == FALSE);
     trie_free_single(t);
 
@@ -220,6 +226,7 @@ void test_join()
 
 void test_unit()
 {
+    printf("\ntest_unit");
     test_create();
     test_connection();
     test_joinable();
@@ -234,10 +241,14 @@ void test_unit()
 
 void test_insert()
 {
+    printf("\ntest_insert");
     char arr[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+    value_info_p vi = get_int_value_info();
 
-    trie_int_p t = NULL;
-    trie_int_insert(&t, arr, 1);
+    trie_p t = NULL;
+
+    value_p value = value_int(1);
+    trie_insert(vi, &t, arr, value);
     assert_path(T(t), NULL, 8, arr);
 
     trie_p t1 = TP(t)->next;
@@ -245,14 +256,16 @@ void test_insert()
 
     //////////////////
 
-    trie_int_insert(&t, arr, 2);
+    value = value_int(2);
+    trie_insert(vi, &t, arr, value);
     t1 = TP(t)->next;
     assert_leaf(t1, 2);
 
     //////////////////
 
     arr[4] = 0;
-    trie_int_insert(&t, arr, 3);
+    value = value_int(3);
+    trie_insert(vi, &t, arr, value);
     assert_path(T(t), NULL, 4, arr);
 
     t1 = TP(t)->next;
@@ -265,7 +278,8 @@ void test_insert()
     //////////////////
 
     arr[0] = 1;
-    trie_int_insert(&t, arr, 4);
+    value = value_int(4);
+    trie_insert(vi, &t, arr, value);
     assert_fork(T(t), 1, NULL);
 
     t1 = TF(t)->next[1];
@@ -275,58 +289,76 @@ void test_insert()
     //////////////////
 
     arr[0] = 2;
-    trie_int_insert(&t, arr, 5);
+    value = value_int(5);
+    trie_insert(vi, &t, arr, value);
     assert_fork(T(t), 2, NULL);
 
     t1 = TF(t)->next[2];
     assert_path(t1, NULL, 7, &arr[1]);
     assert_leaf(TP(t1)->next, 5);
 
-    trie_int_free(t);
+    trie_free(t);
+    free(vi);
 }
 
 void test_querie()
 {
+    printf("\ntest_querie");
+    value_info_p vi = get_int_value_info();
     char arr[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-    trie_int_p t = NULL;
-    
-    int res = trie_int_querie(t, arr);
+    trie_p t = NULL;
+
+    value_p value = trie_querie(t, arr);
+    int res = int_value(value);
     assert(res == 0);
 
-    trie_int_insert(&t, arr, 1);
-    res = trie_int_querie(t, arr);
+    value = value_int(1);
+    trie_insert(vi, &t, arr, value);
+    value = trie_querie(t, arr);
+    res = int_value(value);
     assert(res == 1);
 
     arr[4] = 0;
-    trie_int_insert(&t, arr, 2);
-    res = trie_int_querie(t, arr);
+    value = value_int(2);
+    trie_insert(vi, &t, arr, value);
+    value = trie_querie(t, arr);
+    res = int_value(value);
     assert(res == 2);
 
     arr[2] = 0;
-    res = trie_int_querie(t, arr);
+    value = trie_querie(t, arr);
+    res = int_value(value);
     assert(res == 0);
     
-    trie_int_free(t);
+    trie_free(t);
+    free(vi);
 }
 
 void test_delete_1()
 {
-    trie_int_p t = NULL;
+    printf("\ntest_delete_1");
+    value_info_p vi = get_int_value_info();
+    trie_p t = NULL;
     char arr[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-    trie_int_insert(&t, arr, 1);
+    value_p value = value_int(1);
+    trie_insert(vi, &t, arr, value);
 
     arr[4] = 0;
-    trie_int_insert(&t, arr, 2);
+    value = value_int(2);
+    trie_insert(vi, &t, arr, value);
 
     arr[5] = 0;
-    trie_int_insert(&t, arr, 3);
+    value = value_int(3);
+    trie_insert(vi, &t, arr, value);
 
     arr[6] = 0;
-    trie_int_insert(&t, arr, 4);
+    value = value_int(4);
+    trie_insert(vi, &t, arr, value);
 
     arr[6] = 1;
-    trie_int_insert(&t, arr, 5);
-    trie_int_delete(&t, arr);
+    value = value_int(5);
+    trie_insert(vi, &t, arr, value);
+    trie_delete(vi, &t, arr);
     arr[6] = 0;
 
     trie_p t1 = TP(t)->next;
@@ -335,7 +367,7 @@ void test_delete_1()
     assert_fork(t1, 0, NULL);
     assert(TF(t1)->next[1] == NULL);
     
-    trie_int_delete(&t, arr);
+    trie_delete(vi, &t, arr);
     arr[6] = 6;
     
     t1 = TP(t)->next;
@@ -343,7 +375,7 @@ void test_delete_1()
     t1 = TF(t1)->next[0];
     assert_path(t1, NULL, 2, &arr[6]);
 
-    trie_int_delete(&t, arr);
+    trie_delete(vi, &t, arr);
     arr[5] = 5;
     assert_path(T(t), NULL, 4, arr);
 
@@ -354,35 +386,41 @@ void test_delete_1()
     t1 = TF(t1)->next[0];
     assert_path(t1, NULL, 3, &arr[5]);
 
-    trie_int_delete(&t, arr);
+    trie_delete(vi, &t, arr);
     arr[4] = 4;
     assert_path(T(t), NULL, 8, arr);
 
     arr[4] = 1;
-    trie_int_delete(&t, arr);
+    trie_delete(vi, &t, arr);
     arr[4] = 4;
     assert_path(T(t), NULL, 8, arr);
 
-    trie_int_delete(&t, arr);
+    trie_delete(vi, &t, arr);
     assert(t == NULL);
 
-    trie_int_delete(&t, arr);
+    trie_delete(vi, &t, arr);
     assert(t == NULL);
+    free(vi);
 }
 
 void test_delete_2()
 {
+    printf("\ntest_delete_2");
+    value_info_p vi = get_int_value_info();
     char arr[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     
-    trie_int_p t = NULL;
-    trie_int_insert(&t, arr, 1);
+    trie_p t = NULL;
+    value_p value = value_int(1);
+    trie_insert(vi, &t, arr, value);
 
     arr[5] = 1;
-    trie_int_insert(&t, arr, 2);
+    value = value_int(2);
+    trie_insert(vi, &t, arr, value);
 
     arr[7] = 1;
-    trie_int_insert(&t, arr, 3);
-    trie_int_delete(&t, arr);
+    value = value_int(3);
+    trie_insert(vi, &t, arr, value);
+    trie_delete(vi, &t, arr);
 
     assert_path(T(t), NULL, 5, arr);
     trie_p t1 = TP(t)->next;
@@ -390,10 +428,12 @@ void test_delete_2()
     t1 = TF(t1)->next[1];
     assert_path(t1, NULL, 2, arr);
     
-    trie_int_free(t);
+    trie_free(t);
 }
+
 void test_integration()
 {
+    printf("\ntest_integration");
     test_insert();
     test_querie();
 
@@ -407,6 +447,7 @@ void test_integration()
 
 void test_trie()
 {
+    printf("\ntest_trie");
     test_unit();
     test_integration();
 
@@ -420,6 +461,6 @@ int main()
     setbuf(stdout, NULL);
     test_trie();
     assert_memory();
-    printf("\tTest successful\n");
+    printf("\n\n\tTest successful\n\n");
     return 0;
 }

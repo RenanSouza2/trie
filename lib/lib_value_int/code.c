@@ -1,6 +1,9 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
 
 #include "header.h"
+#include "../lib_base_header/value.h"
 #include "../lib_trie_base/header.h"
 
 void value_print(value_p value)
@@ -8,36 +11,25 @@ void value_print(value_p value)
     printf("%d", *(int*)value);
 }
 
-value_info_t value_int = (value_info_t){4, value_print};
-
-
-#define VALUE(INT) ((value_p)(&(INT)))
-
-void trie_int_delete(trie_int_p *t, char arr[])
+value_p value_int(int value)
 {
-    trie_delete(&value_int, (trie_p*)t, arr);
+    value_p vp = malloc(sizeof(int));
+    assert(value);
+
+    *(int*)vp = value;
+    return vp;
 }
 
-void trie_int_insert(trie_int_p *t, char arr[], int value)
+int int_value(value_p value)
 {
-    trie_insert(&value_int, (trie_p*)t, arr, VALUE(value));
+    return (value == NULL) ? 0 : *(int*)value;
 }
 
-void trie_int_display(trie_int_p t)
+value_info_p get_int_value_info()
 {
-    trie_display(&value_int, (trie_p)t);
-}
+    value_info_p vi = malloc(sizeof(value_info_p));
+    assert(vi);
 
-int  trie_int_querie(trie_int_p t, char arr[])
-{
-    value_p value = trie_querie((trie_p)t, arr);
-    if(value == NULL) return 0;
-
-    int int_value = *(int*)value;
-    return int_value;
-}
-
-void trie_int_free(trie_int_p t)
-{
-    trie_free((trie_p)t);
+    *vi = (value_info_t){4, value_print};
+    return vi;
 }

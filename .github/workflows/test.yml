@@ -1,17 +1,11 @@
-name: C/C++ CI
+name: C CI
 
-on:
-  pull_request:
-    branches: [ "*" ]
+on: [push]
 
 jobs:
   test:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-    - name: make
-      run: make rebuild
     - run: make test
       

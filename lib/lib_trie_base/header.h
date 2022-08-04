@@ -1,22 +1,9 @@
-#ifndef LIB_TRIE_H
-#define LIB_TRIE_H
+#ifndef __LIB_TRIE_H__
+#define __LIB_TRIE_H__
 
-#include "../struct.h"
-#include "../lib_my_string/header.h"
+#include "../lib_base_header/value.h"
 
-STRUCT(trie)
-{
-    int type;
-};
-
-STRUCT(value);
-typedef void (*void_value)(value_p);
-
-STRUCT(value_info)
-{
-    int size;
-    void_value value_print;
-};
+PLACEHOLDER(trie);
 
 void trie_delete(value_info_p vi, trie_p *t, char arr[]);
 void trie_insert(value_info_p vi, trie_p *t, char arr[], value_p value);

@@ -1,14 +1,13 @@
-#ifndef LIB_VALUE_INT_H
-#define LIB_VALUE_INT_H
+#ifndef __LIB_VALUE_INT_H__
+#define __LIB_VALUE_INT_H__
 
-typedef struct _trie_int  *trie_int_p;
+#include "../struct.h"
 
-void trie_int_delete(trie_int_p *t, char arr[]);
-void trie_int_insert(trie_int_p *t, char arr[], int value);
+PLACEHOLDER(value);
+PLACEHOLDER(value_info);
 
-void trie_int_display(trie_int_p t);
-int  trie_int_querie(trie_int_p t, char arr[]);
-
-void trie_int_free(trie_int_p t);
+value_p value_int(int value);
+int int_value(value_p value);
+value_info_p get_int_value_info();
 
 #endif

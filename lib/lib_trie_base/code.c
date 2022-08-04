@@ -10,7 +10,7 @@
 #define TF(POINTER) ((trie_fork_p)(POINTER))
 #define TP(POINTER) ((trie_path_p)(POINTER))
 #define TL(POINTER) ((trie_leaf_p)(POINTER))
-#define VP(POINTER) ((value_t*)(TL(POINTER) + 1))
+#define VP(POINTER) ((value_p)(TL(POINTER) + 1))
 
 #define FALSE 0
 #define TRUE  1
@@ -22,6 +22,11 @@
 #define MAX 10
 #define LEN 8
 
+
+STRUCT(trie)
+{
+    int type;
+};
 
 STRUCT(trie_fork)
 {
@@ -257,6 +262,7 @@ trie_p trie_leaf_create(value_info_p vi, value_p value)
 
     T(t)->type = LEAF;
     memcpy(VP(t), value, vi->size);
+    free(value);
 
     return T(t);
 }
