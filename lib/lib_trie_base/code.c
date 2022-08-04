@@ -254,14 +254,15 @@ trie_p trie_path_create(char len, char arr[], trie_p next)
 
 trie_p trie_leaf_create(value_info_p vi, value_p value)
 {
-    trie_leaf_p t = malloc(sizeof(trie_leaf_t) + vi->size);
+    int value_size = vi->value_size(value);
+    trie_leaf_p t = malloc(sizeof(trie_leaf_t) + value_size);
     assert(t);
 #ifdef DEBUG            
     trie_allocated++;       
 #endif
 
     T(t)->type = LEAF;
-    memcpy(VP(t), value, vi->size);
+    memcpy(VP(t), value, value_size);
     free(value);
 
     return T(t);
@@ -387,7 +388,7 @@ trie_p trie_insert_rec(value_info_p vi, trie_p t, char len, char arr[], value_p 
     if(t->type == LEAF)
     {
         assert(!len);
-        memcpy(VP(t), value, vi->size);
+        memcpy(VP(t), value, vi->value_size(value));
         return t;
     }
 
