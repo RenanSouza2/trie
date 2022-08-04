@@ -1,13 +1,11 @@
-name: C/C++ CI
+name: C CI
 
-on: push
+on: [push]
 
 jobs:
   test:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-      run: make test
+    - run: make test
       
