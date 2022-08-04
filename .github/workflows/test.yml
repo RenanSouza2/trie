@@ -1,8 +1,6 @@
 name: C/C++ CI
 
-on:
-  pull_request:
-    branches: [ "*" ]
+on: push
 
 jobs:
   test:
@@ -11,6 +9,5 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: make
-    - run: make test
+      run: make test
       
