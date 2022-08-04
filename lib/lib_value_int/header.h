@@ -6,8 +6,8 @@
 PLACEHOLDER(value);
 PLACEHOLDER(value_info);
 
-value_p set_value(int value);
-int get_value(value_p value);
+value_p set_int(int value);
+int get_int(value_p value);
 value_info_p get_int_value_info();
 
 #endif
