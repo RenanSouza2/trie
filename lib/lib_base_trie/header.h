@@ -7,12 +7,15 @@ PLACEHOLDER(trie);
 PLACEHOLDER(value);
 PLACEHOLDER(value_info);
 
-void trie_delete(value_info_p vi, trie_p *t, char arr[]);
-void trie_insert(value_info_p vi, trie_p *t, char arr[], value_p value);
+PLACEHOLDER(pointer);
+PLACEHOLDER(trie_info);
 
-void trie_display(value_info_p vi, trie_p t);
-value_p trie_querie(trie_p t, char arr[]);
+void trie_delete(trie_info_p ti, pointer_p *tp, char arr[]);
+void trie_insert(trie_info_p ti, pointer_p *t, char arr[], value_p value);
 
-void trie_free(trie_p t);
+void trie_display(trie_info_p ti, pointer_p tp);
+value_p trie_querie(trie_info_p ti, pointer_p tp, char arr[]);
+
+void trie_free(trie_info_p ti, pointer_p tp);
 
 #endif

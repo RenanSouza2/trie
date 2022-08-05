@@ -3,25 +3,29 @@
 
 #include "../struct.h"
 
-PLACEHOLDER(value);
 PLACEHOLDER(pointer);
 PLACEHOLDER(value_info);
 
-typedef int(*int_pointer_f)(pointer_p);
-typedef void(*void_pointer_f)(pointer_p);
-typedef value_p(*value_pointer_f)(pointer_p);
-typedef pointer_p(*pointer_value_int_f)(value_p,int);
+typedef int(*int_ptr_f)(pointer_p);
+typedef void(*void_ptr_f)(pointer_p);
+typedef void*(*value_ptr_f)(pointer_p);
+typedef pointer_p(*ptr_value_int_f)(void*,int);
+typedef pointer_p(*ptr_ptr_value_int_f)(pointer_p,void*,int);
 
 STRUCT(pointer_info)
 {
     int size;
     pointer_p null;
+    
+    void_ptr_f  display;
+    int_ptr_f   is_null;
 
-    value_pointer_f     get_value;
-    pointer_value_int_f set_value;
+    value_ptr_f         get;
+    ptr_value_int_f     set;
+    void_ptr_f          delete;
+    ptr_ptr_value_int_f replace;
 
-    void_pointer_f  display;
-    int_pointer_f   is_null;
+    void_ptr_f  free;
 };
 
 #endif
