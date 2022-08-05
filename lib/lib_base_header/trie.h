@@ -8,8 +8,8 @@ PLACEHOLDER(value_info);
 
 STRUCT(trie_info)
 {
-    pointer_info_p pi;
     value_info_p vi;
+    pointer_info_p pi;
 };
 
 #endif
