@@ -5,13 +5,15 @@
 
 #include "header.h"
 #include "../lib_my_string/header.h"
+#include "../lib_base_header/trie.h"
 #include "../lib_base_header/value.h"
+#include "../lib_base_header/pointer.h"
 
-#define T(POINTER)  ((trie_p)(POINTER))
-#define TF(POINTER) ((trie_fork_p)(POINTER))
-#define TP(POINTER) ((trie_path_p)(POINTER))
-#define TL(POINTER) ((trie_leaf_p)(POINTER))
-#define VP(POINTER) ((value_p)(TL(POINTER) + 1))
+#define HP(POINTER) ((char*)(((trie_p)(POINTER))+1))
+#define FN(POINTER, INDEX) ((pointer_p)(HP(POINTER) + (INDEX) * ti->pi->size))
+#define PS(POINTER) ((string_p)(HP(POINTER) + ti->pi->size))
+#define PN(POINTER) ((pointer_P)HP(POINTER))
+#define LV(POINTER) ((value_p)HP(POINTER))
 
 #define FALSE 0
 #define TRUE  1
@@ -24,85 +26,51 @@
 #define LEN 8
 
 
-STRUCT(trie)
-{
-    int type;
-};
-
-STRUCT(trie_fork)
-{
-    trie_t t;
-    int connected, least;
-    trie_p next[MAX];
-};
-
-STRUCT(trie_path)
-{
-    trie_t t;
-    trie_p next;
-    string_t str;
-};
-
-STRUCT(trie_leaf)
-{
-    trie_t t;
-    int padding;
-};
-
+#define DEBUG //remove after
 #ifdef DEBUG
 
-int trie_allocated = 0;
-int trie_freed = 0;
-
-void trie_free_single(trie_p t)
+STRUCT(trie)
 {
-    trie_freed++;
-    free(t);
+    int type, connected;
+};
+
+int pointer_is_null(pointer_info_p pi, pointer_p p)
+{
+    return (p == NULL) ? NULL : pi->is_null(p);
 }
 
-void snapshot(char s[])
+void trie_display_single(trie_info_p ti, pointer_p tp) 
 {
-    printf("\n");
-    printf("\nSnapshot %s", s);
-    printf("\ntrie_allocated: %d", trie_allocated);
-    printf("\ntrie_freed: %d", trie_freed);
-    printf("\ntrie_current: %d", trie_allocated - trie_freed);
-}
+    printf("\ntrie: ");
+    ti->pi->display(tp);
+    if(ti->pi->is_null(tp)) return;
 
-void assert_memory()
-{
-    assert(trie_allocated == trie_freed);
-}
-
-void pointer_display(void *p)
-{
-    if(p == NULL)   printf("NULL");
-    else            printf("%p", p);
-}
-
-void trie_display_single(value_info_p vi, trie_p t) {
-    printf("\ntrie: ");pointer_display(t);
-    if(t == NULL) return;
-
+    trie_p t = (trie_p)ti->pi->get_value(tp);
     switch (t->type)
     {
         case FORK:
         printf("\t(FORK)");
-        printf("\nconnected: %d\tleast: %d", TF(t)->connected, TF(t)->least);
+        printf("\nconnected: %d\tleast: %d", t->connected);
         for(int i=0; i<MAX; i++)
-        if(TF(t)->next[i])  
-            printf("\n\t%d: %p", i, TF(t)->next[i]);
+        {
+            pointer_p next = FN(t, i);
+            if(ti->pi->is_null(next)) continue;
+
+            printf("\n\t%d: ", i);
+            ti->pi->display(next);
+        }
         break;
     
         case PATH:
         printf("\t(PATH)");
-        string_display(&TP(t)->str);
-        printf("\nnext: ");pointer_display(TP(t)->next);
+        string_display(PS(t));
+        printf("\nnext: ");
+        ti->pi->display(PN(t));
         break;
 
         case LEAF:
         printf("\t(LEAF)");
-        vi->value_print(VP(t));
+        ti->vi->print(VP(t));
         break;
     }
     printf("\n");
