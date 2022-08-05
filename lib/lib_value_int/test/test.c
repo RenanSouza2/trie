@@ -3,7 +3,7 @@
 #include <assert.h>
 
 #define DEBUG
-#include "../../lib_trie_base/code.c"
+#include "../../lib_base_trie/code.c"
 #include "../code.c"
 
 

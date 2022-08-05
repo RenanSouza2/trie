@@ -5,6 +5,7 @@
 
 #include "header.h"
 #include "../lib_my_string/header.h"
+#include "../lib_base_header/value.h"
 
 #define T(POINTER)  ((trie_p)(POINTER))
 #define TF(POINTER) ((trie_fork_p)(POINTER))

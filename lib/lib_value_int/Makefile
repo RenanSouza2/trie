@@ -1,4 +1,4 @@
-TRIE_PATH=../lib_trie_base
+TRIE_PATH=../lib_base_trie
 TRIE_FILE=$(TRIE_PATH)/lib.o
 
 build: lib.o

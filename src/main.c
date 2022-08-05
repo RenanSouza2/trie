@@ -3,7 +3,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include "../lib/lib_trie_base/header.h"
+#include "../lib/lib_base_trie/header.h"
 #include "../lib/lib_value_int/header.h"
 
 int main()

@@ -4,7 +4,7 @@
 
 #include "header.h"
 #include "../lib_base_header/value.h"
-#include "../lib_trie_base/header.h"
+#include "../lib_base_trie/header.h"
 
 void value_print(value_p value)
 {

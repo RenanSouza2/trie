@@ -1,9 +1,11 @@
 #ifndef __LIB_TRIE_H__
 #define __LIB_TRIE_H__
 
-#include "../lib_base_header/value.h"
+#include "../struct.h"
 
 PLACEHOLDER(trie);
+PLACEHOLDER(value);
+PLACEHOLDER(value_info);
 
 void trie_delete(value_info_p vi, trie_p *t, char arr[]);
 void trie_insert(value_info_p vi, trie_p *t, char arr[], value_p value);
