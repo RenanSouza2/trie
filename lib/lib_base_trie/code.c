@@ -12,7 +12,7 @@
 #define HP(POINTER) ((char*)(((trie_p)(POINTER))+1))
 #define FN(POINTER, INDEX) ((pointer_p)(HP(POINTER) + (INDEX) * ti->pi->size))
 #define PS(POINTER) ((string_p)(HP(POINTER) + ti->pi->size))
-#define PN(POINTER) ((pointer_P)HP(POINTER))
+#define PN(POINTER) ((pointer_p)HP(POINTER))
 #define LV(POINTER) ((value_p)HP(POINTER))
 
 #define FALSE 0
@@ -36,7 +36,7 @@ STRUCT(trie)
 
 int pointer_is_null(pointer_info_p pi, pointer_p p)
 {
-    return (p == NULL) ? NULL : pi->is_null(p);
+    return (p == NULL) ? TRUE : pi->is_null(p);
 }
 
 void trie_display_single(trie_info_p ti, pointer_p tp) 
@@ -50,7 +50,7 @@ void trie_display_single(trie_info_p ti, pointer_p tp)
     {
         case FORK:
         printf("\t(FORK)");
-        printf("\nconnected: %d\tleast: %d", t->connected);
+        printf("\nconnected: %d", t->connected);
         for(int i=0; i<MAX; i++)
         {
             pointer_p next = FN(t, i);
@@ -70,7 +70,7 @@ void trie_display_single(trie_info_p ti, pointer_p tp)
 
         case LEAF:
         printf("\t(LEAF)");
-        ti->vi->print(VP(t));
+        ti->vi->print(LV(t));
         break;
     }
     printf("\n");
