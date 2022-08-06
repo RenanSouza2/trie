@@ -7,8 +7,6 @@
 #include "../../lib_trie_info/header.h"
 #include "../code.c"
 
-#define PTR_CMP(POINTER1, POINTER2) (memcmp(POINTER1, POINTER2, PI->size) == 0)
-
 trie_info_p ti;
 
 void assert_str(string_p str, int len, char arr[])
@@ -75,7 +73,7 @@ void test_create()
     assert(t->connected == 1);
     assert_fork(tp, 0, ptr);
     for(int i=1; i<MAX; i++)
-        assert(PTR_CMP(FN(t, i), PI->null));
+        assert(*(void**)FN(t, i) == NULL);
     PI->free(tp);
 
     char arr[2] = {1, 2};
@@ -194,40 +192,60 @@ void test_joinable()
 void test_path_break()
 {
     printf("\n\ttest_path_break");
-    trie_p tn = T(1);
+    long ptr = 1;
+    pointer_p tp_next = get_pointer(ptr);
     char arr[3] = {1, 2, 3};
 
-    trie_p t = trie_path_create(3, arr, tn);
-    t = trie_path_break(t, 0);
-    assert(t->type == FORK);
+    pointer_p tp = trie_path_create(ti, 3, arr, tp_next);
+    tp = trie_path_break(ti, tp, 0);
+    assert_fork(tp, 1, 0);
 
-    trie_p t1 = TF(t)->next[1];
-    assert_path(t1, tn, 2, &arr[1]);
-    PI->free(t1);
-    PI->free(t);
+    trie_p t = PI->get(tp);
+    pointer_p tp_1 = FN(t, 1);
+    assert_path(tp_1, 0, 2, &arr[1]);
+    tp_1 = pointer_copy(PI, tp_1);
+    PI->free(tp_1);
+    PI->free(tp);
 
-    t = trie_path_create(3, arr, tn);
-    t = trie_path_break(t, 1);
-    assert(t->type == FORK);
+    /////////////////////////////////
 
-    t1 = TF(t)->next[1];
-    assert_fork(t1, 2, NULL);
+    ptr = 2;
+    tp_next = get_pointer(ptr);
+    tp = trie_path_create(ti, 3, arr, tp_next);
+    tp = trie_path_break(ti, tp, 1);
+    assert_fork(tp, 1, 0);
 
-    t1 = TF(t1)->next[2];
-    assert_fork(t1, 3, NULL);
-    assert(TF(t1)->next[3] == tn);
-    PI->free(t1);
-    PI->free(TF(t)->next[1]);
-    PI->free(t);
+    t = PI->get(tp);
+    tp_1 = FN(t, 1);
+    assert_fork(tp_1, 2, 0);
 
-    t = trie_path_create(3, arr, tn);
-    t = trie_path_break(t, 2);
-    assert(t->type == PATH);
+    t = PI->get(tp_1);
+    tp_1 = FN(t, 2);
+    assert_fork(tp_1, 3, 0);
 
-    t1 = TP(t)->next;
-    assert_fork(t1, 3, tn);
-    PI->free(t1);
-    PI->free(t);
+    tp_1 = pointer_copy(PI, tp_1);
+    PI->free(tp_1);
+    
+    t = PI->get(tp);
+    tp_1 = pointer_copy(PI, FN(t, 1));
+    PI->free(tp_1);
+
+    PI->free(tp);
+
+    /////////////////////////////////
+
+    ptr = 3;
+    tp_next = get_pointer(ptr);
+    tp = trie_path_create(ti, 3, arr, tp_next);
+    tp = trie_path_break(ti, tp, 2);
+    assert_path(tp, 0, 2, arr);
+
+    t = PI->get(tp);
+    tp_1 = PN(t);
+    assert_fork(tp_1, 3, 0);
+    tp_1 = pointer_copy(PI, tp_1);
+    PI->free(tp_1);
+    PI->free(tp);
 }
 
 void test_fork_convert()
