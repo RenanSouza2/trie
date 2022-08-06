@@ -252,14 +252,14 @@ void test_fork_convert()
 {
     printf("\n\ttest_fork_convert");
 
-    trie_p tn = T(1);
+    long ptr = 1;
+    pointer_p tp_next = get_pointer(ptr);
+    
     char key = 5;
-
-    trie_p t = trie_fork_create();
-    trie_fork_connect(t, tn, key);
-    t = trie_fork_convert(t);
-    assert_path(t, tn, 1, &key);
-    PI->free(t);
+    pointer_p tp = trie_fork_create(ti, key, tp_next);
+    tp = trie_fork_convert(ti, tp);
+    assert_path(tp, 1, 1, &key);
+    PI->free(tp);
 }
 
 void test_join()
