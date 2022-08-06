@@ -114,43 +114,49 @@ void test_create()
 
 void test_connection()
 {
+    long ptr = 1;
+    pointer_p tp_next =  get_pointer(ptr);
+
     printf("\n\ttest_connection");
-    trie_p t = trie_fork_create();
+    pointer_p tp = trie_fork_create(ti, 5, tp_next);
     
-    trie_fork_connect(t, t, 5);
-    assert_fork(t, 5, t);
-    assert(TF(t)->connected == 1);
-    assert(TF(t)->least == 5);
+    trie_p t = PI->get(tp);
+    assert(t->connected == 1);
+    assert_fork(tp, 5, ptr);
     
-    trie_fork_connect(t, t+1, 5);
-    assert(TF(t)->connected == 1);
-    assert(TF(t)->next[5] == t+1);
+    ptr = 2;
+    tp_next =  get_pointer(ptr);
+    tp = trie_fork_connect(ti, tp, 5, tp_next);
+    t = PI->get(tp);
+    assert(t->connected == 1);
+    assert_fork(tp, 5, ptr);
 
-    trie_fork_connect(t, t, 8);
-    assert_fork(t, 8, t);
-    assert(TF(t)->connected == 2);
-    assert(TF(t)->least == 5);
+    ptr = 3;
+    tp_next =  get_pointer(ptr);
+    tp = trie_fork_connect(ti, tp, 8, tp_next);
+    assert_fork(tp, 8, ptr);
+    t = PI->get(tp);
+    assert(t->connected == 2);
 
-    trie_fork_connect(t, t, 3);
-    assert_fork(t, 8, t);
-    assert(TF(t)->connected == 3);
-    assert(TF(t)->least == 3);
+    ptr = 4;
+    tp_next =  get_pointer(ptr);
+    tp = trie_fork_connect(ti, tp, 3, tp_next);
+    assert_fork(tp, 8, ptr);
+    t = PI->get(tp);
+    assert(t->connected == 3);
 
-    trie_fork_disconnect(t, 3);
-    assert(TF(t)->connected == 2);
-    assert(TF(t)->least == 5);
-    assert(TF(t)->next[3] == NULL);
+    tp = trie_fork_disconnect(ti, tp, 3);
+    t = PI->get(tp);
+    assert(t->connected == 2);
+    assert(PI->get(FN(t, 3)) == NULL);
     
-    trie_fork_disconnect(t, 8);
-    assert(TF(t)->connected == 1);
-    assert(TF(t)->least == 5);
-    assert(TF(t)->next[8] == NULL);
+    tp = trie_fork_disconnect(ti, tp, 8);
+    t = PI->get(tp);
+    assert(t->connected == 1);
+    assert(PI->get(FN(t, 8)) == NULL);
 
-    trie_fork_disconnect(t, 5);
-    assert(TF(t)->connected == 0);
-    assert(TF(t)->least == MAX);
-    assert(TF(t)->next[5] == NULL);
-    PI->free(t);
+    tp = trie_fork_disconnect(ti, tp, 5);
+    assert(tp == NULL);
 }
 
 void test_joinable()
