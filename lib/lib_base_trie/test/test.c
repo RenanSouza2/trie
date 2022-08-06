@@ -162,26 +162,33 @@ void test_connection()
 void test_joinable()
 {
     printf("\n\ttest_joinable");
-    int value = 1;
 
-    value_info_p vi = get_int_value_info();
-    value_p vp = set_int(value);
-    trie_p t = trie_leaf_create(vi, vp);
-    assert(trie_joinnable(t) == FALSE);
-    PI->free(t);
+    long ptr = 1;
+    pointer_p tp_next = get_pointer(ptr);
 
-    t = trie_fork_create();
-    trie_fork_connect(t, t, 5);
+    pointer_p tp = trie_fork_create(ti, 8, tp_next);
+    trie_p t = PI->get(tp);
     assert(trie_joinnable(t) == TRUE);
 
-    trie_fork_connect(t, t, 6);
+    ptr = 2;
+    tp_next = get_pointer(ptr);
+    trie_fork_connect(ti, tp, 6, tp_next);
     assert(trie_joinnable(t) == FALSE);
-    PI->free(t);
+    PI->free(tp);
 
     char arr[2] = {1, 2};
-    t = trie_path_create(2, arr, t);
+    ptr = 3;
+    get_pointer(ptr);
+    tp = trie_path_create(ti, 2, arr, tp_next);
+    t  = PI->get(tp);
     assert(trie_joinnable(t) == TRUE);
-    PI->free(t);
+    PI->free(tp);
+
+    int value = 1;
+    value_p vp = set_int(value);
+    tp = trie_leaf_create(ti, vp);
+    assert(trie_joinnable(t) == FALSE);
+    PI->free(tp);
 }
 
 void test_path_break()
