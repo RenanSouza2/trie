@@ -24,9 +24,9 @@ void assert_fork(pointer_p tp, int key, long ptr)
     assert(t != NULL);
     assert(t->type == FORK);
 
-    pointer_p tp_next = PI->get(FN(t, key));
-    if(ptr) assert(tp_next == (void*)ptr);
-    else    assert(tp_next != NULL);
+    trie_p t_next = PI->get(FN(t, key));
+    if(ptr) assert(t_next == (void*)ptr);
+    else    assert(t_next != NULL);
 }
 
 void assert_path(pointer_p tp, long ptr, int len, char arr[])
@@ -37,9 +37,9 @@ void assert_path(pointer_p tp, long ptr, int len, char arr[])
     assert(t != NULL);
     assert(t->type == PATH);
 
-    pointer_p tp_next = PI->get(PN(t));
-    if(ptr) assert(tp_next == (void*)ptr);
-    else    assert(tp_next != NULL);
+    trie_p t_next = PI->get(PN(t));
+    if(ptr) assert(t_next == (void*)ptr);
+    else    assert(t_next != NULL);
     assert_str(PS(t), len, arr);
 }
 
@@ -65,7 +65,7 @@ pointer_p get_pointer(long i)
 void test_create()
 {
 
-    printf("\n\ttest_create");
+    printf("\n\ttest_create\t");
     long ptr = 1;
     pointer_p tp_next = get_pointer(ptr);
     pointer_p tp = trie_fork_create(ti, 0, tp_next);
@@ -89,10 +89,8 @@ void test_create()
     ptr = 3;
     tp_next = get_pointer(ptr);
     tp = trie_path_create(ti, 0, arr, tp_next);
-    assert(tp == (pointer_p)ptr);
+    assert(tp == tp_next);
 
-    ptr = 4;
-    tp_next = get_pointer(ptr);
     tp = trie_path_create(ti, 1, arr, tp_next);
     assert_fork(tp, 1, ptr);
     PI->free(tp);
@@ -115,7 +113,7 @@ void test_connection()
     long ptr = 1;
     pointer_p tp_next =  get_pointer(ptr);
 
-    printf("\n\ttest_connection");
+    printf("\n\ttest_connection\t");
     pointer_p tp = trie_fork_create(ti, 5, tp_next);
     
     trie_p t = PI->get(tp);
@@ -124,7 +122,7 @@ void test_connection()
     
     ptr = 2;
     tp_next =  get_pointer(ptr);
-    tp = trie_fork_connect(ti, tp, 5, tp_next);
+    tp = trie_fork_create(ti, 5, tp_next);
     t = PI->get(tp);
     assert(t->connected == 1);
     assert_fork(tp, 5, ptr);
@@ -139,7 +137,7 @@ void test_connection()
     ptr = 4;
     tp_next =  get_pointer(ptr);
     tp = trie_fork_connect(ti, tp, 3, tp_next);
-    assert_fork(tp, 8, ptr);
+    assert_fork(tp, 3, ptr);
     t = PI->get(tp);
     assert(t->connected == 3);
 
@@ -159,7 +157,7 @@ void test_connection()
 
 void test_joinable()
 {
-    printf("\n\ttest_joinable");
+    printf("\n\ttest_joinable\t");
 
     long ptr = 1;
     pointer_p tp_next = get_pointer(ptr);
@@ -191,7 +189,7 @@ void test_joinable()
 
 void test_path_break()
 {
-    printf("\n\ttest_path_break");
+    printf("\n\ttest_path_break\t");
     long ptr = 1;
     pointer_p tp_next = get_pointer(ptr);
     char arr[3] = {1, 2, 3};
@@ -202,7 +200,7 @@ void test_path_break()
 
     trie_p t = PI->get(tp);
     pointer_p tp_1 = FN(t, 1);
-    assert_path(tp_1, 0, 2, &arr[1]);
+    assert_path(tp_1, ptr, 2, &arr[1]);
     tp_1 = pointer_copy(PI, tp_1);
     PI->free(tp_1);
     PI->free(tp);
@@ -250,7 +248,7 @@ void test_path_break()
 
 void test_fork_convert()
 {
-    printf("\n\ttest_fork_convert");
+    printf("\n\ttest_fork_convert\t");
 
     long ptr = 1;
     pointer_p tp_next = get_pointer(ptr);

@@ -78,7 +78,6 @@ void trie_display_single(trie_info_p ti, pointer_p tp)
 {
     printf("\ntrie: ");
     PI->display(tp);
-    if(PI->is_null(tp)) return;
 
     trie_p t = PI->get(tp);
     switch (t->type)
@@ -319,11 +318,11 @@ pointer_p trie_path_break(trie_info_p ti, pointer_p tp, int len)
 {
     trie_p t = PI->get(tp);
     string_p str = PS(t);
-    assert(str->len < len);
+    assert(len < str->len);
 
     char *arr = str->arr;
 
-    pointer_p t_aux = pointer_copy(PI, PN(tp));
+    pointer_p t_aux = pointer_copy(PI, PN(t));
     t_aux = trie_path_create(ti, str->len - len-1, &arr[len+1], t_aux);
     t_aux = trie_fork_create(ti, arr[len], t_aux);
     t_aux = trie_path_create(ti, len, arr, t_aux);

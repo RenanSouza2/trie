@@ -5,15 +5,16 @@
 
 #include "../lib_base_header/pointer.h"
 
-void mem_display(pointer_p p)
-{
-    if(p == NULL)   printf("NULL");
-    else            printf("%p", p);
-}
-
 handler_p mem_get(pointer_p p)
 {
     return *(handler_p*)p;
+}
+
+void mem_display(pointer_p p)
+{
+    handler_p h = mem_get(p);
+    if(h == NULL)   printf("NULL");
+    else            printf("%p", h);
 }
 
 int mem_is_null(pointer_p p)
@@ -39,8 +40,7 @@ void mem_delete(pointer_p p)
 
 pointer_p mem_replace(pointer_p p, handler_p h, int size)
 {
-    p = realloc(p, size);
-    memcpy(p, h, size);
+    *(handler_p*)p = h;
     return p;
 }
 
