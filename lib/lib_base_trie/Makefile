@@ -1,4 +1,4 @@
-STR_PATH=../lib_my_string
+STR_PATH=../lib_string
 STR_FILE=$(STR_PATH)/lib.o
 
 build: lib.o
@@ -17,3 +17,6 @@ clean:
 	rm -f *.o
 	$(MAKE) clean --directory=$(STR_PATH)
 
+.PHONY: test
+test:
+	$(MAKE) --directory=test

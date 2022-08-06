@@ -2,10 +2,8 @@ FLAGS=-c -Wall -Werror -Wfatal-errors
 
 build: lib.o
 
-lib.o: code.c
-	gcc $(FLAGS) -o lib.o code.c
+lib.o: tmp.o
+	gcc $(FLAGS) -o tmp.o code.c
 
 clean:
 	rm -f *.o
-
-

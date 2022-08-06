@@ -2,84 +2,114 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#define DEBUG
-#include "../../lib_base_trie/code.c"
+#include "../../lib_value_int/header.h"
+#include "../../lib_pointer_mem/header.h"
+#include "../../lib_trie_info/header.h"
 #include "../code.c"
 
+#define PTR_CMP(POINTER1, POINTER2) (memcmp(POINTER1, POINTER2, PI->size) == 0)
 
+trie_info_p ti;
 
-void assert_str(trie_p t, int len, char arr[])
+void assert_str(string_p str, int len, char arr[])
 {
-    assert(TP(t)->str.len == len);
+    assert(str->len == len);
     for(int i=0; i<len; i++)
-        assert(TP(t)->str.arr[i] == arr[i]);
+        assert(str->arr[i] == arr[i]);
 }
 
-void assert_fork(trie_p t, int key, trie_p tn)
+void assert_fork(pointer_p tp, int key, long ptr)
 {
+    assert(tp != NULL);
+
+    trie_p t = PI->get(tp);
     assert(t != NULL);
     assert(t->type == FORK);
-    assert(TF(t)->least <= key);
-    if(tn == NULL)  assert(TF(t)->next[key] != NULL);
-    else            assert(TF(t)->next[key] == tn);
+
+    pointer_p tp_next = PI->get(FN(t, key));
+    if(ptr) assert(tp_next == (void*)ptr);
+    else    assert(tp_next != NULL);
 }
 
-void assert_path(trie_p t, trie_p tn, int len, char arr[])
+void assert_path(pointer_p tp, long ptr, int len, char arr[])
 {
+    assert(tp != NULL);
+
+    trie_p t = PI->get(tp);
     assert(t != NULL);
     assert(t->type == PATH);
-    if(tn != NULL) assert(TP(t)->next == tn);
-    assert_str(t, len, arr);
+
+    pointer_p tp_next = PI->get(PN(t));
+    if(ptr) assert(tp_next == (void*)ptr);
+    else    assert(tp_next != NULL);
+    assert_str(PS(t), len, arr);
 }
 
-void assert_leaf(trie_p t, int value)
+void assert_leaf(pointer_p tp, int value)
 {
+    assert(tp != NULL);
+
+    trie_p t = PI->get(tp);
     assert(t != NULL);
     assert(t->type == LEAF);
-    assert(*((int*)VP(t)) == value);
+    assert(*(int*)LV(t) == value);
 }
 
 
+
+pointer_p get_pointer(long i)
+{
+    void *v;
+    v = (void*)i;
+    return PI->set(v, 0);
+}
 
 void test_create()
 {
+
     printf("\n\ttest_create");
-    trie_p t = trie_fork_create();
-    assert(t->type == FORK);
-    assert(TF(t)->connected == 0);
-    assert(TF(t)->least == MAX);
-    for(int i=0; i<MAX; i++)
-        assert(TF(t)->next[i] == NULL);
-    trie_free_single(t);
+    long ptr = 1;
+    pointer_p tp_next = get_pointer(ptr);
+    pointer_p tp = trie_fork_create(ti, 0, tp_next);
+    trie_p t = PI->get(tp);
+    assert(t->connected == 1);
+    assert_fork(tp, 0, ptr);
+    for(int i=1; i<MAX; i++)
+        assert(PTR_CMP(FN(t, i), PI->null));
+    PI->free(tp);
 
     char arr[2] = {1, 2};
-    trie_p t1 = t;
     for(int i=1; i<=2; i++)
     {
-        t = trie_path_create_force(i, arr, t1);
-        assert_path(t, t1, i, arr);
-        trie_free_single(t);
+        ptr = 2;
+        tp_next = get_pointer(ptr);
+        tp = trie_path_create_force(ti, i, arr, tp_next);
+        assert_path(tp, ptr, i, arr);
+        PI->free(tp);
     }
 
-    t = trie_path_create(0, arr, t1);
-    assert(t == t1);
+    ptr = 3;
+    tp_next = get_pointer(ptr);
+    tp = trie_path_create(ti, 0, arr, tp_next);
+    assert(tp == (pointer_p)ptr);
 
-    t = trie_path_create(1, arr, t1);
-    assert_fork(t, 1, t1);
-    assert(TF(t)->connected == 1);
-    assert(TF(t)->least == 1);
-    trie_free_single(t);
+    ptr = 4;
+    tp_next = get_pointer(ptr);
+    tp = trie_path_create(ti, 1, arr, tp_next);
+    assert_fork(tp, 1, ptr);
+    PI->free(tp);
 
-    t = trie_path_create(2, arr, t1);
-    assert_path(t, t1, 2, arr);
-    trie_free_single(t);
+    ptr = 5;
+    tp_next = get_pointer(ptr);
+    tp = trie_path_create(ti, 2, arr, tp_next);
+    assert_path(tp, ptr, 2, arr);
+    PI->free(tp);
 
     int value = 1;
-    value_info_p vi = get_int_value_info();
     value_p v = set_int(value);
-    t = trie_leaf_create(vi, v);
-    assert_leaf(t, value);
-    trie_free_single(t);
+    tp = trie_leaf_create(ti, v);
+    assert_leaf(tp, value);
+    PI->free(tp);
 }
 
 void test_connection()
@@ -120,7 +150,7 @@ void test_connection()
     assert(TF(t)->connected == 0);
     assert(TF(t)->least == MAX);
     assert(TF(t)->next[5] == NULL);
-    trie_free_single(t);
+    PI->free(t);
 }
 
 void test_joinable()
@@ -132,7 +162,7 @@ void test_joinable()
     value_p vp = set_int(value);
     trie_p t = trie_leaf_create(vi, vp);
     assert(trie_joinnable(t) == FALSE);
-    trie_free_single(t);
+    PI->free(t);
 
     t = trie_fork_create();
     trie_fork_connect(t, t, 5);
@@ -140,12 +170,12 @@ void test_joinable()
 
     trie_fork_connect(t, t, 6);
     assert(trie_joinnable(t) == FALSE);
-    trie_free_single(t);
+    PI->free(t);
 
     char arr[2] = {1, 2};
     t = trie_path_create(2, arr, t);
     assert(trie_joinnable(t) == TRUE);
-    trie_free_single(t);
+    PI->free(t);
 }
 
 void test_path_break()
@@ -160,8 +190,8 @@ void test_path_break()
 
     trie_p t1 = TF(t)->next[1];
     assert_path(t1, tn, 2, &arr[1]);
-    trie_free_single(t1);
-    trie_free_single(t);
+    PI->free(t1);
+    PI->free(t);
 
     t = trie_path_create(3, arr, tn);
     t = trie_path_break(t, 1);
@@ -173,9 +203,9 @@ void test_path_break()
     t1 = TF(t1)->next[2];
     assert_fork(t1, 3, NULL);
     assert(TF(t1)->next[3] == tn);
-    trie_free_single(t1);
-    trie_free_single(TF(t)->next[1]);
-    trie_free_single(t);
+    PI->free(t1);
+    PI->free(TF(t)->next[1]);
+    PI->free(t);
 
     t = trie_path_create(3, arr, tn);
     t = trie_path_break(t, 2);
@@ -183,8 +213,8 @@ void test_path_break()
 
     t1 = TP(t)->next;
     assert_fork(t1, 3, tn);
-    trie_free_single(t1);
-    trie_free_single(t);
+    PI->free(t1);
+    PI->free(t);
 }
 
 void test_fork_convert()
@@ -198,7 +228,7 @@ void test_fork_convert()
     trie_fork_connect(t, tn, key);
     t = trie_fork_convert(t);
     assert_path(t, tn, 1, &key);
-    trie_free_single(t);
+    PI->free(t);
 }
 
 void test_join()
@@ -213,21 +243,21 @@ void test_join()
     trie_p t2 = trie_path_create(2, &arr[2], tn2);
     trie_p t = trie_join(t1, t2);
     assert_path(t, tn2, 4, arr);
-    trie_free_single(t);
+    PI->free(t);
 
     t1 = trie_fork_create();
     t2 = trie_path_create(2, &arr[2], tn2);
     trie_fork_connect(t1, t2, 2);
     t = trie_join(t1, t2);
     assert_path(t, tn2, 3, &arr[1]);
-    trie_free_single(t);
+    PI->free(t);
     
     t1 = trie_path_create(2, arr, tn1);
     t2 = trie_fork_create();
     trie_fork_connect(t2, tn2, 3);
     t = trie_join(t1, t2);
     assert_path(t, tn2, 3, arr);
-    trie_free_single(t);
+    PI->free(t);
 }
 
 void test_unit()
@@ -465,6 +495,11 @@ void test_trie()
 int main() 
 {
     setbuf(stdout, NULL);
+
+    value_info_p vi = get_int_value_info();
+    pointer_info_p pi = get_mem_info();
+    ti = get_trie_info(vi, pi);
+
     test_trie();
     assert_memory();
     printf("\n\n\t\tTest successful\n\n");

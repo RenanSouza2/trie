@@ -4,7 +4,7 @@
 #include <assert.h>
 
 #include "header.h"
-#include "../lib_my_string/header.h"
+#include "../lib_string/header.h"
 #include "../lib_base_header/trie.h"
 #include "../lib_base_header/value.h"
 #include "../lib_base_header/pointer.h"
