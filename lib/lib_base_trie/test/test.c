@@ -266,29 +266,49 @@ void test_join()
 {
     printf("\n\ttest_join");
 
-    trie_p tn1 = T(1);
-    trie_p tn2 = T(2);
+
     char arr[4] = {1, 2, 3, 4};
 
-    trie_p t1 = trie_path_create(2, arr, tn1);
-    trie_p t2 = trie_path_create(2, &arr[2], tn2);
-    trie_p t = trie_join(t1, t2);
-    assert_path(t, tn2, 4, arr);
-    PI->free(t);
+    long ptr = 1;
+    pointer_p tp_next = get_pointer(ptr);
+    pointer_p tp_1 = trie_path_create(ti, 2, arr, tp_next);
 
-    t1 = trie_fork_create();
-    t2 = trie_path_create(2, &arr[2], tn2);
-    trie_fork_connect(t1, t2, 2);
-    t = trie_join(t1, t2);
-    assert_path(t, tn2, 3, &arr[1]);
-    PI->free(t);
+    ptr = 2;
+    tp_next = get_pointer(ptr);
+    pointer_p tp_2 = trie_path_create(ti, 2, &arr[2], tp_next);
+
+
+    pointer_p tp = trie_join(ti, tp_1, tp_2);
+    assert_path(tp, 2, 4, arr);
+    PI->free(tp);
+
+    /////////////////////////////////
+
+    ptr = 1;
+    tp_next = get_pointer(ptr);
+    tp_1 = trie_path_create(ti, 1, &arr[1], tp_next);
     
-    t1 = trie_path_create(2, arr, tn1);
-    t2 = trie_fork_create();
-    trie_fork_connect(t2, tn2, 3);
-    t = trie_join(t1, t2);
-    assert_path(t, tn2, 3, arr);
-    PI->free(t);
+    ptr = 2;
+    tp_next = get_pointer(ptr);
+    tp_2 = trie_path_create(ti, 2, &arr[2], tp_next);
+
+    tp = trie_join(ti, tp_1, tp_2);
+    assert_path(tp, 2, 3, &arr[1]);
+    PI->free(tp);
+
+    /////////////////////////////////
+
+    ptr = 1;
+    tp_next = get_pointer(ptr);
+    tp_1 = trie_path_create(ti, 2, arr, tp_next);
+
+    ptr = 2;
+    tp_next = get_pointer(ptr);
+    tp_2 = trie_path_create(ti, 1, &arr[2], tp_next);
+    
+    tp = trie_join(ti, tp_1, tp_2);
+    assert_path(tp, 2, 3, arr);
+    PI->free(tp);
 }
 
 void test_unit()
@@ -300,8 +320,6 @@ void test_unit()
     test_path_break();
     test_fork_convert();
     test_join();
-
-    assert_memory();
 }
 
 
