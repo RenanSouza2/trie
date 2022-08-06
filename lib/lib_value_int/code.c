@@ -4,7 +4,6 @@
 
 #include "header.h"
 #include "../lib_base_header/value.h"
-#include "../lib_base_trie/header.h"
 
 void value_print(value_p value)
 {
@@ -25,9 +24,14 @@ int get_int(value_p value)
     return (value == NULL) ? 0 : *(int*)value;
 }
 
-int get_int_size(value_p value)
+int int_size(value_p value)
 {
     return 4;
+}
+
+int int_is_null(value_p value)
+{
+    return get_int(value) == 0;
 }
 
 value_info_p get_int_value_info()
@@ -36,7 +40,8 @@ value_info_p get_int_value_info()
     assert(vi);
 
     *vi = (value_info_t){
-        get_int_size, 
+        int_size, 
+        int_is_null,
         value_print
     };
     return vi;
