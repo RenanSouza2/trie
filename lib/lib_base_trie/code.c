@@ -167,8 +167,8 @@ void trie_display_rec(trie_info_p ti, pointer_p tp, int len, char res[])
 
 void trie_display_structure(trie_info_p ti, pointer_p tp)
 {
-    if(PI->is_null) printf("\nEmpty trie");
-    else            trie_display_structure_rec(ti, tp);
+    if(tp == NULL || PI->is_null(tp))   printf("\nEmpty trie");
+    else                                trie_display_structure_rec(ti, tp);
 }
 
 void trie_display(trie_info_p ti, pointer_p tp)
@@ -353,6 +353,7 @@ pointer_p trie_fork_convert(trie_info_p ti, pointer_p tp)
 
 pointer_p trie_join(trie_info_p ti, pointer_p tp1, pointer_p tp2)
 {
+    tp2 = pointer_copy(PI, tp2);
     tp1 = trie_fork_convert(ti, tp1);
     tp2 = trie_fork_convert(ti, tp2);
     trie_p t1 = PI->get(tp1);
@@ -380,7 +381,7 @@ pointer_p trie_delete_rec(trie_info_p ti, pointer_p tp, char len, char arr[])
 {
     if(tp == NULL || PI->is_null(tp)) 
     {
-        free(tp);
+        if(tp) free(tp);
         return NULL;
     }
 
@@ -399,6 +400,7 @@ pointer_p trie_delete_rec(trie_info_p ti, pointer_p tp, char len, char arr[])
         t = PI->get(tp);
         if(t->connected > 1) return tp;
 
+        key = trie_fork_first_key(ti, t);
         tp_next = FN(t, key);
         break;
     

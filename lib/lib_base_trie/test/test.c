@@ -423,75 +423,91 @@ void test_querie()
     trie_free(ti, tp);
 }
 
-// void test_delete_1()
-// {
-//     printf("\n\ttest_delete_1");
-//     value_info_p vi = get_int_value_info();
-//     trie_p t = NULL;
-//     char arr[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-//     value_p value = set_int(1);
-//     trie_insert(vi, &t, arr, value);
-//
-//     arr[4] = 0;
-//     value = set_int(2);
-//     trie_insert(vi, &t, arr, value);
-//
-//     arr[5] = 0;
-//     value = set_int(3);
-//     trie_insert(vi, &t, arr, value);
-//
-//     arr[6] = 0;
-//     value = set_int(4);
-//     trie_insert(vi, &t, arr, value);
-//
-//     arr[6] = 1;
-//     value = set_int(5);
-//     trie_insert(vi, &t, arr, value);
-//     trie_delete(vi, &t, arr);
-//     arr[6] = 0;
-//
-//     trie_p t1 = TP(t)->next;
-//     t1 = TF(t1)->next[0];
-//     t1 = TF(t1)->next[0];
-//     assert_fork(t1, 0, NULL);
-//     assert(TF(t1)->next[1] == NULL);
-//
-//      trie_delete(vi, &t, arr);
-//     arr[6] = 6;
-//
-//      t1 = TP(t)->next;
-//     t1 = TF(t1)->next[0];
-//     t1 = TF(t1)->next[0];
-//     assert_path(t1, NULL, 2, &arr[6]);
-//
-//     trie_delete(vi, &t, arr);
-//     arr[5] = 5;
-//     assert_path(T(t), NULL, 4, arr);
-//
-//     t1 = TP(t)->next;
-//     assert_fork(t1, 0, NULL);
-//     assert(TF(t1)->connected == 2);
-//
-//     t1 = TF(t1)->next[0];
-//     assert_path(t1, NULL, 3, &arr[5]);
-//
-//     trie_delete(vi, &t, arr);
-//     arr[4] = 4;
-//     assert_path(T(t), NULL, 8, arr);
-//
-//     arr[4] = 1;
-//     trie_delete(vi, &t, arr);
-//     arr[4] = 4;
-//     assert_path(T(t), NULL, 8, arr);
-//
-//     trie_delete(vi, &t, arr);
-//     assert(t == NULL);
-//
-//     trie_delete(vi, &t, arr);
-//     assert(t == NULL);
-//     free(vi);
-// }
-//
+void test_delete_1()
+{
+    printf("\n\ttest_delete_1");
+    pointer_p tp = NULL;
+    char arr[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+    value_p value = set_int(1);
+    trie_insert(ti, &tp, arr, value);
+
+    arr[4] = 0;
+    value = set_int(2);
+    trie_insert(ti, &tp, arr, value);
+
+    arr[5] = 0;
+    value = set_int(3);
+    trie_insert(ti, &tp, arr, value);
+
+    arr[6] = 0;
+    value = set_int(4);
+    trie_insert(ti, &tp, arr, value);
+
+    arr[6] = 1;
+    value = set_int(5);
+    trie_insert(ti, &tp, arr, value);
+    trie_delete(ti, &tp, arr);
+    arr[6] = 0;
+
+    trie_p t = PI->get(tp);
+    pointer_p tp_aux = PN(t);
+    t = PI->get(tp_aux);
+    tp_aux = FN(t, 0);
+    t = PI->get(tp_aux);
+    tp_aux = FN(t, 0);
+    assert_fork(tp_aux, 0, 0);
+
+    //////////////////
+
+    trie_delete(ti, &tp, arr);
+    arr[6] = 6;
+
+    t = PI->get(tp);
+    tp_aux = PN(t);
+    t = PI->get(tp_aux);
+    tp_aux = FN(t, 0);
+    t = PI->get(tp_aux);
+    tp_aux = FN(t, 0);
+    assert_path(tp_aux, 0, 2, &arr[6]);
+
+    //////////////////
+
+    trie_delete(ti, &tp, arr);
+    arr[5] = 5;
+    assert_path(tp, 0, 4, arr);
+
+    t = PI->get(tp);
+    tp_aux = PN(t);
+    assert_fork(tp_aux, 0, 0);
+
+    t = PI->get(tp_aux);
+    assert(t->connected == 2);
+
+    tp_aux = FN(t, 0);
+    assert_path(tp_aux, 0, 3, &arr[5]);
+
+    //////////////////
+
+    trie_delete(ti, &tp, arr);
+    arr[4] = 4;
+    assert_path(tp, 0, 8, arr);
+
+    //////////////////
+
+    arr[4] = 1;
+    trie_delete(ti, &tp, arr);
+    arr[4] = 4;
+    assert_path(tp, 0, 8, arr);
+
+    //////////////////
+
+    trie_delete(ti, &tp, arr);
+    assert(tp == NULL);
+
+    trie_delete(ti, &tp, arr);
+    assert(tp == NULL);
+}
+
 // void test_delete_2()
 // {
 //     printf("\n\ttest_delete_2");
@@ -526,7 +542,7 @@ void test_integration()
     test_insert();
     test_querie();
 
-    // test_delete_1();
+    test_delete_1();
     // test_delete_2();
 
 }
