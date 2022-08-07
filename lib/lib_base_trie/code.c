@@ -57,6 +57,50 @@ int path_free = 0;
 int leaf_created = 0;
 int leaf_free = 0;
 
+#define DIFF(TYPE) (TYPE##_created - TYPE##_free)
+
+#define PRINT_DIFF(TYPE) printf("\n%s_diff\t: %3d\t", #TYPE, DIFF(TYPE))
+
+#define PRINT(TYPE) {                                           \
+        printf("\n");                                           \
+        printf("\n%s_created : %3d"  , #TYPE, TYPE##_created);  \
+        printf("\n%s_freed   : %3d\t", #TYPE, TYPE##_free);     \
+        printf("\n----------------------");                     \
+        printf("\n%s_diff    : %3d\t", #TYPE, DIFF(TYPE));      \
+    }
+#define ASSERT(TYPE) assert(DIFF(TYPE) == 0);
+
+void assert_memory()
+{
+    ASSERT(value);
+    ASSERT(pointer);
+    ASSERT(fork);
+    ASSERT(path);
+    ASSERT(leaf);
+}
+
+void snapshot(char s[])
+{
+    printf("\n\n\n\tsnapshot: %s", s);
+
+    PRINT_DIFF(pointer);
+    PRINT_DIFF(value);
+    PRINT_DIFF(fork);
+    PRINT_DIFF(path);
+    PRINT_DIFF(leaf);
+}
+
+void snapshot_complete(char s[])
+{
+    printf("\n\n\n\tsnapshot: %s", s);
+
+    PRINT(value);
+    PRINT(pointer);
+    PRINT(fork);
+    PRINT(path);
+    PRINT(leaf);
+}
+
 int decrease(int created, int freed)
 {
     assert(created > freed);
@@ -65,7 +109,6 @@ int decrease(int created, int freed)
 
 #define INC(INT) INT##_created++;
 #define DEC(INT) INT##_free = decrease(INT##_created, INT##_free)
-
 #else
 #define INC(INT)
 #define DEC(INT)
@@ -92,6 +135,7 @@ int trie_fork_first_key(trie_info_p ti, trie_p t)
     }
     assert(FALSE);
 }
+
 
 
 #ifdef DEBUG
@@ -207,15 +251,17 @@ void trie_display(trie_info_p ti, pointer_p tp)
 pointer_p trie_fork_create(trie_info_p ti, int key, pointer_p tp_next)
 {
     int size = FORK_SIZE;
-    trie_p t = calloc(1, size);
+    trie_p t = malloc(size);
     assert(t);
     INC(fork);
 
     t->type = FORK;
     t->connected = 1;
 
-    pointer_p next = FN(t, key);
-    PTR_CPY(next, tp_next);
+    for(int i=0; i<MAX; i++)
+        PTR_CPY(FN(t, i), PI->null);
+
+    PTR_CPY(FN(t, key), tp_next);
     free(tp_next);
     DEC(pointer);
 
@@ -227,7 +273,7 @@ pointer_p trie_path_create_force(trie_info_p ti, char len, char arr[], pointer_p
     assert(len > 0);
 
     int size = PATH_SIZE(len);
-    trie_p t = malloc(size);
+    trie_p t = calloc(1, size);
     assert(t);
     INC(path);
 
@@ -235,6 +281,8 @@ pointer_p trie_path_create_force(trie_info_p ti, char len, char arr[], pointer_p
 
     pointer_p next = PN(t);
     PTR_CPY(next, tp_next);
+    free(tp_next);
+    DEC(pointer);
 
     string_p str = PS(t);
     str->len = len;
@@ -265,7 +313,7 @@ pointer_p trie_leaf_create(trie_info_p ti, value_p value)
     t->type = LEAF;
     memcpy(LV(t), value, value_size);
     free(value);
-    DEC(pointer);
+    DEC(value);
 
     return PI->set(t, value_size);
 }
@@ -320,6 +368,8 @@ pointer_p trie_path_connect(trie_info_p ti, pointer_p tp, pointer_p tp_next)
 
     trie_p t = PI->get(tp);
     PTR_CPY(PN(t), tp_next);
+    free(tp_next);
+    DEC(pointer);
 
     int len = PS(t)->len;
     PI->replace(tp, t, len);
@@ -332,6 +382,8 @@ pointer_p trie_leaf_set_value(trie_info_p ti, pointer_p tp, value_p value)
 
     int size = VI->size(value);
     memcpy(LV(t), value, size);
+    free(value);
+    DEC(value);
 
     PI->replace(tp, t, LEAF_SIZE(size));
     return tp;
@@ -372,17 +424,17 @@ pointer_p trie_fork_convert(trie_info_p ti, pointer_p tp)
     assert(t->type == FORK);
     assert(t->connected == 1);
 
-    int key = trie_fork_first_key(ti, t);
+    char key = trie_fork_first_key(ti, t);
     pointer_p t_next = pointer_copy(PI, FN(t, key));
     PI->free(tp);
 
-    char arr[] = {key};
-    return trie_path_create_force(ti, 1, arr, t_next);
+    return trie_path_create_force(ti, 1, &key, t_next);
 }
 
 pointer_p trie_join(trie_info_p ti, pointer_p tp1, pointer_p tp2)
 {
     tp2 = pointer_copy(PI, tp2);
+
     tp1 = trie_fork_convert(ti, tp1);
     tp2 = trie_fork_convert(ti, tp2);
     trie_p t1 = PI->get(tp1);
@@ -398,7 +450,8 @@ pointer_p trie_join(trie_info_p ti, pointer_p tp1, pointer_p tp2)
     memcpy(arr, str1->arr, len1);
     memcpy(&arr[len1], str2->arr, len2);
     
-    pointer_p tp = trie_path_create(ti, len, arr, PN(t2));
+    pointer_p tp_next = pointer_copy(PI, PN(t2));
+    pointer_p tp = trie_path_create(ti, len, arr, tp_next);
     PI->free(tp1);
     PI->free(tp2);
     return tp;
@@ -408,7 +461,7 @@ pointer_p trie_join(trie_info_p ti, pointer_p tp1, pointer_p tp2)
 
 pointer_p trie_delete_rec(trie_info_p ti, pointer_p tp, char len, char arr[])
 {
-    if(PI->is_null(tp))
+    if(tp && PI->is_null(tp))
     {
         free(tp);
         DEC(pointer);
@@ -462,7 +515,7 @@ pointer_p trie_delete_rec(trie_info_p ti, pointer_p tp, char len, char arr[])
 
 pointer_p trie_insert_rec(trie_info_p ti, pointer_p tp, char len, char arr[], value_p value)
 {
-    if(PI->is_null(tp))
+    if(tp && PI->is_null(tp))
     {
         free(tp);
         DEC(pointer);
@@ -480,6 +533,8 @@ pointer_p trie_insert_rec(trie_info_p ti, pointer_p tp, char len, char arr[], va
 
     if(t->type == PATH)
     {
+        // snapshot("INSIDE 1");
+
         string_p str = PS(t);
         int index = string_cmp(str, arr);
         if(index < str->len) 
@@ -487,12 +542,24 @@ pointer_p trie_insert_rec(trie_info_p ti, pointer_p tp, char len, char arr[], va
             tp = trie_path_break(ti, tp, index);
             t  = PI->get(tp);
         }
+        
+        // snapshot("INSIDE 2");
 
         if(t->type == PATH)
         {
             pointer_p tp_next = pointer_copy(PI, PN(t));
+            
+        // snapshot("INSIDE 3");
+
             tp_next = trie_insert_rec(ti, tp_next, len-index, &arr[index], value);
-            return trie_path_connect(ti, tp, tp_next);
+            
+        // snapshot("INSIDE 4");
+
+            tp = trie_path_connect(ti, tp, tp_next);;
+
+        // snapshot("INSIDE 5");
+
+            return tp;
         }
     }
 

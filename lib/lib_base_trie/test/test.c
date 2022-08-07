@@ -64,8 +64,7 @@ pointer_p get_pointer(long i)
 
 void test_create()
 {
-
-    printf("\n\ttest_create\t");
+    printf("\n\ttest_create\t\t");
     long ptr = 1;
     pointer_p tp_next = get_pointer(ptr);
     pointer_p tp = trie_fork_create(ti, 0, tp_next);
@@ -74,6 +73,7 @@ void test_create()
     assert_fork(tp, 0, ptr);
     for(int i=1; i<MAX; i++)
         assert(*(void**)FN(t, i) == NULL);
+
     PI->free(tp);
 
     char arr[2] = {1, 2};
@@ -106,26 +106,31 @@ void test_create()
     tp = trie_leaf_create(ti, v);
     assert_leaf(tp, value);
     PI->free(tp);
+
+    assert_memory();
 }
 
 void test_connection()
 {
+    printf("\n\ttest_connection\t\t");
+
     long ptr = 1;
     pointer_p tp_next =  get_pointer(ptr);
-
-    printf("\n\ttest_connection\t");
     pointer_p tp = trie_fork_create(ti, 5, tp_next);
-    
     trie_p t = PI->get(tp);
     assert(t->connected == 1);
     assert_fork(tp, 5, ptr);
+
+    /////////////////////////////////
     
     ptr = 2;
-    tp_next =  get_pointer(ptr);
-    tp = trie_fork_create(ti, 5, tp_next);
+    tp_next = get_pointer(ptr);
+    tp = trie_fork_connect(ti, tp, 5, tp_next);
     t = PI->get(tp);
     assert(t->connected == 1);
     assert_fork(tp, 5, ptr);
+    
+    /////////////////////////////////
 
     ptr = 3;
     tp_next =  get_pointer(ptr);
@@ -134,6 +139,8 @@ void test_connection()
     t = PI->get(tp);
     assert(t->connected == 2);
 
+    /////////////////////////////////
+
     ptr = 4;
     tp_next =  get_pointer(ptr);
     tp = trie_fork_connect(ti, tp, 3, tp_next);
@@ -141,10 +148,14 @@ void test_connection()
     t = PI->get(tp);
     assert(t->connected == 3);
 
+    /////////////////////////////////
+
     tp = trie_fork_disconnect(ti, tp, 3);
     t = PI->get(tp);
     assert(t->connected == 2);
     assert(PI->get(FN(t, 3)) == NULL);
+
+    /////////////////////////////////
     
     tp = trie_fork_disconnect(ti, tp, 8);
     t = PI->get(tp);
@@ -153,11 +164,13 @@ void test_connection()
 
     tp = trie_fork_disconnect(ti, tp, 5);
     assert(tp == NULL);
+    
+    assert_memory();
 }
 
 void test_joinable()
 {
-    printf("\n\ttest_joinable\t");
+    printf("\n\ttest_joinable\t\t");
 
     long ptr = 1;
     pointer_p tp_next = get_pointer(ptr);
@@ -166,30 +179,39 @@ void test_joinable()
     trie_p t = PI->get(tp);
     assert(trie_joinnable(t) == TRUE);
 
+    /////////////////////////////////
+
     ptr = 2;
     tp_next = get_pointer(ptr);
     trie_fork_connect(ti, tp, 6, tp_next);
     assert(trie_joinnable(t) == FALSE);
     PI->free(tp);
 
+    /////////////////////////////////
+
     char arr[2] = {1, 2};
     ptr = 3;
-    get_pointer(ptr);
+    tp_next = get_pointer(ptr);
     tp = trie_path_create(ti, 2, arr, tp_next);
     t  = PI->get(tp);
-    assert(trie_joinnable(t) == TRUE);
+    int res = trie_joinnable(t);
+    assert(res == TRUE);
     PI->free(tp);
+
+    /////////////////////////////////
 
     int value = 1;
     value_p vp = set_int(value);
     tp = trie_leaf_create(ti, vp);
     assert(trie_joinnable(t) == FALSE);
     PI->free(tp);
+    
+    assert_memory();
 }
 
 void test_path_break()
 {
-    printf("\n\ttest_path_break\t");
+    printf("\n\ttest_path_break\t\t");
     long ptr = 1;
     pointer_p tp_next = get_pointer(ptr);
     char arr[3] = {1, 2, 3};
@@ -244,11 +266,13 @@ void test_path_break()
     tp_1 = pointer_copy(PI, tp_1);
     PI->free(tp_1);
     PI->free(tp);
+    
+    assert_memory();
 }
 
 void test_fork_convert()
 {
-    printf("\n\ttest_fork_convert\t");
+    printf("\n\ttest_fork_convert\t\t");
 
     long ptr = 1;
     pointer_p tp_next = get_pointer(ptr);
@@ -258,26 +282,29 @@ void test_fork_convert()
     tp = trie_fork_convert(ti, tp);
     assert_path(tp, 1, 1, &key);
     PI->free(tp);
+    
+    assert_memory();
 }
 
 void test_join()
 {
-    printf("\n\ttest_join");
-
+    printf("\n\ttest_join\t\t");
 
     char arr[4] = {1, 2, 3, 4};
 
     long ptr = 1;
     pointer_p tp_next = get_pointer(ptr);
     pointer_p tp_1 = trie_path_create(ti, 2, arr, tp_next);
-
+    
     ptr = 2;
     tp_next = get_pointer(ptr);
     pointer_p tp_2 = trie_path_create(ti, 2, &arr[2], tp_next);
-
-
+    
     pointer_p tp = trie_join(ti, tp_1, tp_2);
     assert_path(tp, 2, 4, arr);
+    
+    free(tp_2);
+    DEC(pointer);
     PI->free(tp);
 
     /////////////////////////////////
@@ -292,6 +319,9 @@ void test_join()
 
     tp = trie_join(ti, tp_1, tp_2);
     assert_path(tp, 2, 3, &arr[1]);
+    
+    free(tp_2);
+    DEC(pointer);
     PI->free(tp);
 
     /////////////////////////////////
@@ -306,27 +336,34 @@ void test_join()
     
     tp = trie_join(ti, tp_1, tp_2);
     assert_path(tp, 2, 3, arr);
+    
+    free(tp_2);
+    DEC(pointer);
     PI->free(tp);
+
+    assert_memory();
 }
 
 void test_unit()
 {
-    printf("\ntest_unit");
+    printf("\ntest_unit\t\t");
+
     test_create();
     test_connection();
     test_joinable();
     test_path_break();
     test_fork_convert();
     test_join();
+
+    assert_memory();
 }
 
 
 
 void test_insert()
 {
-    printf("\n\ttest_insert");
+    printf("\n\ttest_insert\t\t");
     char arr[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-
     pointer_p tp = NULL;
 
     value_p value = set_int(1);
@@ -342,7 +379,7 @@ void test_insert()
     trie_insert(ti, &tp, arr, value);
     t = PI->get(tp);
     assert_leaf(PN(t), 2);
-
+    
     //////////////////
 
     arr[4] = 0;
@@ -360,7 +397,7 @@ void test_insert()
 
     t = PI->get(tp_aux);
     assert_leaf(PN(t), 3);
-
+    
     //////////////////
 
     arr[0] = 1;
@@ -390,11 +427,12 @@ void test_insert()
     assert_leaf(PN(t), 5);
 
     trie_free(ti, tp);
+    assert_memory();
 }
 
 void test_querie()
 {
-    printf("\n\ttest_querie");
+    printf("\n\ttest_querie\t\t");
     char arr[8] = {0, 1, 2, 3, 4, 5, 6, 7};
     pointer_p tp = NULL;
 
@@ -421,11 +459,12 @@ void test_querie()
     assert(res == 0);
 
     trie_free(ti, tp);
+    assert_memory();
 }
 
 void test_delete_1()
 {
-    printf("\n\ttest_delete_1");
+    printf("\n\ttest_delete_1\t\t");
     pointer_p tp = NULL;
     char arr[8] = {0, 1, 2, 3, 4, 5, 6, 7};
     value_p value = set_int(1);
@@ -506,11 +545,13 @@ void test_delete_1()
 
     trie_delete(ti, &tp, arr);
     assert(tp == NULL);
+    
+    assert_memory();
 }
 
 void test_delete_2()
 {
-    printf("\n\ttest_delete_2");
+    printf("\n\ttest_delete_2\t\t");
     char arr[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
     pointer_p tp = NULL;
@@ -537,11 +578,12 @@ void test_delete_2()
     assert_path(tp_aux, 0, 2, arr);
 
     trie_free(ti, tp);
+    assert_memory();
 }
 
 void test_integration()
 {
-    printf("\n\ntest_integration");
+    printf("\n\ntest_integration\t\t");
     test_insert();
     test_querie();
 
@@ -553,15 +595,19 @@ void test_integration()
 
 void test_trie()
 {
-    printf("\ntest_trie");
+    assert_memory();
+
     test_unit();
     test_integration();
+    
+    assert_memory();
 }
 
 
 
 int main() 
 {
+    
     setbuf(stdout, NULL);
 
     value_info_p vi = get_int_value_info();
@@ -569,6 +615,7 @@ int main()
     ti = get_trie_info(vi, pi);
 
     test_trie();
-    printf("\n\n\t\tTest successful\n\n");
+
+    printf("\n\n\t\tTest successful\n\n\t\t");
     return 0;
 }

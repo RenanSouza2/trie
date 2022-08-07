@@ -95,5 +95,10 @@ pointer_info_p get_mem_info()
         mem_replace,
         mem_free
     };
+
+#ifdef DEBUG
+    pointer_created = 0;
+#endif
+
     return pi;
 }
