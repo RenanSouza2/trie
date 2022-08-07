@@ -223,7 +223,7 @@ void trie_display_rec(trie_info_p ti, pointer_p tp, int len, char res[])
         }
         break;
 
-        case PATH:
+        case PATH:;
         string_p str = PS(t);
         memcpy(&res[len], str->arr, str->len);
         trie_display_rec(ti, PN(t), len + str->len, res);
