@@ -261,7 +261,8 @@ pointer_p trie_fork_disconnect(trie_info_p ti, pointer_p tp, int key)
     t->connected--;
     PTR_CPY(next, PI->null);
 
-    return PI->replace(tp, t, FORK_SIZE);
+    PI->replace(tp, t, FORK_SIZE);
+    return tp;
 }
 
 pointer_p trie_fork_connect(trie_info_p ti, pointer_p tp, int key, pointer_p tp_next)
@@ -276,7 +277,8 @@ pointer_p trie_fork_connect(trie_info_p ti, pointer_p tp, int key, pointer_p tp_
     PTR_CPY(next, tp_next);
     free(tp_next);
 
-    return PI->replace(tp, t, FORK_SIZE);
+    PI->replace(tp, t, FORK_SIZE);
+    return tp;
 }
 
 pointer_p trie_path_connect(trie_info_p ti, pointer_p tp, pointer_p tp_next)
@@ -291,7 +293,8 @@ pointer_p trie_path_connect(trie_info_p ti, pointer_p tp, pointer_p tp_next)
     PTR_CPY(PN(t), tp_next);
 
     int len = PS(t)->len;
-    return PI->replace(tp, t, len);
+    PI->replace(tp, t, len);
+    return tp;
 }
 
 pointer_p trie_leaf_set_value(trie_info_p ti, pointer_p tp, value_p value)
@@ -301,7 +304,8 @@ pointer_p trie_leaf_set_value(trie_info_p ti, pointer_p tp, value_p value)
     int size = VI->size(value);
     memcpy(LV(t), value, size);
 
-    return PI->replace(tp, t, LEAF_SIZE(size));
+    PI->replace(tp, t, LEAF_SIZE(size));
+    return tp;
 }
 
 
@@ -374,7 +378,7 @@ pointer_p trie_join(trie_info_p ti, pointer_p tp1, pointer_p tp2)
 
 pointer_p trie_delete_rec(trie_info_p ti, pointer_p tp, char len, char arr[])
 {
-    if(PI->is_null(tp)) 
+    if(tp == NULL || PI->is_null(tp)) 
     {
         free(tp);
         return NULL;
@@ -424,9 +428,9 @@ pointer_p trie_delete_rec(trie_info_p ti, pointer_p tp, char len, char arr[])
 
 pointer_p trie_insert_rec(trie_info_p ti, pointer_p tp, char len, char arr[], value_p value)
 {
-    if(PI->is_null(tp))
+    if(tp == NULL || PI->is_null(tp))
     {
-        free(tp);
+        if(tp) free(tp);
         tp = trie_leaf_create(ti, value);
         return trie_path_create(ti, len, arr, tp);
     }
@@ -438,11 +442,15 @@ pointer_p trie_insert_rec(trie_info_p ti, pointer_p tp, char len, char arr[], va
     {
         string_p str = PS(t);
         int index = string_cmp(str, arr);
-        if(index < str->len) tp = trie_path_break(ti, tp, index);
+        if(index < str->len) 
+        {
+            tp = trie_path_break(ti, tp, index);
+            t  = PI->get(tp);
+        }
 
         if(t->type == PATH)
         {
-            pointer_p tp_next = pointer_copy(PI, PN(tp));
+            pointer_p tp_next = pointer_copy(PI, PN(t));
             tp_next = trie_insert_rec(ti, tp_next, len-index, &arr[index], value);
             return trie_path_connect(ti, tp, tp_next);
         }
@@ -456,7 +464,7 @@ pointer_p trie_insert_rec(trie_info_p ti, pointer_p tp, char len, char arr[], va
 
 value_p trie_querie_rec(trie_info_p ti, pointer_p tp, char len, char arr[])
 {
-    if(PI->is_null(tp)) return NULL;
+    if(tp == NULL || PI->is_null(tp)) return NULL;
 
     trie_p t = PI->get(tp);
     switch (t->type)
@@ -512,12 +520,14 @@ void trie_free(trie_info_p ti, pointer_p tp)
             pointer_p next = FN(t, i);
             if(PI->is_null(next)) continue;
             
+            next = pointer_copy(PI, next);
             trie_free(ti, next);
         }
         break;
     
         case PATH:
-        trie_free(ti, PN(t));
+        pointer_p next = pointer_copy(PI, PN(t));
+        trie_free(ti, next);
         break;
     }
     PI->free(tp);

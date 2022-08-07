@@ -38,10 +38,9 @@ void mem_delete(pointer_p p)
     free(p);
 }
 
-pointer_p mem_replace(pointer_p p, handler_p h, int size)
+void mem_replace(pointer_p p, handler_p h, int size)
 {
     *(handler_p*)p = h;
-    return p;
 }
 
 pointer_info_p get_mem_info()

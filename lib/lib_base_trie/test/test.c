@@ -322,68 +322,76 @@ void test_unit()
 
 
 
-// void test_insert()
-// {
-//     printf("\n\ttest_insert");
-//     char arr[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-//     value_info_p vi = get_int_value_info();
-//
-//     trie_p t = NULL;
-//
-//     value_p value = set_int(1);
-//     trie_insert(vi, &t, arr, value);
-//     assert_path(T(t), NULL, 8, arr);
-//
-//     trie_p t1 = TP(t)->next;
-//     assert_leaf(t1, 1);
-//
-//     //////////////////
-//
-//     value = set_int(2);
-//     trie_insert(vi, &t, arr, value);
-//     t1 = TP(t)->next;
-//     assert_leaf(t1, 2);
-//
-//     //////////////////
-//
-//     arr[4] = 0;
-//     value = set_int(3);
-//     trie_insert(vi, &t, arr, value);
-//     assert_path(T(t), NULL, 4, arr);
-//
-//     t1 = TP(t)->next;
-//     assert_fork(t1, 0, NULL);
-//
-//     t1 = TF(t1)->next[0];
-//     assert_path(t1, NULL, 3, &arr[5]);
-//     assert_leaf(TP(t1)->next, 3);
-//
-//      //////////////////
-//
-//     arr[0] = 1;
-//     value = set_int(4);
-//     trie_insert(vi, &t, arr, value);
-//     assert_fork(T(t), 1, NULL);
-//
-//     t1 = TF(t)->next[1];
-//     assert_path(t1, NULL, 7, &arr[1]);
-//     assert_leaf(TP(t1)->next, 4);
-//
-//      //////////////////
-//
-//     arr[0] = 2;
-//     value = set_int(5);
-//     trie_insert(vi, &t, arr, value);
-//     assert_fork(T(t), 2, NULL);
-//
-//     t1 = TF(t)->next[2];
-//     assert_path(t1, NULL, 7, &arr[1]);
-//     assert_leaf(TP(t1)->next, 5);
-//
-//     trie_free(t);
-//     free(vi);
-// }
-//
+void test_insert()
+{
+    printf("\n\ttest_insert");
+    char arr[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+
+    pointer_p tp = NULL;
+
+    value_p value = set_int(1);
+    trie_insert(ti, &tp, arr, value);
+    assert_path(tp, 0, 8, arr);
+
+    trie_p t = PI->get(tp);
+    assert_leaf(PN(t), 1);
+
+    //////////////////
+
+    value = set_int(2);
+    trie_insert(ti, &tp, arr, value);
+    t = PI->get(tp);
+    assert_leaf(PN(t), 2);
+
+    //////////////////
+
+    arr[4] = 0;
+    value = set_int(3);
+    trie_insert(ti, &tp, arr, value);
+    assert_path(tp, 0, 4, arr);
+
+    t = PI->get(tp);
+    pointer_p tp_aux = PN(t);
+    assert_fork(tp_aux, 0, 0);
+
+    t = PI->get(tp_aux);
+    tp_aux = FN(t, 0);
+    assert_path(tp_aux, 0, 3, &arr[5]);
+
+    t = PI->get(tp_aux);
+    assert_leaf(PN(t), 3);
+
+    //////////////////
+
+    arr[0] = 1;
+    value = set_int(4);
+    trie_insert(ti, &tp, arr, value);
+    assert_fork(tp, 1, 0);
+
+    t = PI->get(tp);
+    tp_aux = FN(t, 1);
+    assert_path(tp_aux, 0, 7, &arr[1]);
+
+    t = PI->get(tp_aux);
+    assert_leaf(PN(t), 4);
+
+    //////////////////
+
+    arr[0] = 2;
+    value = set_int(5);
+    trie_insert(ti, &tp, arr, value);
+    assert_fork(tp, 2, 0);
+
+    t = PI->get(tp);
+    tp_aux = FN(t, 2);
+    assert_path(tp_aux, 0, 7, &arr[1]);
+    
+    t = PI->get(tp_aux);
+    assert_leaf(PN(t), 5);
+
+    trie_free(ti, tp);
+}
+
 // void test_querie()
 // {
 //     printf("\n\ttest_querie");
@@ -512,16 +520,18 @@ void test_unit()
 //     assert_path(t1, NULL, 2, arr);
 //
 //      trie_free(t);
-// }PI->freevoid test_integration()
-// {
-//     printf("\n\ntest_integration");
-//     test_insert();
-//     test_querie();
-//
-//     test_delete_1();
-//     test_delete_2();
-//
 // }
+
+void test_integration()
+{
+    printf("\n\ntest_integration");
+    test_insert();
+    // test_querie();
+
+    // test_delete_1();
+    // test_delete_2();
+
+}
 
 
 
@@ -529,7 +539,7 @@ void test_trie()
 {
     printf("\ntest_trie");
     test_unit();
-    // test_integration();
+    test_integration();
 }
 
 
