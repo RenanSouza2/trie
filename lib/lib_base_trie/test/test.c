@@ -71,7 +71,7 @@ void test_create()
     trie_p t = PI->get(tp);
     assert(t->connected == 1);
     assert_fork(tp, 0, ptr);
-    for(int i=1; i<MAX; i++)
+    for(int i=1; i < ti->max; i++)
         assert(*(void**)FN(t, i) == NULL);
 
     PI->free(tp);
@@ -612,7 +612,7 @@ int main()
 
     value_info_p vi = get_int_value_info();
     pointer_info_p pi = get_mem_info();
-    ti = get_trie_info(vi, pi);
+    ti = get_trie_info(10, 8, vi, pi);
 
     test_trie();
 

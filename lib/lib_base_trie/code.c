@@ -19,7 +19,7 @@
 #define LV(POINTER) ((value_p)HP(POINTER))
 
 #define PTR_CPY(POINTER1, POINTER2) memcpy(POINTER1, POINTER2, PI->size);
-#define FORK_SIZE (8 + MAX * PI->size)
+#define FORK_SIZE (8 + ti->max * PI->size)
 #define PATH_SIZE(LENGTH) (9 + PI->size + LENGTH)
 #define LEAF_SIZE(SIZE) (8 + SIZE)
 
@@ -29,9 +29,6 @@
 #define FORK 0
 #define PATH 1
 #define LEAF 2
-
-#define MAX 10
-#define LEN 8
 
 
 
@@ -128,7 +125,7 @@ pointer_p pointer_copy(pointer_info_p pi, pointer_p p)
 
 int trie_fork_first_key(trie_info_p ti, trie_p t)
 {
-    for(int i=0; i<MAX; i++)
+    for(int i=0; i < ti->max; i++)
     {
         pointer_p next = FN(t, i);
         if(!PI->is_null(next)) return i;
@@ -150,7 +147,7 @@ void trie_display_single(trie_info_p ti, pointer_p tp)
         case FORK:
         printf("\t(FORK)");
         printf("\nconnected: %d", t->connected);
-        for(int i=0; i<MAX; i++)
+        for(int i=0; i < ti->max; i++)
         {
             pointer_p next = FN(t, i);
             if(PI->is_null(next)) continue;
@@ -182,7 +179,7 @@ void trie_display_structure_rec(trie_info_p ti, pointer_p tp)
     switch (t->type)
     {
         case FORK:
-        for(int i=0; i<MAX; i++)
+        for(int i=0; i < ti->max; i++)
         {
             pointer_p next = FN(t, i);
             if(PI->is_null(next)) continue;
@@ -213,7 +210,7 @@ void trie_display_rec(trie_info_p ti, pointer_p tp, int len, char res[])
     switch(t->type)
     {
         case FORK:
-        for(int i=0; i<MAX; i++)
+        for(int i=0; i < ti->max; i++)
         {
             pointer_p next = FN(t, i);
             if(PI->is_null(next)) continue;
@@ -240,7 +237,7 @@ void trie_display_rec(trie_info_p ti, pointer_p tp, int len, char res[])
 
 void trie_display(trie_info_p ti, pointer_p tp)
 {
-    char res[LEN];
+    char res[ti->len];
     if(tp == NULL) printf("\nEMPTY TRIE");
     else           trie_display_rec(ti, tp, 0, res);
     printf("\n");
@@ -258,7 +255,7 @@ pointer_p trie_fork_create(trie_info_p ti, int key, pointer_p tp_next)
     t->type = FORK;
     t->connected = 1;
 
-    for(int i=0; i<MAX; i++)
+    for(int i=0; i < ti->max; i++)
         PTR_CPY(FN(t, i), PI->null);
 
     PTR_CPY(FN(t, key), tp_next);
@@ -598,18 +595,18 @@ value_p trie_querie_rec(trie_info_p ti, pointer_p tp, char len, char arr[])
 void trie_insert(trie_info_p ti, pointer_p *tp, char arr[], value_p value)
 {
     *tp = (VI->is_null(value)) 
-        ? trie_delete_rec(ti, *tp, LEN, arr)
-        : trie_insert_rec(ti, *tp, LEN, arr, value);
+        ? trie_delete_rec(ti, *tp, ti->len, arr)
+        : trie_insert_rec(ti, *tp, ti->len, arr, value);
 }
 
 void trie_delete(trie_info_p ti, pointer_p *tp, char arr[])
 {
-    *tp = trie_delete_rec(ti, *tp, LEN, arr);
+    *tp = trie_delete_rec(ti, *tp, ti->len, arr);
 }
 
 value_p trie_querie(trie_info_p ti, pointer_p tp, char arr[])
 {
-    return trie_querie_rec(ti, tp, LEN, arr);
+    return trie_querie_rec(ti, tp, ti->len, arr);
 }
 
 
@@ -622,7 +619,7 @@ void trie_free(trie_info_p ti, pointer_p tp)
     switch (t->type)
     {
         case FORK:
-        for(int i=0; i<MAX; i++)
+        for(int i=0; i < ti->max; i++)
         {
             pointer_p next = FN(t, i);
             if(PI->is_null(next)) continue;
