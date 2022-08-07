@@ -632,7 +632,7 @@ void trie_free(trie_info_p ti, pointer_p tp)
         }
         break;
     
-        case PATH:
+        case PATH:;
         pointer_p next = pointer_copy(PI, PN(t));
         trie_free(ti, next);
         break;
