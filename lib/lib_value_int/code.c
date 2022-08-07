@@ -5,6 +5,16 @@
 #include "header.h"
 #include "../lib_base_header/value.h"
 
+int decrease(int created, int freed);
+
+#ifdef DEBUG
+extern int value_created;
+
+#define INC(INT) INT##_created++;
+#else
+#define INC(INT)
+#endif
+
 void value_print(value_p value)
 {
     printf("%d", *(int*)value);
@@ -14,6 +24,7 @@ value_p set_int(int value)
 {
     value_p vp = malloc(sizeof(int));
     assert(value);
+    INC(value);
 
     *(int*)vp = value;
     return vp;

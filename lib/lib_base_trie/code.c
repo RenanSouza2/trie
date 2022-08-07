@@ -41,25 +41,46 @@ STRUCT(trie)
 };
 
 
+#ifdef DEBUG
+int value_created = 0;
+int value_free = 0;
+
+int pointer_created;
+int pointer_free = 0;
+
+int fork_created = 0;
+int fork_free = 0;
+
+int path_created = 0;
+int path_free = 0;
+
+int leaf_created = 0;
+int leaf_free = 0;
+
+int decrease(int created, int freed)
+{
+    assert(created > freed);
+    return freed + 1;
+}
+
+#define INC(INT) INT##_created++;
+#define DEC(INT) INT##_free = decrease(INT##_created, INT##_free)
+
+#else
+#define INC(INT)
+#define DEC(INT)
+#endif
+
+
 
 pointer_p pointer_copy(pointer_info_p pi, pointer_p p)
 {
     pointer_p p_new = malloc(pi->size);
     assert(p_new);
+    INC(pointer);
 
     memcpy(p_new, p, pi->size);
     return p_new;
-}
-
-trie_p trie_path_copy(trie_info_p ti, trie_p t)
-{
-    int len  = PS(t)->len;
-    int size = PATH_SIZE(len);
-    trie_p t_new = malloc(size);
-    assert(t_new);
-
-    memcpy(t_new, t, size);
-    return t_new;
 }
 
 int trie_fork_first_key(trie_info_p ti, trie_p t)
@@ -73,7 +94,7 @@ int trie_fork_first_key(trie_info_p ti, trie_p t)
 }
 
 
-
+#ifdef DEBUG
 void trie_display_single(trie_info_p ti, pointer_p tp) 
 {
     printf("\ntrie: ");
@@ -132,6 +153,16 @@ void trie_display_structure_rec(trie_info_p ti, pointer_p tp)
     }
 }
 
+void trie_display_structure(trie_info_p ti, pointer_p tp)
+{
+    if(tp == NULL || PI->is_null(tp))   printf("\nEmpty trie");
+    else                                trie_display_structure_rec(ti, tp);
+}
+
+#endif
+
+
+
 void trie_display_rec(trie_info_p ti, pointer_p tp, int len, char res[])
 {
     trie_p t = PI->get(tp);
@@ -163,14 +194,6 @@ void trie_display_rec(trie_info_p ti, pointer_p tp, int len, char res[])
     }
 }
 
-
-
-void trie_display_structure(trie_info_p ti, pointer_p tp)
-{
-    if(tp == NULL || PI->is_null(tp))   printf("\nEmpty trie");
-    else                                trie_display_structure_rec(ti, tp);
-}
-
 void trie_display(trie_info_p ti, pointer_p tp)
 {
     char res[LEN];
@@ -186,6 +209,7 @@ pointer_p trie_fork_create(trie_info_p ti, int key, pointer_p tp_next)
     int size = FORK_SIZE;
     trie_p t = calloc(1, size);
     assert(t);
+    INC(fork);
 
     t->type = FORK;
     t->connected = 1;
@@ -193,6 +217,7 @@ pointer_p trie_fork_create(trie_info_p ti, int key, pointer_p tp_next)
     pointer_p next = FN(t, key);
     PTR_CPY(next, tp_next);
     free(tp_next);
+    DEC(pointer);
 
     return PI->set(t, size);
 }
@@ -204,6 +229,7 @@ pointer_p trie_path_create_force(trie_info_p ti, char len, char arr[], pointer_p
     int size = PATH_SIZE(len);
     trie_p t = malloc(size);
     assert(t);
+    INC(path);
 
     t->type = PATH;
 
@@ -234,10 +260,12 @@ pointer_p trie_leaf_create(trie_info_p ti, value_p value)
     int size = LEAF_SIZE(value_size);
     trie_p t = calloc(1, size);
     assert(t);
+    INC(leaf);
 
     t->type = LEAF;
     memcpy(LV(t), value, value_size);
     free(value);
+    DEC(pointer);
 
     return PI->set(t, value_size);
 }
@@ -276,6 +304,7 @@ pointer_p trie_fork_connect(trie_info_p ti, pointer_p tp, int key, pointer_p tp_
     if(PI->is_null(next)) t->connected++;
     PTR_CPY(next, tp_next);
     free(tp_next);
+    DEC(pointer);
 
     PI->replace(tp, t, FORK_SIZE);
     return tp;
@@ -379,11 +408,14 @@ pointer_p trie_join(trie_info_p ti, pointer_p tp1, pointer_p tp2)
 
 pointer_p trie_delete_rec(trie_info_p ti, pointer_p tp, char len, char arr[])
 {
-    if(tp == NULL || PI->is_null(tp)) 
+    if(PI->is_null(tp))
     {
-        if(tp) free(tp);
-        return NULL;
+        free(tp);
+        DEC(pointer);
+        tp = NULL;
     }
+
+    if(tp == NULL) return NULL;
 
     pointer_p tp_next;
     trie_p t = PI->get(tp);
@@ -430,9 +462,15 @@ pointer_p trie_delete_rec(trie_info_p ti, pointer_p tp, char len, char arr[])
 
 pointer_p trie_insert_rec(trie_info_p ti, pointer_p tp, char len, char arr[], value_p value)
 {
-    if(tp == NULL || PI->is_null(tp))
+    if(PI->is_null(tp))
     {
-        if(tp) free(tp);
+        free(tp);
+        DEC(pointer);
+        tp = NULL;
+    }
+
+    if(tp == NULL) 
+    {
         tp = trie_leaf_create(ti, value);
         return trie_path_create(ti, len, arr, tp);
     }

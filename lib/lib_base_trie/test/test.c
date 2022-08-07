@@ -547,7 +547,6 @@ void test_integration()
 
     test_delete_1();
     test_delete_2();
-
 }
 
 

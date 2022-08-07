@@ -1,13 +1,13 @@
-FLAGS=-Wall -Werror -Wfatal-errors
+FLAGS=-Wall -Werror -Wfatal-errors -D DEBUG
 
 STR_PATH=../../lib_string
 STR_FILE=$(STR_PATH)/lib.o
 
 INT_PATH=../../lib_value_int
-INT_FILE=$(INT_PATH)/lib.o
+INT_FILE=$(INT_PATH)/debug.o
 
 MEM_PATH=../../lib_pointer_mem
-MEM_FILE=$(MEM_PATH)/lib.o
+MEM_FILE=$(MEM_PATH)/debug.o
 
 TRIE_PATH=../../lib_trie_info
 TRIE_FILE=$(TRIE_PATH)/lib.o
@@ -35,11 +35,11 @@ $(STR_FILE):
 
 .PHONY: $(INT_FILE)
 $(INT_FILE):
-	$(MAKE) --directory=$(INT_PATH)
+	$(MAKE) debug.o --directory=$(INT_PATH)
 
 .PHONY: $(MEM_FILE)
 $(MEM_FILE):
-	$(MAKE) --directory=$(MEM_PATH)
+	$(MAKE) debug.o --directory=$(MEM_PATH)
 
 .PHONY: $(TRIE_FILE)
 $(TRIE_FILE):
