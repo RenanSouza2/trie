@@ -14,7 +14,7 @@ int main()
     
     value_info_p vi = get_int_value_info();
     pointer_info_p pi = get_mem_info();
-    trie_info_p ti = get_trie_info(vi, pi);
+    trie_info_p ti = get_trie_info(10, 8, vi, pi);
     pointer_p tp = NULL;
 
     char arr[] = {1, 2, 3, 4, 5, 6, 7, 8};

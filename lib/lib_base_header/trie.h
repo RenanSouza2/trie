@@ -8,6 +8,7 @@ PLACEHOLDER(value_info);
 
 STRUCT(trie_info)
 {
+    int max, len;
     value_info_p vi;
     pointer_info_p pi;
 };
