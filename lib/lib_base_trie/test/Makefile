@@ -45,5 +45,6 @@ $(MEM_FILE):
 $(TRIE_FILE):
 	$(MAKE) --directory=$(TRIE_PATH)
 
+.PHONY: clean
 clean:
-	rm -f test.o
+	rm -f *.o

@@ -13,9 +13,11 @@ tmp.o: code.c
 $(STR_FILE):
 	$(MAKE) --directory=$(STR_PATH)
 
+.PHONY: clean
 clean:
 	rm -f *.o
 	$(MAKE) clean --directory=$(STR_PATH)
+	$(MAKE) clean --directory=test
 
 .PHONY: test
 test:

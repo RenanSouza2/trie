@@ -3,6 +3,7 @@ build: lib.o
 lib.o: code.c
 	gcc -o lib.o code.c -c -Wall -Werror -Wfatal-errors
 
+.PHONY: clean
 clean:
 	rm -f lib.o $(OBJ)
 	$(MAKE) clean --directory=test
