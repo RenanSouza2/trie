@@ -392,39 +392,37 @@ void test_insert()
     trie_free(ti, tp);
 }
 
-// void test_querie()
-// {
-//     printf("\n\ttest_querie");
-//     value_info_p vi = get_int_value_info();
-//     char arr[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-//     trie_p t = NULL;
-//
-//     value_p value = trie_querie(t, arr);
-//     int res = get_int(value);
-//     assert(res == 0);
-//
-//     value = set_int(1);
-//     trie_insert(vi, &t, arr, value);
-//     value = trie_querie(t, arr);
-//     res = get_int(value);
-//     assert(res == 1);
-//
-//     arr[4] = 0;
-//     value = set_int(2);
-//     trie_insert(vi, &t, arr, value);
-//     value = trie_querie(t, arr);
-//     res = get_int(value);
-//     assert(res == 2);
-//
-//     arr[2] = 0;
-//     value = trie_querie(t, arr);
-//     res = get_int(value);
-//     assert(res == 0);
-//
-//      trie_free(t);
-//     free(vi);
-// }
-//
+void test_querie()
+{
+    printf("\n\ttest_querie");
+    char arr[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+    pointer_p tp = NULL;
+
+    value_p value = trie_querie(ti, tp, arr);
+    int res = get_int(value);
+    assert(res == 0);
+
+    value = set_int(1);
+    trie_insert(ti, &tp, arr, value);
+    value = trie_querie(ti, tp, arr);
+    res = get_int(value);
+    assert(res == 1);
+
+    arr[4] = 0;
+    value = set_int(2);
+    trie_insert(ti, &tp, arr, value);
+    value = trie_querie(ti, tp, arr);
+    res = get_int(value);
+    assert(res == 2);
+
+    arr[2] = 0;
+    value = trie_querie(ti, tp, arr);
+    res = get_int(value);
+    assert(res == 0);
+
+    trie_free(ti, tp);
+}
+
 // void test_delete_1()
 // {
 //     printf("\n\ttest_delete_1");
@@ -526,7 +524,7 @@ void test_integration()
 {
     printf("\n\ntest_integration");
     test_insert();
-    // test_querie();
+    test_querie();
 
     // test_delete_1();
     // test_delete_2();
