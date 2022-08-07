@@ -5,8 +5,6 @@ build: lib.o
 lib.o: code.c
 	gcc $(FLAGS) -o lib.o code.c
 
-debug.o: code.c
-	gcc $(FLAGS) -o debug.o code.c -D DEBUG
-
+.PHONY: clean
 clean:
 	rm -f *.o

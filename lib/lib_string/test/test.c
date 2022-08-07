@@ -27,6 +27,6 @@ void test_string_cmp()
 int main() {
     setbuf(stdout, NULL);
     test_string_cmp();
-    printf("\tTest successful\n");
+    printf("\n\tTest successful\n\n");
     return 0;
 }
