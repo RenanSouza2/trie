@@ -1,15 +1,15 @@
 FLAGS=-Wall -Werror -Wfatal-errors -D DEBUG
 
-STR_PATH=../../lib_string
+STR_PATH=../../../utils/string
 STR_FILE=$(STR_PATH)/lib.o
 
-INT_PATH=../../lib_value_int
+INT_PATH=../../../value/int
 INT_FILE=$(INT_PATH)/debug.o
 
-MEM_PATH=../../lib_pointer_mem
+MEM_PATH=../../../pointer/mem
 MEM_FILE=$(MEM_PATH)/debug.o
 
-TRIE_PATH=../../lib_trie_info
+TRIE_PATH=../../../base/lib_trie_info
 TRIE_FILE=$(TRIE_PATH)/lib.o
 
 test: test.o
@@ -24,7 +24,6 @@ test.o: tmp.o lib_tmp.o
 tmp.o: test.c ../code.c
 	gcc -c $(FLAGS) -o tmp.o test.c
 
-#  $(STR_FILE) $(INT_FILE) $(MEM_FILE) $(TRIE_FILE)
 .INTERMEDIATE: lib_tmp.o
 lib_tmp.o: $(STR_FILE) $(INT_FILE) $(MEM_FILE) $(TRIE_FILE)
 	ld -o lib_tmp.o $^ -r

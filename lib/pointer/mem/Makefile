@@ -11,5 +11,3 @@ debug.o: code.c
 .PHONY: clean
 clean:
 	rm -f *.o
-
-

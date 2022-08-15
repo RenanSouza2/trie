@@ -15,3 +15,8 @@ int string_cmp(string_p str, char arr[])
     for(i=0; i<len && str->arr[i] == arr[i]; i++);
     return i;
 }
+
+int string_size(int length)
+{
+    return sizeof(short) + length;
+}

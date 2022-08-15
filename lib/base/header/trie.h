@@ -1,7 +1,7 @@
 #ifndef __BASE_H__
 #define __BASE_H__
 
-#include "../struct.h"
+#include "../../utils/struct.h"
 
 PLACEHOLDER(pointer_info);
 PLACEHOLDER(value_info);

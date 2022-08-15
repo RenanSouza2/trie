@@ -1,7 +1,7 @@
 #ifndef __BASE_TRIE_H__
 #define __BASE_TRIE_H__
 
-#include "../struct.h"
+#include "../../utils/struct.h"
 
 typedef void *handler_p;
 PLACEHOLDER(pointer);

@@ -2,7 +2,7 @@
 #include <assert.h>
 
 #include "header.h"
-#include "../lib_base_header/trie.h"
+#include "../header/trie.h"
 
 trie_info_p get_trie_info(int max, int len, value_info_p vi, pointer_info_p pi)
 {

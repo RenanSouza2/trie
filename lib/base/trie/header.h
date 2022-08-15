@@ -1,7 +1,7 @@
 #ifndef __LIB_TRIE_H__
 #define __LIB_TRIE_H__
 
-#include "../struct.h"
+#include "../../utils/struct.h"
 
 PLACEHOLDER(trie);
 PLACEHOLDER(value);

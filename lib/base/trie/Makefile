@@ -1,4 +1,4 @@
-STR_PATH=../lib_string
+STR_PATH=../../utils/string
 STR_FILE=$(STR_PATH)/lib.o
 
 build: lib.o

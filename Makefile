@@ -5,16 +5,16 @@ FLAGS=-Wall -Wall -Werror -Wfatal-errors
 
 LIBS=lib_trie lib_my_string
 
-BASE_PATH=lib/lib_base_trie
+BASE_PATH=lib/base/trie
 BASE_FILE=$(BASE_PATH)/lib.o
 
-INT_PATH=lib/lib_value_int
+INT_PATH=lib/value/int
 INT_FILE=$(INT_PATH)/lib.o
 
-MEM_PATH=lib/lib_pointer_mem
+MEM_PATH=lib/pointer/mem
 MEM_FILE=$(MEM_PATH)/lib.o
 
-TRIE_PATH=lib/lib_trie_info
+TRIE_PATH=lib/base/lib_trie_info
 TRIE_FILE=$(TRIE_PATH)/lib.o
 
 run: $(OBJ)
