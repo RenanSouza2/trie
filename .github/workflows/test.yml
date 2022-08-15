@@ -3,9 +3,20 @@ name: C CI
 on: [push]
 
 jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - run: make
+
   test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - run: make test
-      
+
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - run: make clen

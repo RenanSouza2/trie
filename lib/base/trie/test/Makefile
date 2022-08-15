@@ -1,7 +1,7 @@
 FLAGS=-Wall -Werror -Wfatal-errors -D DEBUG
 
 STR_PATH=../../../utils/string
-STR_FILE=$(STR_PATH)/lib.o
+STR_FILE=$(STR_PATH)/debug.o
 
 INT_PATH=../../../value/int
 INT_FILE=$(INT_PATH)/debug.o
@@ -10,7 +10,7 @@ MEM_PATH=../../../pointer/mem
 MEM_FILE=$(MEM_PATH)/debug.o
 
 TRIE_PATH=../../../base/lib_trie_info
-TRIE_FILE=$(TRIE_PATH)/lib.o
+TRIE_FILE=$(TRIE_PATH)/debug.o
 
 test: test.o
 	./test.o 
@@ -30,7 +30,7 @@ lib_tmp.o: $(STR_FILE) $(INT_FILE) $(MEM_FILE) $(TRIE_FILE)
 
 .PHONY: $(STR_FILE)
 $(STR_FILE):
-	$(MAKE) --directory=$(STR_PATH)
+	$(MAKE) debug.o --directory=$(STR_PATH)
 
 .PHONY: $(INT_FILE)
 $(INT_FILE):
@@ -42,7 +42,7 @@ $(MEM_FILE):
 
 .PHONY: $(TRIE_FILE)
 $(TRIE_FILE):
-	$(MAKE) --directory=$(TRIE_PATH)
+	$(MAKE) debug.o --directory=$(TRIE_PATH)
 
 .PHONY: clean
 clean:

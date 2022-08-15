@@ -3,8 +3,8 @@ STR_FILE=$(STR_PATH)/lib.o
 
 build: lib.o
 
-lib.o: tmp.o $(STR_FILE)
-	ld -r -o lib.o $^
+lib.o debug.o: tmp.o $(STR_FILE)
+	ld -r -o $@ $^
 	
 tmp.o: code.c
 	gcc -o tmp.o code.c -c -Wall -Werror -Wfatal-errors
