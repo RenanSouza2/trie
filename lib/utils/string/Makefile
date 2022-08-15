@@ -1,11 +1,11 @@
 build: lib.o
 
-lib.o: code.c
-	gcc -o lib.o code.c -c -Wall -Werror -Wfatal-errors
+lib.o debug.o: code.c
+	gcc -o $@ code.c -c -Wall -Werror -Wfatal-errors
 
 .PHONY: clean
 clean:
-	rm -f lib.o $(OBJ)
+	rm -f *.o
 	$(MAKE) clean --directory=test
 
 .PHONY: test

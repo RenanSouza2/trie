@@ -1,10 +1,9 @@
 clean:
-	$(MAKE) clean --directory=lib_base_trie
-	$(MAKE) clean --directory=lib_pointer_mem
-	$(MAKE) clean --directory=lib_string
-	$(MAKE) clean --directory=lib_trie_info
-	$(MAKE) clean --directory=lib_value_int
+	$(MAKE) clean --directory=base
+	$(MAKE) clean --directory=pointer
+	$(MAKE) clean --directory=utils
+	$(MAKE) clean --directory=value
 
 test:
-	$(MAKE) test --directory=lib_string
-	$(MAKE) test --directory=lib_base_trie
+	$(MAKE) test --directory=utils
+	$(MAKE) test --directory=base

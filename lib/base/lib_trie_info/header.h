@@ -1,7 +1,7 @@
 #ifndef __TRIE_INFO_H__
 #define __TRIE_INFO_H__
 
-#include "../struct.h"
+#include "../../utils/struct.h"
 
 PLACEHOLDER(trie_info);
 PLACEHOLDER(value_info);

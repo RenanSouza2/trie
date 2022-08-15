@@ -1,7 +1,7 @@
 #ifndef __LIB_VALUE_INT_H__
 #define __LIB_VALUE_INT_H__
 
-#include "../struct.h"
+#include "../../utils/struct.h"
 
 PLACEHOLDER(value);
 PLACEHOLDER(value_info);

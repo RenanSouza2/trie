@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "../../lib_value_int/header.h"
-#include "../../lib_pointer_mem/header.h"
-#include "../../lib_trie_info/header.h"
+#include "../../../value/int/header.h"
+#include "../../../pointer/mem/header.h"
+#include "../../../base/lib_trie_info/header.h"
 #include "../code.c"
 
 trie_info_p ti;

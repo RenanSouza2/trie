@@ -3,10 +3,10 @@
 #include <string.h>
 #include <assert.h>
 
-#include "../lib/lib_base_trie/header.h"
-#include "../lib/lib_value_int/header.h"
-#include "../lib/lib_pointer_mem/header.h"
-#include "../lib/lib_trie_info/header.h"
+#include "../lib/base/trie/header.h"
+#include "../lib/value/int/header.h"
+#include "../lib/pointer/mem/header.h"
+#include "../lib/base/lib_trie_info/header.h"
 
 int main()
 {

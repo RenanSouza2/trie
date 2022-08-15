@@ -1,7 +1,7 @@
 #ifndef __MEM_POINTER_H__
 #define __MEM_POINTER_H__
 
-#include "../struct.h"
+#include "../../utils/struct.h"
 
 PLACEHOLDER(pointer_info);
 

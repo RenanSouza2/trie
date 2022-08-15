@@ -4,10 +4,10 @@
 #include <assert.h>
 
 #include "header.h"
-#include "../lib_string/header.h"
-#include "../lib_base_header/trie.h"
-#include "../lib_base_header/value.h"
-#include "../lib_base_header/pointer.h"
+#include "../../utils/string/header.h"
+#include "../../base/header/trie.h"
+#include "../../base/header/value.h"
+#include "../../base/header/pointer.h"
 
 #define PI ti->pi
 #define VI ti->vi
@@ -19,9 +19,9 @@
 #define LV(POINTER) ((value_p)HP(POINTER))
 
 #define PTR_CPY(POINTER1, POINTER2) memcpy(POINTER1, POINTER2, PI->size);
-#define FORK_SIZE (8 + ti->max * PI->size)
-#define PATH_SIZE(LENGTH) (9 + PI->size + LENGTH)
-#define LEAF_SIZE(SIZE) (8 + SIZE)
+#define FORK_SIZE (sizeof(trie_t) + ti->max * PI->size)
+#define PATH_SIZE(LENGTH) (sizeof(trie_t) + PI->size + string_size(LENGTH))
+#define LEAF_SIZE(SIZE) (sizeof(trie_t) + SIZE)
 
 #define FALSE 0
 #define TRUE  1

@@ -1,7 +1,7 @@
 #ifndef __BASE_VALUE_H__
 #define __BASE_VALUE_H__
 
-#include "../struct.h"
+#include "../../utils/struct.h"
 
 PLACEHOLDER(value);
 
