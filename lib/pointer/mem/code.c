@@ -3,6 +3,7 @@
 #include <string.h>
 #include <assert.h>
 
+#include "header.h"
 #include "../../base/header/pointer.h"
 
 #ifdef DEBUG

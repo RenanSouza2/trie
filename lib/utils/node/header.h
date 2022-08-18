@@ -1,0 +1,32 @@
+#ifndef __UTILS_TRIE_H__
+#define __UTILS_TRIE_H__
+
+#include "../struct.h"
+#include "../../base/header/trie.h"
+#include "../../base/header/value.h"
+#include "../../base/header/pointer.h"
+
+#define FORK 0
+#define PATH 1
+#define LEAF 2
+
+#define PI ti->pi
+
+#define HP(POINTER) ((char*)(((trie_p)(POINTER))+1))
+#define FN(POINTER, INDEX) ((pointer_p)(HP(POINTER) + (INDEX) * PI->size))
+
+#define PTR_CPY(POINTER1, POINTER2) memcpy(POINTER1, POINTER2, PI->size)
+
+#define FORK_SIZE (sizeof(trie_t) + ti->max * PI->size)
+
+PLACEHOLDER(trie_info);
+PLACEHOLDER(pointer);
+
+STRUCT(trie)
+{
+    int type, connected;
+};
+
+trie_p trie_fork_set(trie_info_p ti, int key, pointer_p tp_next);
+
+#endif

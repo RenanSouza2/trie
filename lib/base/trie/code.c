@@ -5,11 +5,8 @@
 
 #include "header.h"
 #include "../../utils/string/header.h"
-#include "../../base/header/trie.h"
-#include "../../base/header/value.h"
-#include "../../base/header/pointer.h"
+#include "../../utils/node/header.h"
 
-#define PI ti->pi
 #define VI ti->vi
 
 #define HP(POINTER) ((char*)(((trie_p)(POINTER))+1))
@@ -18,26 +15,14 @@
 #define PN(POINTER) ((pointer_p)HP(POINTER))
 #define LV(POINTER) ((value_p)HP(POINTER))
 
-#define PTR_CPY(POINTER1, POINTER2) memcpy(POINTER1, POINTER2, PI->size);
 #define PTR_NULL(POINTER) (memcmp(POINTER, PI->null, PI->size) == 0)
 
-#define FORK_SIZE (sizeof(trie_t) + ti->max * PI->size)
 #define PATH_SIZE(LENGTH) (sizeof(trie_t) + PI->size + string_size(LENGTH))
 #define LEAF_SIZE(SIZE) (sizeof(trie_t) + SIZE)
 
 #define FALSE 0
 #define TRUE  1
 
-#define FORK 0
-#define PATH 1
-#define LEAF 2
-
-
-
-STRUCT(trie)
-{
-    int type, connected;
-};
 
 
 #ifdef DEBUG
@@ -249,21 +234,9 @@ void trie_display(trie_info_p ti, pointer_p tp)
 
 pointer_p trie_fork_create(trie_info_p ti, int key, pointer_p tp_next)
 {
+    trie_p t = trie_fork_set(ti, key, tp_next);
+    
     int size = FORK_SIZE;
-    trie_p t = malloc(size);
-    assert(t);
-    INC(fork);
-
-    t->type = FORK;
-    t->connected = 1;
-
-    for(int i=0; i < ti->max; i++)
-        PTR_CPY(FN(t, i), PI->null);
-
-    PTR_CPY(FN(t, key), tp_next);
-    free(tp_next);
-    DEC(pointer);
-
     return PI->set(t, size);
 }
 
