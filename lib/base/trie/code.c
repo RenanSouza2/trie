@@ -7,13 +7,8 @@
 #include "../../utils/string/header.h"
 #include "../../utils/node/header.h"
 
-#define VI ti->vi
-
-#define LV(POINTER) ((value_p)HP(POINTER))
-
 #define PTR_NULL(POINTER) (memcmp(POINTER, PI->null, PI->size) == 0)
 
-#define LEAF_SIZE(SIZE) (sizeof(trie_t) + SIZE)
 
 #define FALSE 0
 #define TRUE  1
@@ -230,6 +225,8 @@ void trie_display(trie_info_p ti, pointer_p tp)
 pointer_p trie_fork_create(trie_info_p ti, int key, pointer_p tp_next)
 {
     trie_p t = trie_fork_set(ti, key, tp_next);
+    INC(fork);
+    DEC(pointer);
     
     int size = FORK_SIZE;
     return PI->set(t, size);
@@ -238,6 +235,8 @@ pointer_p trie_fork_create(trie_info_p ti, int key, pointer_p tp_next)
 pointer_p trie_path_create_force(trie_info_p ti, char len, char arr[], pointer_p tp_next)
 {
     trie_p t = trie_path_set(ti, len, arr, tp_next);
+    INC(path);
+    DEC(pointer);
 
     int size = PATH_SIZE(len);
     return PI->set(t, size);
@@ -256,18 +255,12 @@ pointer_p trie_path_create(trie_info_p ti, char len, char arr[], pointer_p tp_ne
 
 pointer_p trie_leaf_create(trie_info_p ti, value_p value)
 {
-    int value_size = VI->size(value);
-    int size = LEAF_SIZE(value_size);
-    trie_p t = calloc(1, size);
-    assert(t);
+    trie_p t = trie_leaf_set(ti, value);
     INC(leaf);
-
-    t->type = LEAF;
-    memcpy(LV(t), value, value_size);
-    free(value);
     DEC(value);
-
-    return PI->set(t, value_size);
+    
+    int size = LEAF_SIZE(VI->size(value));
+    return PI->set(t, size);
 }
 
 

@@ -8,11 +8,15 @@ NODE_FILE=$(NODE_PATH)/lib.o
 
 build: lib.o
 
-lib.o debug.o: tmp.o $(STR_FILE) $(NODE_FILE)
+lib.o debug.o: tmp.o tmp_libs.o
 	ld -r -o $@ $^
-	
+
+.INTERMEDIATE: tmp.o
 tmp.o: code.c
 	gcc -o tmp.o code.c -c -Wall -Werror -Wfatal-errors
+
+tmp_libs.o: $(STR_FILE) $(NODE_FILE)
+	ld -o $@ $^ -r
 
 .PHONY: $(STR_FILE)
 $(STR_FILE):
