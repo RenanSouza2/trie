@@ -9,15 +9,10 @@
 
 #define VI ti->vi
 
-#define HP(POINTER) ((char*)(((trie_p)(POINTER))+1))
-#define FN(POINTER, INDEX) ((pointer_p)(HP(POINTER) + (INDEX) * PI->size))
-#define PS(POINTER) ((string_p)(HP(POINTER) + PI->size))
-#define PN(POINTER) ((pointer_p)HP(POINTER))
 #define LV(POINTER) ((value_p)HP(POINTER))
 
 #define PTR_NULL(POINTER) (memcmp(POINTER, PI->null, PI->size) == 0)
 
-#define PATH_SIZE(LENGTH) (sizeof(trie_t) + PI->size + string_size(LENGTH))
 #define LEAF_SIZE(SIZE) (sizeof(trie_t) + SIZE)
 
 #define FALSE 0
@@ -242,24 +237,9 @@ pointer_p trie_fork_create(trie_info_p ti, int key, pointer_p tp_next)
 
 pointer_p trie_path_create_force(trie_info_p ti, char len, char arr[], pointer_p tp_next)
 {
-    assert(len > 0);
+    trie_p t = trie_path_set(ti, len, arr, tp_next);
 
     int size = PATH_SIZE(len);
-    trie_p t = calloc(1, size);
-    assert(t);
-    INC(path);
-
-    t->type = PATH;
-
-    pointer_p next = PN(t);
-    PTR_CPY(next, tp_next);
-    free(tp_next);
-    DEC(pointer);
-
-    string_p str = PS(t);
-    str->len = len;
-    memcpy(str->arr, arr, len);
-
     return PI->set(t, size);
 }
 
