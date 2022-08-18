@@ -19,7 +19,6 @@ STRUCT(pointer_info)
     pointer_p null;
     
     void_ptr_f  display;
-    int_ptr_f   is_null;
 
     value_ptr_f          get;
     ptr_value_int_f      set;
