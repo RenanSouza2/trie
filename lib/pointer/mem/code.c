@@ -40,11 +40,6 @@ void mem_display(pointer_p p)
     else            printf("%p", h);
 }
 
-int mem_is_null(pointer_p p)
-{
-    return mem_get(p) == NULL;
-}
-
 pointer_p mem_set(handler_p h, int size)
 {
     pointer_p p = malloc(sizeof(handler_p));
@@ -88,7 +83,6 @@ pointer_info_p get_mem_info()
         mem_set(NULL, 0),
 
         mem_display,
-        mem_is_null,
 
         mem_get,
         mem_set,
