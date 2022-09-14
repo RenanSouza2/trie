@@ -2,6 +2,7 @@
 #define __UTILS_TRIE_H__
 
 #include "../struct.h"
+#include "../string/header.h"
 #include "../../base/header/trie.h"
 #include "../../base/header/value.h"
 #include "../../base/header/pointer.h"

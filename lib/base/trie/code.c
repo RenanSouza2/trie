@@ -7,9 +7,6 @@
 #include "../../utils/string/header.h"
 #include "../../utils/node/header.h"
 
-#define PTR_NULL(POINTER) (memcmp(POINTER, PI->null, PI->size) == 0)
-
-
 #define FALSE 0
 #define TRUE  1
 
