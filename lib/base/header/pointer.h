@@ -20,11 +20,10 @@ STRUCT(pointer_info)
     int size;
     void_ptr_f  display;
 
-    value_data_ptr_f        get;
-    ptr_data_value_int_f    set;
+    value_data_ptr_f     get;
+    ptr_data_value_int_f set;
     void_ptr_value_int_f replace;
     void_ptr_f           free;
-
 };
 
 #endif

@@ -85,7 +85,19 @@ int decrease(int created, int freed)
 #define DEC(INT)
 #endif
 
+int pointer_is_null(pointer_info_p pi, pointer_p p)
+{
+    for(int i=0; i<pi->size / 8; i++)
+        if(((long long*)p)[i])
+            return FALSE;
+    
+    p = (pointer_p)&((long long*)p)[pi->size / 8];
+    for(int i=0; i<pi->size%8; i++)
+        if(((char*)p)[i])
+            return FALSE;
 
+    return TRUE;
+}
 
 pointer_p pointer_copy(pointer_info_p pi, pointer_p p)
 {
@@ -102,7 +114,7 @@ int trie_fork_first_key(trie_info_p ti, trie_p t)
     for(int i=0; i < ti->max; i++)
     {
         pointer_p next = FN(t, i);
-        if(!PTR_NULL(next)) return i;
+        if(!pointer_is_null(PI, next)) return i;
     }
     assert(FALSE);
 }
