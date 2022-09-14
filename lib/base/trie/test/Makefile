@@ -1,7 +1,7 @@
 FLAGS=-Wall -Werror -Wfatal-errors -D DEBUG
 
-STR_PATH=../../../utils/string
-STR_FILE=$(STR_PATH)/debug.o
+LIB_PATH=..
+LIB_FILE=$(LIB_PATH)/tmp_libs.o
 
 INT_PATH=../../../value/int
 INT_FILE=$(INT_PATH)/debug.o
@@ -17,20 +17,20 @@ test: test.o
 
 build: test.o
 
-test.o: tmp.o lib_tmp.o
+test.o: tmp.o tmp_trie.o
 	gcc $(FLAGS) -o test.o $^
 
 .INTERMEDIATE: tmp.o
 tmp.o: test.c ../code.c
 	gcc -c $(FLAGS) -o tmp.o test.c
 
-.INTERMEDIATE: lib_tmp.o
-lib_tmp.o: $(STR_FILE) $(INT_FILE) $(MEM_FILE) $(TRIE_FILE)
-	ld -o lib_tmp.o $^ -r
+.INTERMEDIATE: tmp_trie.o
+tmp_trie.o: $(LIB_FILE) $(INT_FILE) $(MEM_FILE) $(TRIE_FILE)
+	ld -o $@ $^ -r
 
-.PHONY: $(STR_FILE)
-$(STR_FILE):
-	$(MAKE) debug.o --directory=$(STR_PATH)
+.PHONY: $(LIB_FILE)
+$(LIB_FILE):
+	$(MAKE) debug.o --directory=$(LIB_PATH)
 
 .PHONY: $(INT_FILE)
 $(INT_FILE):

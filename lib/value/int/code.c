@@ -40,11 +40,6 @@ int int_size(value_p value)
     return 4;
 }
 
-int int_is_null(value_p value)
-{
-    return get_int(value) == 0;
-}
-
 value_info_p get_int_value_info()
 {
     value_info_p vi = malloc(sizeof(value_info_p));
@@ -52,7 +47,6 @@ value_info_p get_int_value_info()
 
     *vi = (value_info_t){
         int_size, 
-        int_is_null,
         value_print
     };
     return vi;
