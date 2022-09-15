@@ -142,10 +142,21 @@ int trie_fork_first_key(trie_info_p ti, trie_p t)
     assert(FALSE);
 }
 
+void char_display(unsigned char c)
+{
+    printf("%x%x", c >> 4, c & 15);
+}
 
+void bits_display(int size, char bits[])
+{
+    for(int i=0; i<size; i++)
+        char_display(bits[i]);
+}
+
+typedef void(*print_f)(int,handler_p);
 
 #ifdef DEBUG
-void trie_display_single(trie_info_p ti, pointer_p tp) 
+void trie_display_single(trie_info_p ti, pointer_p tp, print_f print) 
 {
     printf("\ntrie: ");
     PI->display(tp);
@@ -176,16 +187,17 @@ void trie_display_single(trie_info_p ti, pointer_p tp)
         case LEAF:
         printf("\t(LEAF)");
         printf("\nvalue: ");
-        ti->vi->print(LV(t));
+        print = print ? print : (print_f)bits_display;
+        print(t->connected, LV(t)); 
         break;
     }
     printf("\n");
 }
 
-void trie_display_structure(trie_info_p ti, pointer_p tp)
+void trie_display_structure(trie_info_p ti, pointer_p tp, print_f print)
 {
     trie_p t = PI->get(tp);
-    trie_display_single(ti, tp);
+    trie_display_single(ti, tp, print);
     switch (t->type)
     {
         case FORK:
@@ -194,24 +206,26 @@ void trie_display_structure(trie_info_p ti, pointer_p tp)
             pointer_p next = FN(t, i);
             if(PTR_NULL(next)) continue;
 
-            trie_display_structure(ti, next);
+            trie_display_structure(ti, next, print);
         }
         break;
 
         case PATH:
-        trie_display_structure(ti, PN(t));
+        trie_display_structure(ti, PN(t), print);
         break;
     }
 }
 
-void root_display_structure(root_p r)
+void root_display_structure(root_p r, print_f print)
 {
     trie_info_p ti = r->ti;
     if(r->tp == NULL || PTR_NULL(r->tp)) printf("\nEmpty trie");
-else                                     trie_display_structure(r->ti, r->tp);
+    else                                 trie_display_structure(r->ti, r->tp, print);
 }
 
 #endif
+
+
 
 char key_to_char(int key)
 {
@@ -221,19 +235,6 @@ char key_to_char(int key)
         default: return key;
     }
 }
-
-void char_display(unsigned char c)
-{
-    printf("%x%x", c >> 4, c & 15);
-}
-
-void bits_display(int size, char bits[])
-{
-    for(int i=0; i<size; i++)
-        char_display(bits[i]);
-}
-
-typedef void(*print_f)(int,handler_p);
 
 void trie_display(trie_info_p ti, pointer_p tp, int len, char res[], print_f print)
 {
@@ -261,7 +262,7 @@ void trie_display(trie_info_p ti, pointer_p tp, int len, char res[], print_f pri
         printf("\n");
         for(int i=0; i<len; i++)
             printf("%c", key_to_char(res[i]));
-        printf("\t->\t");
+        printf("  ->  ");
         print(t->connected, (char*)LV(t));
         break;
     }

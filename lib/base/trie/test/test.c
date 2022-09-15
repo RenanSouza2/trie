@@ -622,12 +622,11 @@ int main()
     
     setbuf(stdout, NULL);
 
-    value_info_p vi = get_int_value_info();
     pointer_info_p pi = get_mem_info();
-    ti = get_trie_info(10, vi, pi);
+    ti = get_trie_info(10, pi);
 
     test_trie();
 
-    printf("\n\n\t\tTest successful\n\n\t\t");
+    printf("\n\n\t\tTest successful\n\n");
     return 0;
 }
