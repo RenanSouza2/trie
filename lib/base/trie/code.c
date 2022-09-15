@@ -168,13 +168,14 @@ void trie_display_single(trie_info_p ti, pointer_p tp)
 
         case LEAF:
         printf("\t(LEAF)");
+        printf("\nvalue: ");
         ti->vi->print(LV(t));
         break;
     }
     printf("\n");
 }
 
-void trie_display_structure_rec(trie_info_p ti, pointer_p tp)
+void trie_display_structure(trie_info_p ti, pointer_p tp)
 {
     trie_p t = PI->get(tp);
     trie_display_single(ti, tp);
@@ -186,20 +187,21 @@ void trie_display_structure_rec(trie_info_p ti, pointer_p tp)
             pointer_p next = FN(t, i);
             if(PTR_NULL(next)) continue;
 
-            trie_display_structure_rec(ti, next);
+            trie_display_structure(ti, next);
         }
         break;
 
         case PATH:
-        trie_display_structure_rec(ti, PN(t));
+        trie_display_structure(ti, PN(t));
         break;
     }
 }
 
-void trie_display_structure(trie_info_p ti, pointer_p tp)
+void root_display_structure(root_p r)
 {
-    if(tp == NULL || PTR_NULL(tp))   printf("\nEmpty trie");
-    else                                trie_display_structure_rec(ti, tp);
+    trie_info_p ti = r->ti;
+    if(r->tp == NULL || PTR_NULL(r->tp)) printf("\nEmpty trie");
+else                                     trie_display_structure(r->ti, r->tp);
 }
 
 #endif
