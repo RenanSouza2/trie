@@ -19,11 +19,11 @@ STRUCT(root)
 
 root_p root_init(trie_info_p ti, int len);
 
-void root_delete(root_p r, char arr[]);
-void root_insert(root_p r, char arr[], value_p value);
+void root_delete(root_p r, char const arr[]);
+void root_insert(root_p r, char const arr[], value_p value);
 
 void root_display(root_p r);
-value_p root_querie(root_p r, char arr[]);
+value_p root_querie(root_p r, char const arr[]);
 
 void root_free(root_p r);
 

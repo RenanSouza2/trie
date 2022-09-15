@@ -17,21 +17,17 @@ int main()
     trie_info_p ti = get_trie_info(10, vi, pi);
     root_p r = root_init(ti, 8);
 
-    char arr[] = {1, 2, 3, 4, 5, 6, 7, 8};
     value_p value = set_int(1);
-    root_insert(r, arr, value);
+    root_insert(r, "12345678", value);
     
-    arr[2] = 0;
     value = set_int(2);
-    root_insert(r, arr, value);
+    root_insert(r, "12045678", value);
     
-    arr[4] = 0;
     value = set_int(3);
-    root_insert(r, arr, value);
+    root_insert(r, "12040678", value);
     
-    arr[2] = 3;
     value = set_int(4);
-    root_insert(r, arr, value);
+    root_insert(r, "12340678", value);
 
     root_display(r);
     
