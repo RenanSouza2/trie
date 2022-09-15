@@ -67,6 +67,8 @@ void test_create()
     printf("\n\ttest_create\t\t");
     long ptr = 1;
     pointer_p tp_next = get_pointer(ptr);
+    printf("\nHere 4");
+
     pointer_p tp = trie_fork_create(ti, 0, tp_next);
     trie_p t = PI->get(tp);
     assert(t->connected == 1);
@@ -366,7 +368,7 @@ void test_insert()
     char arr[8] = {0, 1, 2, 3, 4, 5, 6, 7};
     root_p r = root_init(ti, 8);
 
-    printf("\n\t\ttest_insert_1\t");
+    printf("\n\t\ttest_insert_1\t\t");
     value_p value = set_int(1);
     root_insert(r, "01234567", value);
     assert_path(r->tp, 0, 8, arr);
@@ -376,7 +378,7 @@ void test_insert()
 
     //////////////////
 
-    printf("\n\t\ttest_insert_2\t");
+    printf("\n\t\ttest_insert_2\t\t");
     value = set_int(2);
     root_insert(r, "01234567", value);
     t = PI->get(r->tp);
@@ -384,7 +386,7 @@ void test_insert()
     
     //////////////////
 
-    printf("\n\t\ttest_insert_3\t");
+    printf("\n\t\ttest_insert_3\t\t");
     arr[4] = 0;
     value = set_int(3);
     root_insert(r, "01230567", value);
@@ -403,7 +405,7 @@ void test_insert()
     
     //////////////////
 
-    printf("\n\t\ttest_insert_4\t");
+    printf("\n\t\ttest_insert_4\t\t");
     arr[0] = 1;
     value = set_int(4);
     root_insert(r, "11230567", value);
@@ -418,7 +420,7 @@ void test_insert()
 
     //////////////////
 
-    printf("\n\t\ttest_insert_5\t");
+    printf("\n\t\ttest_insert_5\t\t");
     arr[0] = 2;
     value = set_int(5);
     root_insert(r, "21230567", value);
@@ -485,7 +487,7 @@ void test_delete_1()
     value = set_int(5);
     root_insert(r, "01230017", value);
 
-    printf("\n\t\t\ttest_delete_1_1\t");
+    printf("\n\t\ttest_delete_1_1\t\t");
     root_delete(r, "01230017");
     
     char arr[8] = { 0, 1, 2, 3, 0, 0, 0, 7 };
@@ -500,7 +502,7 @@ void test_delete_1()
 
     //////////////////
 
-    printf("\n\t\t\ttest_delete_1_2\t");
+    printf("\n\t\ttest_delete_1_2\t\t");
     root_delete(r, "01230007");
     arr[6] = 6;
 
@@ -515,7 +517,7 @@ void test_delete_1()
 
     //////////////////
 
-    printf("\n\t\t\ttest_delete_1_3\t");
+    printf("\n\t\ttest_delete_1_3\t\t");
     root_delete(r, "01230067");
     arr[5] = 5;
     assert_path(r->tp, 0, 4, arr);
@@ -532,14 +534,14 @@ void test_delete_1()
 
     //////////////////
 
-    printf("\n\t\t\ttest_delete_1_4\t");
+    printf("\n\t\ttest_delete_1_4\t\t");
     root_delete(r, "01230567");
     arr[4] = 4;
     assert_path(r->tp, 0, 8, arr);
 
     //////////////////
 
-    printf("\n\t\t\ttest_delete_1_5\t");
+    printf("\n\t\ttest_delete_1_5\t\t");
     arr[4] = 1;
     root_delete(r, "01231567");
 
@@ -548,11 +550,11 @@ void test_delete_1()
 
     //////////////////
 
-    printf("\n\t\t\ttest_delete_1_6\t");
+    printf("\n\t\ttest_delete_1_6\t\t");
     root_delete(r, "01234567");
     assert(r->tp == NULL);
 
-    printf("\n\t\t\ttest_delete_1_7\t");
+    printf("\n\t\ttest_delete_1_7\t\t");
     root_delete(r, "01234567");
     assert(r->tp == NULL);
     
