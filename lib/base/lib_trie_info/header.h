@@ -7,6 +7,6 @@ PLACEHOLDER(trie_info);
 PLACEHOLDER(value_info);
 PLACEHOLDER(pointer_info);
 
-trie_info_p get_trie_info(int max, int len, value_info_p vi, pointer_info_p pi);
+trie_info_p get_trie_info(int max, value_info_p vi, pointer_info_p pi);
 
 #endif
