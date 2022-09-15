@@ -14,26 +14,26 @@ int main()
     
     value_info_p vi = get_int_value_info();
     pointer_info_p pi = get_mem_info();
-    trie_info_p ti = get_trie_info(10, 8, vi, pi);
-    pointer_p tp = NULL;
+    trie_info_p ti = get_trie_info(10, vi, pi);
+    root_p r = root_init(ti, 8);
 
     char arr[] = {1, 2, 3, 4, 5, 6, 7, 8};
     value_p value = set_int(1);
-    trie_insert(ti, &tp, arr, value);
+    root_insert(r, arr, value);
     
     arr[2] = 0;
     value = set_int(2);
-    trie_insert(ti, &tp, arr, value);
+    root_insert(r, arr, value);
     
     arr[4] = 0;
     value = set_int(3);
-    trie_insert(ti, &tp, arr, value);
+    root_insert(r, arr, value);
     
     arr[2] = 3;
     value = set_int(4);
-    trie_insert(ti, &tp, arr, value);
+    root_insert(r, arr, value);
 
-    trie_display(ti, tp);
+    root_display(r);
     
     printf("\n");
     return 0;

@@ -10,12 +10,21 @@ PLACEHOLDER(value_info);
 PLACEHOLDER(pointer);
 PLACEHOLDER(trie_info);
 
-void trie_delete(trie_info_p ti, pointer_p *tp, char arr[]);
-void trie_insert(trie_info_p ti, pointer_p *t, char arr[], value_p value);
+STRUCT(root)
+{
+    int len;
+    trie_info_p ti;
+    pointer_p tp;
+};
 
-void trie_display(trie_info_p ti, pointer_p tp);
-value_p trie_querie(trie_info_p ti, pointer_p tp, char arr[]);
+root_p root_init(trie_info_p ti, int len);
 
-void trie_free(trie_info_p ti, pointer_p tp);
+void root_delete(root_p r, char arr[]);
+void root_insert(root_p r, char arr[], value_p value);
+
+void root_display(root_p r);
+value_p root_querie(root_p r, char arr[]);
+
+void root_free(root_p r);
 
 #endif
