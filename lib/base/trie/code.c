@@ -10,13 +10,12 @@
 #include "../../base/header/pointer.h"
 
 #define PI ti->pi
-#define VI ti->vi
 
 #define HP(POINTER) ((char*)(((trie_p)(POINTER))+1))
 #define FN(POINTER, INDEX) ((pointer_p)(HP(POINTER) + (INDEX) * PI->size))
 #define PS(POINTER) ((string_p)(HP(POINTER) + PI->size))
 #define PN(POINTER) ((pointer_p)HP(POINTER))
-#define LV(POINTER) ((value_p)HP(POINTER))
+#define LV(POINTER) ((handler_p)HP(POINTER))
 
 #define PTR_CPY(POINTER1, POINTER2) (memcpy(POINTER1, POINTER2, PI->size));
 #define PTR_RESET(POINTER) (memset(POINTER, 0, PI->size))
@@ -143,10 +142,21 @@ int trie_fork_first_key(trie_info_p ti, trie_p t)
     assert(FALSE);
 }
 
+void char_display(unsigned char c)
+{
+    printf("%x%x", c >> 4, c & 15);
+}
 
+void bits_display(int size, char bits[])
+{
+    for(int i=0; i<size; i++)
+        char_display(bits[i]);
+}
+
+typedef void(*print_f)(int,handler_p);
 
 #ifdef DEBUG
-void trie_display_single(trie_info_p ti, pointer_p tp) 
+void trie_display_single(trie_info_p ti, pointer_p tp, print_f print) 
 {
     printf("\ntrie: ");
     PI->display(tp);
@@ -177,16 +187,17 @@ void trie_display_single(trie_info_p ti, pointer_p tp)
         case LEAF:
         printf("\t(LEAF)");
         printf("\nvalue: ");
-        ti->vi->print(LV(t));
+        print = print ? print : (print_f)bits_display;
+        print(t->connected, LV(t)); 
         break;
     }
     printf("\n");
 }
 
-void trie_display_structure(trie_info_p ti, pointer_p tp)
+void trie_display_structure(trie_info_p ti, pointer_p tp, print_f print)
 {
     trie_p t = PI->get(tp);
-    trie_display_single(ti, tp);
+    trie_display_single(ti, tp, print);
     switch (t->type)
     {
         case FORK:
@@ -195,21 +206,21 @@ void trie_display_structure(trie_info_p ti, pointer_p tp)
             pointer_p next = FN(t, i);
             if(PTR_NULL(next)) continue;
 
-            trie_display_structure(ti, next);
+            trie_display_structure(ti, next, print);
         }
         break;
 
         case PATH:
-        trie_display_structure(ti, PN(t));
+        trie_display_structure(ti, PN(t), print);
         break;
     }
 }
 
-void root_display_structure(root_p r)
+void root_display_structure(root_p r, print_f print)
 {
     trie_info_p ti = r->ti;
     if(r->tp == NULL || PTR_NULL(r->tp)) printf("\nEmpty trie");
-else                                     trie_display_structure(r->ti, r->tp);
+    else                                 trie_display_structure(r->ti, r->tp, print);
 }
 
 #endif
@@ -225,7 +236,7 @@ char key_to_char(int key)
     }
 }
 
-void trie_display(trie_info_p ti, pointer_p tp, int len, char res[])
+void trie_display(trie_info_p ti, pointer_p tp, int len, char res[], print_f print)
 {
     trie_p t = PI->get(tp);
     switch(t->type)
@@ -237,21 +248,22 @@ void trie_display(trie_info_p ti, pointer_p tp, int len, char res[])
             if(PTR_NULL(next)) continue;
 
             res[len] = i;
-            trie_display(ti, next, len+1, res);
+            trie_display(ti, next, len+1, res, print);
         }
         break;
 
         case PATH:;
         string_p str = PS(t);
         memcpy(&res[len], str->arr, str->len);
-        trie_display(ti, PN(t), len + str->len, res);
+        trie_display(ti, PN(t), len + str->len, res, print);
         break;
 
         case LEAF:
         printf("\n");
         for(int i=0; i<len; i++)
             printf("%c", key_to_char(res[i]));
-        printf("\t->\t"); VI->print(LV(t));
+        printf("  ->  ");
+        print(t->connected, (char*)LV(t));
         break;
     }
 }
@@ -314,18 +326,19 @@ pointer_p trie_path_create(trie_info_p ti, char len, char arr[], pointer_p tp_ne
 
 pointer_p trie_leaf_create(trie_info_p ti, value_p value)
 {
-    int value_size = VI->size(value);
-    int size = LEAF_SIZE(value_size);
+    int size = LEAF_SIZE(value->size);
     trie_p t = calloc(1, size);
     assert(t);
     INC(leaf);
 
     t->type = LEAF;
-    memcpy(LV(t), value, value_size);
+    t->connected = value->size;
+    memcpy(LV(t), value->ptr, value->size);
+    free(value->ptr);
     free(value);
     DEC(value);
 
-    return PI->set(t, value_size);
+    return PI->set(t, size);
 }
 
 
@@ -390,12 +403,12 @@ pointer_p trie_leaf_set_value(trie_info_p ti, pointer_p tp, value_p value)
 {
     trie_p t = PI->get(tp);
 
-    int size = VI->size(value);
-    memcpy(LV(t), value, size);
+    memcpy(LV(t), value->ptr, value->size);
+    free(value->ptr);
     free(value);
     DEC(value);
 
-    PI->replace(tp, t, LEAF_SIZE(size));
+    PI->replace(tp, t, LEAF_SIZE(value->size));
     return tp;
 }
 
@@ -566,7 +579,7 @@ pointer_p trie_insert(trie_info_p ti, pointer_p tp, char len, char arr[], value_
     return trie_fork_connect(ti, tp, key, tp_next);
 }
 
-value_p trie_querie(trie_info_p ti, pointer_p tp, char arr[])
+handler_p trie_querie(trie_info_p ti, pointer_p tp, char arr[])
 {
     if(tp == NULL || PTR_NULL(tp)) return NULL;
 
@@ -630,11 +643,12 @@ char key_to_value(char key)
 
 
 
-void root_display(root_p r)
+void root_display(root_p r, handler_p print)
 {
     char res[r->len];
     if(r->tp == NULL) printf("\nEMPTY TRIE");
-    else              trie_display(r->ti, r->tp, 0, res);
+    else if(print)    trie_display(r->ti, r->tp, 0, res, (print_f)print);
+    else              trie_display(r->ti, r->tp, 0, res, (print_f)bits_display);
     printf("\n");
 }
 
@@ -655,7 +669,7 @@ void root_insert(root_p r, char const arr[], value_p value)
     for(int i=0; i<r->len; i++)
         arr_input[i] = key_to_value(arr[i]);
     
-    r->tp = (r->VI->is_null(value)) 
+    r->tp = memory_is_null(value->ptr, value->size) 
         ? trie_delete(r->ti, r->tp, arr_input)
         : trie_insert(r->ti, r->tp, r->len, arr_input, value);
 }
@@ -671,7 +685,7 @@ void root_delete(root_p r, char const arr[])
     r->tp = trie_delete(r->ti, r->tp, arr_input);
 }
 
-value_p root_querie(root_p r, char const arr[])
+handler_p root_querie(root_p r, char const arr[])
 {
     assert(strlen(arr) == r->len);
 

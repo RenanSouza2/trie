@@ -3,16 +3,10 @@
 
 #include "../../utils/struct.h"
 
-PLACEHOLDER(value);
-
-typedef int(*int_value_f)(value_p);
-typedef void(*void_value_f)(value_p);
-
-STRUCT(value_info)
+STRUCT(value)
 {
-    int_value_f     size;
-    int_value_f     is_null;
-    void_value_f    print;
+    int size;
+    handler_p ptr;
 };
 
 #endif
