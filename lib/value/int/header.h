@@ -8,6 +8,6 @@ PLACEHOLDER(value_info);
 
 value_p set_int(int value);
 int get_int(value_p value);
-value_info_p get_int_value_info();
+void int_print(int size, value_p value);
 
 #endif

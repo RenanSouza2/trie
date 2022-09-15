@@ -3,7 +3,11 @@
 
 #include "../../utils/struct.h"
 
-PLACEHOLDER(value);
+STRUCT(value)
+{
+    int size;
+    handler_p ptr;
+};
 
 typedef int(*int_value_f)(value_p);
 typedef void(*void_value_f)(value_p);

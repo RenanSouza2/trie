@@ -7,4 +7,6 @@
 
 #define PLACEHOLDER(NAME) typedef struct _##NAME *NAME##_p
 
+typedef void *handler_p;
+
 #endif

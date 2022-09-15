@@ -12,9 +12,8 @@ int main()
 {
     setbuf(stdout, NULL);
     
-    value_info_p vi = get_int_value_info();
     pointer_info_p pi = get_mem_info();
-    trie_info_p ti = get_trie_info(10, vi, pi);
+    trie_info_p ti = get_trie_info(10, pi);
     root_p r = root_init(ti, 8);
 
     value_p value = set_int(1);
@@ -29,7 +28,7 @@ int main()
     value = set_int(4);
     root_insert(r, "12340678", value);
 
-    root_display(r);
+    root_display(r, int_print);
     
     printf("\n");
     return 0;
