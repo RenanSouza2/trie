@@ -16,8 +16,6 @@ typedef void(*void_ptr_value_int_f)(pointer_p,handler_p,int);
 STRUCT(pointer_info)
 {
     int size;
-    pointer_p null;
-    
     void_ptr_f  display;
 
     value_ptr_f          get;

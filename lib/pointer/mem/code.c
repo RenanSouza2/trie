@@ -80,7 +80,6 @@ pointer_info_p get_mem_info()
 
     *pi = (pointer_info_t) {
         sizeof(void*),
-        mem_set(NULL, 0),
 
         mem_display,
 

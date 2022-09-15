@@ -18,8 +18,9 @@
 #define PN(POINTER) ((pointer_p)HP(POINTER))
 #define LV(POINTER) ((value_p)HP(POINTER))
 
-#define PTR_CPY(POINTER1, POINTER2) memcpy(POINTER1, POINTER2, PI->size);
-#define PTR_NULL(POINTER) (memcmp(POINTER, PI->null, PI->size) == 0)
+#define PTR_CPY(POINTER1, POINTER2) (memcpy(POINTER1, POINTER2, PI->size));
+#define PTR_RESET(POINTER) (memset(POINTER, 0, PI->size))
+#define PTR_NULL(POINTER) (memory_is_null(POINTER, PI->size))
 
 #define FORK_SIZE (sizeof(trie_t) + ti->max * PI->size)
 #define PATH_SIZE(LENGTH) (sizeof(trie_t) + PI->size + string_size(LENGTH))
@@ -113,7 +114,14 @@ int decrease(int created, int freed)
 #define DEC(INT)
 #endif
 
+int memory_is_null(handler_p h, int len)
+{
+    for(int i=0; i<len; i++)
+        if(((char*)h)[i])
+            return FALSE;
 
+    return TRUE;
+}
 
 pointer_p pointer_copy(pointer_info_p pi, pointer_p p)
 {
@@ -261,7 +269,7 @@ pointer_p trie_fork_create(trie_info_p ti, char key, pointer_p tp_next)
     t->connected = 1;
 
     for(int i=0; i < ti->max; i++)
-        PTR_CPY(FN(t, i), PI->null);
+        PTR_RESET(FN(t, i));
 
     PTR_CPY(FN(t, key), tp_next);
     free(tp_next);
@@ -337,7 +345,7 @@ pointer_p trie_fork_disconnect(trie_info_p ti, pointer_p tp, int key)
     }
 
     t->connected--;
-    PTR_CPY(next, PI->null);
+    PTR_RESET(next);
 
     PI->replace(tp, t, FORK_SIZE);
     return tp;
