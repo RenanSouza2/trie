@@ -208,7 +208,16 @@ else                                     trie_display_structure(r->ti, r->tp);
 
 
 
-void trie_display_rec(trie_info_p ti, pointer_p tp, int len, char res[])
+char key_to_char(int key)
+{
+    switch (key)
+    {
+        case 0 ... 9 : return key + '0';
+        default: return key;
+    }
+}
+
+void trie_display(trie_info_p ti, pointer_p tp, int len, char res[])
 {
     trie_p t = PI->get(tp);
     switch(t->type)
@@ -220,36 +229,28 @@ void trie_display_rec(trie_info_p ti, pointer_p tp, int len, char res[])
             if(PTR_NULL(next)) continue;
 
             res[len] = i;
-            trie_display_rec(ti, next, len+1, res);
+            trie_display(ti, next, len+1, res);
         }
         break;
 
         case PATH:;
         string_p str = PS(t);
         memcpy(&res[len], str->arr, str->len);
-        trie_display_rec(ti, PN(t), len + str->len, res);
+        trie_display(ti, PN(t), len + str->len, res);
         break;
 
         case LEAF:
         printf("\n");
         for(int i=0; i<len; i++)
-            printf(" %2d", res[i]);
+            printf("%c", key_to_char(res[i]));
         printf("\t->\t"); VI->print(LV(t));
         break;
     }
 }
 
-void root_display(root_p r)
-{
-    char res[r->len];
-    if(r->tp == NULL) printf("\nEMPTY TRIE");
-    else              trie_display_rec(r->ti, r->tp, 0, res);
-    printf("\n");
-}
 
 
-
-pointer_p trie_fork_create(trie_info_p ti, int key, pointer_p tp_next)
+pointer_p trie_fork_create(trie_info_p ti, char key, pointer_p tp_next)
 {
     int size = FORK_SIZE;
     trie_p t = malloc(size);
@@ -460,7 +461,7 @@ pointer_p trie_join(trie_info_p ti, pointer_p tp1, pointer_p tp2)
 
 
 
-pointer_p trie_delete_rec(trie_info_p ti, pointer_p tp, char arr[])
+pointer_p trie_delete(trie_info_p ti, pointer_p tp, char arr[])
 {
     if(tp && PTR_NULL(tp))
     {
@@ -479,7 +480,7 @@ pointer_p trie_delete_rec(trie_info_p ti, pointer_p tp, char arr[])
         int key = arr[0];
 
         tp_next = pointer_copy(PI, FN(t, key));
-        tp_next = trie_delete_rec(ti, tp_next, &arr[1]);
+        tp_next = trie_delete(ti, tp_next, &arr[1]);
         tp = trie_fork_connect(ti, tp, key, tp_next);
         if(tp == NULL) return NULL;
 
@@ -497,7 +498,7 @@ pointer_p trie_delete_rec(trie_info_p ti, pointer_p tp, char arr[])
         if(index < path_len) return tp;
 
         tp_next = pointer_copy(PI, PN(t));
-        tp_next = trie_delete_rec(ti, tp_next, &arr[path_len]);
+        tp_next = trie_delete(ti, tp_next, &arr[path_len]);
         tp = trie_path_connect(ti, tp, tp_next);
         if(tp == NULL) return NULL;
 
@@ -534,8 +535,6 @@ pointer_p trie_insert(trie_info_p ti, pointer_p tp, char len, char arr[], value_
 
     if(t->type == PATH)
     {
-        // snapshot("INSIDE 1");
-
         string_p str = PS(t);
         int index = string_cmp(str, arr);
         if(index < str->len) 
@@ -544,22 +543,11 @@ pointer_p trie_insert(trie_info_p ti, pointer_p tp, char len, char arr[], value_
             t  = PI->get(tp);
         }
         
-        // snapshot("INSIDE 2");
-
         if(t->type == PATH)
         {
             pointer_p tp_next = pointer_copy(PI, PN(t));
-            
-        // snapshot("INSIDE 3");
-
             tp_next = trie_insert(ti, tp_next, len-index, &arr[index], value);
-            
-        // snapshot("INSIDE 4");
-
-            tp = trie_path_connect(ti, tp, tp_next);;
-
-        // snapshot("INSIDE 5");
-
+            tp = trie_path_connect(ti, tp, tp_next);
             return tp;
         }
     }
@@ -570,7 +558,7 @@ pointer_p trie_insert(trie_info_p ti, pointer_p tp, char len, char arr[], value_
     return trie_fork_connect(ti, tp, key, tp_next);
 }
 
-value_p trie_querie_rec(trie_info_p ti, pointer_p tp, char arr[])
+value_p trie_querie(trie_info_p ti, pointer_p tp, char arr[])
 {
     if(tp == NULL || PTR_NULL(tp)) return NULL;
 
@@ -578,49 +566,20 @@ value_p trie_querie_rec(trie_info_p ti, pointer_p tp, char arr[])
     switch (t->type)
     {
         case FORK:
-        return trie_querie_rec(ti, FN(t, arr[0]), &arr[1]);
+        return trie_querie(ti, FN(t, arr[0]), &arr[1]);
         
         case PATH:;
         string_p str = PS(t);
         int index = string_cmp(str, arr);
         if(index < str->len) return NULL;
 
-        return trie_querie_rec(ti, PN(t), &arr[index]);
+        return trie_querie(ti, PN(t), &arr[index]);
 
         case LEAF:
         return LV(t);
     }
     assert(FALSE);
 }
-
-
-root_p root_init(trie_info_p ti, int len)
-{
-    root_p r = malloc(sizeof(root_t));
-    assert(r);
-
-    *r = (root_t){len, ti, NULL};
-    return r;
-}
-
-void root_insert(root_p r, char arr[], value_p value)
-{
-    r->tp = (r->VI->is_null(value)) 
-        ? trie_delete_rec(r->ti, r->tp, arr)
-        : trie_insert(r->ti, r->tp, r->len, arr, value);
-}
-
-void root_delete(root_p r, char arr[])
-{
-    r->tp = trie_delete_rec(r->ti, r->tp, arr);
-}
-
-value_p root_querie(root_p r, char arr[])
-{
-    return trie_querie_rec(r->ti, r->tp, arr);
-}
-
-
 
 void trie_free(trie_info_p ti, pointer_p tp)
 {
@@ -646,6 +605,73 @@ void trie_free(trie_info_p ti, pointer_p tp)
         break;
     }
     PI->free(tp);
+}
+
+
+
+char key_to_value(char key)
+{
+    switch (key)
+    {
+        case '0' ... '9' : return key - '0';
+        case 'a' ... 'z' : return key - 'a';
+        case 'A' ... 'Z' : return key - 'A';
+        default: assert(FALSE);
+    }
+}
+
+
+
+void root_display(root_p r)
+{
+    char res[r->len];
+    if(r->tp == NULL) printf("\nEMPTY TRIE");
+    else              trie_display(r->ti, r->tp, 0, res);
+    printf("\n");
+}
+
+root_p root_init(trie_info_p ti, int len)
+{
+    root_p r = malloc(sizeof(root_t));
+    assert(r);
+
+    *r = (root_t){len, ti, NULL};
+    return r;
+}
+
+void root_insert(root_p r, char const arr[], value_p value)
+{
+    assert(strlen(arr) == r->len);
+
+    char arr_input[r->len];
+    for(int i=0; i<r->len; i++)
+        arr_input[i] = key_to_value(arr[i]);
+    
+    r->tp = (r->VI->is_null(value)) 
+        ? trie_delete(r->ti, r->tp, arr_input)
+        : trie_insert(r->ti, r->tp, r->len, arr_input, value);
+}
+
+void root_delete(root_p r, char const arr[])
+{
+    assert(strlen(arr) == r->len);
+
+    char arr_input[r->len];
+    for(int i=0; i<r->len; i++)
+        arr_input[i] = key_to_value(arr[i]);
+    
+    r->tp = trie_delete(r->ti, r->tp, arr_input);
+}
+
+value_p root_querie(root_p r, char const arr[])
+{
+    assert(strlen(arr) == r->len);
+
+    char arr_input[r->len];
+    for(int i=0; i<r->len; i++)
+        arr_input[i] = key_to_value(arr[i]);
+    
+    return trie_querie(r->ti, r->tp, arr_input);
 }
 
 void root_free(root_p r)
