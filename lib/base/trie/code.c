@@ -370,17 +370,33 @@ pointer_p trie_fork_connect(trie_info_p ti, pointer_p tp, int key, pointer_p tp_
 {
     if(tp_next == NULL) return trie_fork_disconnect(ti, tp, key);
 
-    trie_p t = PI->get(tp);
-    assert(t->type == FORK);
+    trie_display_single(ti, tp, NULL);
+
+    trie_p t_old = PI->get(tp);
+    assert(t_old->type == FORK);
+
+    int size = PATH_SIZE(PS(t_old)->len);
+    trie_p t = malloc(size);
+    assert(t);
+    memcpy(t, t_old, size);
 
     pointer_p next = FN(t, key);
     if(PTR_NULL(next)) t->connected++;
+
     PTR_CPY(next, tp_next);
     free(tp_next);
     DEC(pointer);
+    
+    pointer_p res = PI->set(t, size);
+    printf("\nres: %p", res);
 
-    PI->replace(tp, t, FORK_SIZE);
-    return tp;
+    trie_p t_what = PI->get(res);
+    printf("\nt: %p", t_what);
+    trie_display_single(ti, res, NULL);
+
+    printf("\nWhat");
+
+    return res;
 }
 
 pointer_p trie_path_connect(trie_info_p ti, pointer_p tp, pointer_p tp_next)

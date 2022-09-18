@@ -67,7 +67,6 @@ void test_create()
     printf("\n\ttest_create\t\t");
     long ptr = 1;
     pointer_p tp_next = get_pointer(ptr);
-    printf("\nHere 4");
 
     pointer_p tp = trie_fork_create(ti, 0, tp_next);
     trie_p t = PI->get(tp);
@@ -116,6 +115,8 @@ void test_connection()
 {
     printf("\n\ttest_connection\t\t");
 
+    printf("\n\t\ttest_connection_1\t\t");
+
     long ptr = 1;
     pointer_p tp_next =  get_pointer(ptr);
     pointer_p tp = trie_fork_create(ti, 5, tp_next);
@@ -124,15 +125,22 @@ void test_connection()
     assert_fork(tp, 5, ptr);
 
     /////////////////////////////////
+    printf("\n\t\ttest_connection_2\t\t");
     
     ptr = 2;
     tp_next = get_pointer(ptr);
+    printf("\nHere\t\t");
     tp = trie_fork_connect(ti, tp, 5, tp_next);
+    printf("\nThere\t\t");
     t = PI->get(tp);
+    printf("\nAca\t\t");
     assert(t->connected == 1);
+    printf("\nAla\t\t");
     assert_fork(tp, 5, ptr);
+    printf("\nAcola\t\t");
     
     /////////////////////////////////
+    printf("\n\t\ttest_connection_3\t\t");
 
     ptr = 3;
     tp_next =  get_pointer(ptr);
@@ -142,6 +150,7 @@ void test_connection()
     assert(t->connected == 2);
 
     /////////////////////////////////
+    printf("\n\t\ttest_connection_4\t\t");
 
     ptr = 4;
     tp_next =  get_pointer(ptr);
@@ -151,6 +160,7 @@ void test_connection()
     assert(t->connected == 3);
 
     /////////////////////////////////
+    printf("\n\t\ttest_connection_5\t\t");
 
     tp = trie_fork_disconnect(ti, tp, 3);
     t = PI->get(tp);
@@ -158,6 +168,7 @@ void test_connection()
     assert(PI->get(FN(t, 3)) == NULL);
 
     /////////////////////////////////
+    printf("\n\t\ttest_connection_6\t\t");
     
     tp = trie_fork_disconnect(ti, tp, 8);
     t = PI->get(tp);
