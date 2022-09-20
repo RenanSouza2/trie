@@ -360,7 +360,7 @@ pointer_p trie_fork_disconnect(trie_info_p ti, pointer_p tp, int key)
 
     t->connected--;
     PTR_CLEAN(FN(t, key));
-    
+
     return PI->set(t, size);
 }
 
@@ -396,14 +396,20 @@ pointer_p trie_path_connect(trie_info_p ti, pointer_p tp, pointer_p tp_next)
         return NULL;
     }
 
-    trie_p t = PI->get(tp);
+    trie_p t_old = PI->get(tp);
+    int size = PATH_SIZE(PS(t_old)->len);
+    trie_p t = malloc(size);
+    assert(t);
+    INC(path);
+    memcpy(t, t_old, size);
+    PI->free(tp);
+
     PTR_CPY(PN(t), tp_next);
     free(tp_next);
     DEC(pointer);
 
-    int len = PS(t)->len;
-    PI->replace(tp, t, len);
-    return tp;
+    
+    return PI->set(t, size);
 }
 
 pointer_p trie_leaf_set_value(trie_info_p ti, pointer_p tp, value_p value)
