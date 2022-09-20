@@ -181,6 +181,41 @@ void test_connection()
     assert_memory();
 }
 
+void test_connection_2()
+{
+    printf("\n\ttest_connection_2\t\t");
+    
+    printf("\n\t\ttest_connection_2_1\t\t");
+
+    long ptr = 1;
+    pointer_p tp_next = get_pointer(ptr);
+    pointer_p tp = trie_fork_create(ti, 5, tp_next);
+    
+    tp = trie_fork_connect(ti, tp, 5, NULL);
+    assert(tp == NULL);
+
+    /////////////////////////////////
+    printf("\n\t\ttest_connection_2_2\t\t");
+
+    char arr[] = {1, 2};
+    tp_next =  get_pointer(ptr);
+    tp = trie_path_create(ti, 2, arr, tp_next);
+    
+    ptr = 2;
+    tp_next = get_pointer(ptr);
+    tp = trie_path_connect(ti, tp, tp_next);
+
+    trie_p t = PI->get(tp);
+    assert(*(long*)PN(t) == ptr);
+
+    /////////////////////////////////
+    printf("\n\t\ttest_connection_2_3\t\t");
+
+    tp = trie_path_connect(ti, tp, NULL);
+    assert(tp == NULL);
+
+}
+
 void test_joinable()
 {
     printf("\n\ttest_joinable\t\t");
@@ -368,6 +403,7 @@ void test_unit()
 
     test_create();
     test_connection();
+    test_connection_2();
     test_joinable();
     test_path_break();
     test_fork_convert();
