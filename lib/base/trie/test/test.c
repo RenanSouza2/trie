@@ -4,9 +4,9 @@
 
 #include "../../../value/int/header.h"
 #include "../../../pointer/mem/header.h"
-#include "../../../base/lib_trie_info/header.h"
 #include "../code.c"
 
+pointer_info_p pi_test;
 trie_info_p ti;
 
 void assert_str(string_p str, int len, char arr[])
@@ -418,7 +418,7 @@ void test_insert()
 {
     printf("\n\ttest_insert\t\t");
     char arr[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-    root_p r = root_init(ti, 8);
+    root_p r = root_init(pi_test, 8, 10);
 
     printf("\n\t\ttest_insert_1\t\t");
     value_p value = set_int(1);
@@ -492,7 +492,7 @@ void test_insert()
 void test_querie()
 {
     printf("\n\ttest_querie\t\t");
-    root_p r = root_init(ti, 8);
+    root_p r = root_init(pi_test, 8, 10);
 
     value_p value = root_querie(r, "01234567");
     int res = get_int(value);
@@ -521,7 +521,7 @@ void test_querie()
 void test_delete_1()
 {
     printf("\n\ttest_delete_1\t\t");
-    root_p r = root_init(ti, 8);
+    root_p r = root_init(pi_test, 8, 10);
 
     
     value_p value = set_int(1);
@@ -616,7 +616,7 @@ void test_delete_1()
 void test_delete_2()
 {
     printf("\n\ttest_delete_2\t\t");
-    root_p r = root_init(ti, 8);
+    root_p r = root_init(pi_test, 8, 10);
     
 
 
@@ -674,8 +674,8 @@ int main()
     
     setbuf(stdout, NULL);
 
-    pointer_info_p pi = get_mem_info();
-    ti = get_trie_info(10, pi);
+    pi_test = get_mem_info();
+    ti = get_trie_info(10, pi_test);
 
     test_trie();
 

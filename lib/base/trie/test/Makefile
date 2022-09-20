@@ -9,9 +9,6 @@ INT_FILE=$(INT_PATH)/debug.o
 MEM_PATH=../../../pointer/mem
 MEM_FILE=$(MEM_PATH)/debug.o
 
-TRIE_PATH=../../../base/lib_trie_info
-TRIE_FILE=$(TRIE_PATH)/debug.o
-
 test: test.o
 	./test.o 
 
@@ -25,7 +22,7 @@ tmp.o: test.c ../code.c
 	gcc -c $(FLAGS) -o tmp.o test.c
 
 .INTERMEDIATE: lib_tmp.o
-lib_tmp.o: $(STR_FILE) $(INT_FILE) $(MEM_FILE) $(TRIE_FILE)
+lib_tmp.o: $(STR_FILE) $(INT_FILE) $(MEM_FILE)
 	ld -o lib_tmp.o $^ -r
 
 .PHONY: $(STR_FILE)
@@ -39,10 +36,6 @@ $(INT_FILE):
 .PHONY: $(MEM_FILE)
 $(MEM_FILE):
 	$(MAKE) debug.o --directory=$(MEM_PATH)
-
-.PHONY: $(TRIE_FILE)
-$(TRIE_FILE):
-	$(MAKE) debug.o --directory=$(TRIE_PATH)
 
 .PHONY: clean
 clean:

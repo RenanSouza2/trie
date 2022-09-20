@@ -5,9 +5,9 @@
 
 #include "header.h"
 #include "../../utils/string/header.h"
-#include "../../base/header/trie.h"
-#include "../../base/header/value.h"
-#include "../../base/header/pointer.h"
+#include "../header/trie.h"
+#include "../header/pointer.h"
+#include "../header/value.h"
 
 #define PI ti->pi
 
@@ -38,6 +38,7 @@ STRUCT(trie)
 {
     int type, connected;
 };
+
 
 
 #ifdef DEBUG
@@ -646,6 +647,14 @@ char key_to_value(char key)
     }
 }
 
+trie_info_p get_trie_info(int max, pointer_info_p pi)
+{
+    trie_info_p ti = malloc(sizeof(trie_info_t));
+    assert(ti);
+
+    *ti = (trie_info_t) {max, pi};
+    return ti;
+}
 
 
 void root_display(root_p r, handler_p print)
@@ -657,11 +666,12 @@ void root_display(root_p r, handler_p print)
     printf("\n");
 }
 
-root_p root_init(trie_info_p ti, int len)
+root_p root_init(pointer_info_p pi, int len, int max)
 {
     root_p r = malloc(sizeof(root_t));
     assert(r);
 
+    trie_info_p ti = get_trie_info(max, pi);
     *r = (root_t){len, ti, NULL};
     return r;
 }

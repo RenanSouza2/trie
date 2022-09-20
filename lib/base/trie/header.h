@@ -8,6 +8,7 @@ PLACEHOLDER(value);
 PLACEHOLDER(value_info);
 
 PLACEHOLDER(pointer);
+PLACEHOLDER(pointer_info);
 PLACEHOLDER(trie_info);
 
 STRUCT(root)
@@ -17,7 +18,7 @@ STRUCT(root)
     pointer_p tp;
 };
 
-root_p root_init(trie_info_p ti, int len);
+root_p root_init(pointer_info_p pi, int len, int max);
 
 void root_delete(root_p r, char const arr[]);
 void root_insert(root_p r, char const arr[], value_p value);
