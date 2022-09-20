@@ -657,14 +657,6 @@ trie_info_p get_trie_info(int max, pointer_info_p pi)
 }
 
 
-void root_display(root_p r, handler_p print)
-{
-    char res[r->len];
-    if(r->tp == NULL) printf("\nEMPTY TRIE");
-    else if(print)    trie_display(r->ti, r->tp, 0, res, (print_f)print);
-    else              trie_display(r->ti, r->tp, 0, res, (print_f)bits_display);
-    printf("\n");
-}
 
 root_p root_init(pointer_info_p pi, int len, int max)
 {
@@ -709,6 +701,15 @@ handler_p root_querie(root_p r, char const arr[])
         arr_input[i] = key_to_value(arr[i]);
     
     return trie_querie(r->ti, r->tp, arr_input);
+}
+
+void root_display(root_p r, handler_p print)
+{
+    char res[r->len];
+    if(r->tp == NULL) printf("\nEMPTY TRIE");
+    else if(print)    trie_display(r->ti, r->tp, 0, res, (print_f)print);
+    else              trie_display(r->ti, r->tp, 0, res, (print_f)bits_display);
+    printf("\n");
 }
 
 void root_free(root_p r)

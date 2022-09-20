@@ -20,11 +20,11 @@ STRUCT(root)
 
 root_p root_init(pointer_info_p pi, int len, int max);
 
-void root_delete(root_p r, char const arr[]);
 void root_insert(root_p r, char const arr[], value_p value);
+void root_delete(root_p r, char const arr[]);
 
-void root_display(root_p r, handler_p print);
 handler_p root_querie(root_p r, char const arr[]);
+void root_display(root_p r, handler_p print);
 
 void root_free(root_p r);
 
