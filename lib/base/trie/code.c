@@ -18,7 +18,7 @@
 #define LV(POINTER) ((handler_p)HP(POINTER))
 
 #define PTR_CPY(POINTER1, POINTER2) (memcpy(POINTER1, POINTER2, PI->size));
-#define PTR_RESET(POINTER) (memset(POINTER, 0, PI->size))
+#define PTR_CLEAN(POINTER) (memset(POINTER, 0, PI->size))
 #define PTR_NULL(POINTER) (memory_is_null(POINTER, PI->size))
 
 #define FORK_SIZE (sizeof(trie_t) + ti->max * PI->size)
@@ -156,12 +156,9 @@ void bits_display(int size, char bits[])
 typedef void(*print_f)(int,handler_p);
 
 #ifdef DEBUG
-void trie_display_single(trie_info_p ti, pointer_p tp, print_f print) 
+void trie_display_single(trie_info_p ti, trie_p t, print_f print) 
 {
-    printf("\ntrie: ");
-    PI->display(tp);
-
-    trie_p t = PI->get(tp);
+    printf("\ntrie: %p", (void*)t);
     switch (t->type)
     {
         case FORK:
@@ -197,7 +194,7 @@ void trie_display_single(trie_info_p ti, pointer_p tp, print_f print)
 void trie_display_structure(trie_info_p ti, pointer_p tp, print_f print)
 {
     trie_p t = PI->get(tp);
-    trie_display_single(ti, tp, print);
+    trie_display_single(ti, t, print);
     switch (t->type)
     {
         case FORK:
@@ -281,7 +278,7 @@ pointer_p trie_fork_create(trie_info_p ti, char key, pointer_p tp_next)
     t->connected = 1;
 
     for(int i=0; i < ti->max; i++)
-        PTR_RESET(FN(t, i));
+        PTR_CLEAN(FN(t, i));
 
     PTR_CPY(FN(t, key), tp_next);
     free(tp_next);
@@ -345,40 +342,50 @@ pointer_p trie_leaf_create(trie_info_p ti, value_p value)
 
 pointer_p trie_fork_disconnect(trie_info_p ti, pointer_p tp, int key)
 {
-    trie_p t = PI->get(tp);
-    assert(t->type == FORK);
+    trie_p t_old = PI->get(tp);
+    assert(t_old->type == FORK);
 
-    pointer_p next = FN(t, key);
-    if(PTR_NULL(next)) return tp;
-
-    if(t->connected == 1)
+    if(PTR_NULL(FN(t_old, key))) return tp;
+    if(t_old->connected == 1)
     {
         PI->free(tp);
         return NULL;
     }
+    int size = FORK_SIZE;
+    trie_p t = malloc(size);
+    assert(t);
+    INC(fork);
+    memcpy(t, t_old, size);
+    PI->free(tp);
 
     t->connected--;
-    PTR_RESET(next);
+    PTR_CLEAN(FN(t, key));
 
-    PI->replace(tp, t, FORK_SIZE);
-    return tp;
+    return PI->set(t, size);
 }
 
 pointer_p trie_fork_connect(trie_info_p ti, pointer_p tp, int key, pointer_p tp_next)
 {
     if(tp_next == NULL) return trie_fork_disconnect(ti, tp, key);
 
-    trie_p t = PI->get(tp);
-    assert(t->type == FORK);
+    trie_p t_old = PI->get(tp);
+    assert(t_old->type == FORK);
+
+    int size = FORK_SIZE;
+    trie_p t = malloc(size);
+    assert(t);
+    INC(fork);
+    memcpy(t, t_old, size);
+    PI->free(tp);
 
     pointer_p next = FN(t, key);
     if(PTR_NULL(next)) t->connected++;
+
     PTR_CPY(next, tp_next);
     free(tp_next);
     DEC(pointer);
-
-    PI->replace(tp, t, FORK_SIZE);
-    return tp;
+    
+    return PI->set(t, size);
 }
 
 pointer_p trie_path_connect(trie_info_p ti, pointer_p tp, pointer_p tp_next)
@@ -389,27 +396,25 @@ pointer_p trie_path_connect(trie_info_p ti, pointer_p tp, pointer_p tp_next)
         return NULL;
     }
 
-    trie_p t = PI->get(tp);
+    trie_p t_old = PI->get(tp);
+    int size = PATH_SIZE(PS(t_old)->len);
+    trie_p t = malloc(size);
+    assert(t);
+    INC(path);
+    memcpy(t, t_old, size);
+    PI->free(tp);
+
     PTR_CPY(PN(t), tp_next);
     free(tp_next);
     DEC(pointer);
 
-    int len = PS(t)->len;
-    PI->replace(tp, t, len);
-    return tp;
+    return PI->set(t, size);
 }
 
 pointer_p trie_leaf_set_value(trie_info_p ti, pointer_p tp, value_p value)
 {
-    trie_p t = PI->get(tp);
-
-    memcpy(LV(t), value->ptr, value->size);
-    free(value->ptr);
-    free(value);
-    DEC(value);
-
-    PI->replace(tp, t, LEAF_SIZE(value->size));
-    return tp;
+    PI->free(tp);
+    return trie_leaf_create(ti, value);
 }
 
 

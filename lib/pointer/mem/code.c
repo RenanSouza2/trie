@@ -68,11 +68,6 @@ void mem_free(pointer_p p)
     DEC(pointer);
 }
 
-void mem_replace(pointer_p p, handler_p h, int size)
-{
-    *(handler_p*)p = h;
-}
-
 pointer_info_p get_mem_info()
 {
     pointer_info_p pi = malloc(sizeof(pointer_info_t));
@@ -85,7 +80,6 @@ pointer_info_p get_mem_info()
 
         mem_get,
         mem_set,
-        mem_replace,
         mem_free
     };
 
