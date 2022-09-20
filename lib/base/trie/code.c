@@ -408,21 +408,13 @@ pointer_p trie_path_connect(trie_info_p ti, pointer_p tp, pointer_p tp_next)
     free(tp_next);
     DEC(pointer);
 
-    
     return PI->set(t, size);
 }
 
 pointer_p trie_leaf_set_value(trie_info_p ti, pointer_p tp, value_p value)
 {
-    trie_p t = PI->get(tp);
-
-    memcpy(LV(t), value->ptr, value->size);
-    free(value->ptr);
-    free(value);
-    DEC(value);
-
-    PI->replace(tp, t, LEAF_SIZE(value->size));
-    return tp;
+    PI->free(tp);
+    return trie_leaf_create(ti, value);
 }
 
 
