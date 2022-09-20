@@ -68,16 +68,16 @@ void mem_free(pointer_p p)
     DEC(pointer);
 }
 
-pointer_info_p pi = NULL;
+pointer_info_p _pi = NULL;
 
 pointer_info_p get_mem_info()
 {
-    if(pi) return pi;
+    if(_pi) return _pi;
 
-    pi = malloc(sizeof(pointer_info_t));
-    assert(pi);
+    _pi = malloc(sizeof(pointer_info_t));
+    assert(_pi);
 
-    *pi = (pointer_info_t) {
+    *_pi = (pointer_info_t) {
         sizeof(void*),
 
         mem_display,
@@ -87,5 +87,5 @@ pointer_info_p get_mem_info()
         mem_free
     };
 
-    return pi;
+    return _pi;
 }
