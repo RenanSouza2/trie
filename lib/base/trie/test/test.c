@@ -113,9 +113,9 @@ void test_create()
 
 void test_connection()
 {
-    printf("\n\ttest_connection\t\t");
+    printf("\n\ttest_connect\t\t");
 
-    printf("\n\t\ttest_connection_1\t\t");
+    printf("\n\t\ttest_connect_1\t\t");
 
     long ptr = 1;
     pointer_p tp_next =  get_pointer(ptr);
@@ -125,22 +125,17 @@ void test_connection()
     assert_fork(tp, 5, ptr);
 
     /////////////////////////////////
-    printf("\n\t\ttest_connection_2\t\t");
+    printf("\n\t\ttest_connect_2\t\t");
     
     ptr = 2;
     tp_next = get_pointer(ptr);
-    printf("\nHere\t\t");
     tp = trie_fork_connect(ti, tp, 5, tp_next);
-    printf("\nThere\t\t");
     t = PI->get(tp);
-    printf("\nAca\t\t");
     assert(t->connected == 1);
-    printf("\nAla\t\t");
     assert_fork(tp, 5, ptr);
-    printf("\nAcola\t\t");
     
     /////////////////////////////////
-    printf("\n\t\ttest_connection_3\t\t");
+    printf("\n\t\ttest_connect_3\t\t");
 
     ptr = 3;
     tp_next =  get_pointer(ptr);
@@ -150,7 +145,7 @@ void test_connection()
     assert(t->connected == 2);
 
     /////////////////////////////////
-    printf("\n\t\ttest_connection_4\t\t");
+    printf("\n\t\ttest_connect_4\t\t");
 
     ptr = 4;
     tp_next =  get_pointer(ptr);
@@ -160,7 +155,9 @@ void test_connection()
     assert(t->connected == 3);
 
     /////////////////////////////////
-    printf("\n\t\ttest_connection_5\t\t");
+    printf("\n\ttest_disconnect\t\t");
+
+    printf("\n\t\ttest_disconnect_1\t\t");
 
     tp = trie_fork_disconnect(ti, tp, 3);
     t = PI->get(tp);
@@ -168,13 +165,16 @@ void test_connection()
     assert(PI->get(FN(t, 3)) == NULL);
 
     /////////////////////////////////
-    printf("\n\t\ttest_connection_6\t\t");
+    printf("\n\t\ttest_disconnect_2\t\t");
     
     tp = trie_fork_disconnect(ti, tp, 8);
     t = PI->get(tp);
     assert(t->connected == 1);
     assert(PI->get(FN(t, 8)) == NULL);
 
+    /////////////////////////////////
+    printf("\n\t\ttest_disconnect_3\t\t");
+    
     tp = trie_fork_disconnect(ti, tp, 5);
     assert(tp == NULL);
     
@@ -185,6 +185,8 @@ void test_joinable()
 {
     printf("\n\ttest_joinable\t\t");
 
+    printf("\n\t\ttest_joinable_1\t\t");
+
     long ptr = 1;
     pointer_p tp_next = get_pointer(ptr);
 
@@ -193,14 +195,16 @@ void test_joinable()
     assert(trie_joinnable(t) == TRUE);
 
     /////////////////////////////////
+    printf("\n\t\ttest_joinable_2\t\t");
 
     ptr = 2;
     tp_next = get_pointer(ptr);
-    trie_fork_connect(ti, tp, 6, tp_next);
+    tp = trie_fork_connect(ti, tp, 6, tp_next);
     assert(trie_joinnable(t) == FALSE);
     PI->free(tp);
 
     /////////////////////////////////
+    printf("\n\t\ttest_joinable_3\t\t");
 
     char arr[2] = {1, 2};
     ptr = 3;
@@ -212,6 +216,7 @@ void test_joinable()
     PI->free(tp);
 
     /////////////////////////////////
+    printf("\n\t\ttest_joinable_4\t\t");
 
     int value = 1;
     value_p vp = set_int(value);

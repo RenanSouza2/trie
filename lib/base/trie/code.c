@@ -156,12 +156,9 @@ void bits_display(int size, char bits[])
 typedef void(*print_f)(int,handler_p);
 
 #ifdef DEBUG
-void trie_display_single(trie_info_p ti, pointer_p tp, print_f print) 
+void trie_display_single(trie_info_p ti, trie_p t, print_f print) 
 {
-    printf("\ntrie: ");
-    PI->display(tp);
-
-    trie_p t = PI->get(tp);
+    printf("\ntrie: %p", (void*)t);
     switch (t->type)
     {
         case FORK:
@@ -197,7 +194,7 @@ void trie_display_single(trie_info_p ti, pointer_p tp, print_f print)
 void trie_display_structure(trie_info_p ti, pointer_p tp, print_f print)
 {
     trie_p t = PI->get(tp);
-    trie_display_single(ti, tp, print);
+    trie_display_single(ti, t, print);
     switch (t->type)
     {
         case FORK:
@@ -354,31 +351,32 @@ pointer_p trie_fork_disconnect(trie_info_p ti, pointer_p tp, int key)
         PI->free(tp);
         return NULL;
     }
-
-    trie_p t = malloc(sizeof(FORK_SIZE));
+    int size = FORK_SIZE;
+    trie_p t = malloc(size);
     assert(t);
-    memcpy(t, t_old, FORK_SIZE);
+    INC(fork);
+    memcpy(t, t_old, size);
     PI->free(tp);
 
     t->connected--;
     PTR_CLEAN(FN(t, key));
-
-    return PI->set(t, FORK_SIZE);
+    
+    return PI->set(t, size);
 }
 
 pointer_p trie_fork_connect(trie_info_p ti, pointer_p tp, int key, pointer_p tp_next)
 {
     if(tp_next == NULL) return trie_fork_disconnect(ti, tp, key);
 
-    trie_display_single(ti, tp, NULL);
-
     trie_p t_old = PI->get(tp);
     assert(t_old->type == FORK);
 
-    int size = PATH_SIZE(PS(t_old)->len);
+    int size = FORK_SIZE;
     trie_p t = malloc(size);
     assert(t);
+    INC(fork);
     memcpy(t, t_old, size);
+    PI->free(tp);
 
     pointer_p next = FN(t, key);
     if(PTR_NULL(next)) t->connected++;
@@ -387,16 +385,7 @@ pointer_p trie_fork_connect(trie_info_p ti, pointer_p tp, int key, pointer_p tp_
     free(tp_next);
     DEC(pointer);
     
-    pointer_p res = PI->set(t, size);
-    printf("\nres: %p", res);
-
-    trie_p t_what = PI->get(res);
-    printf("\nt: %p", t_what);
-    trie_display_single(ti, res, NULL);
-
-    printf("\nWhat");
-
-    return res;
+    return PI->set(t, size);
 }
 
 pointer_p trie_path_connect(trie_info_p ti, pointer_p tp, pointer_p tp_next)
