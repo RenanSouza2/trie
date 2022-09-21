@@ -3,9 +3,9 @@
 #include <string.h>
 #include <assert.h>
 
-#include "../lib/base/trie/header.h"
-#include "../lib/value/int/header.h"
-#include "../lib/pointer/mem/header.h"
+#include "../../lib/base/trie/header.h"
+#include "../../lib/value/int/header.h"
+#include "../../lib/pointer/mem/header.h"
 
 int main()
 {
