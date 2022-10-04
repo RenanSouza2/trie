@@ -19,7 +19,7 @@ $(TRIE_FILE):
 	$(MAKE) --directory=$(TRIE_PATH)
 	
 clean:
-	rm -rf $(OBJ)
+	rm -rf $(BIN)/*.o
 	$(MAKE) clean --directory=lib
 
 rebuild:
