@@ -1,41 +1,35 @@
-SRC=src/main.c
-OBJ=bin/main.o
+BIN=bin
+SRC=src
 
-FLAGS=-Wall -Wall -Werror -Wfatal-errors
+CODE_1=code1
+SRC_1=$(SRC)/$(CODE_1)
+OBJ_1=$(BIN)/$(CODE_1).o
 
-LIBS=lib_trie lib_my_string
+CODE_2=code2
+SRC_2=$(SRC)/$(CODE_2)
+OBJ_2=$(BIN)/$(CODE_2).o
 
-TRIE_PATH=lib/base/trie
-TRIE_FILE=$(TRIE_PATH)/lib.o
 
-INT_PATH=lib/value/int
-INT_FILE=$(INT_PATH)/lib.o
+run: $(OBJ_1) $(OBJ_2)
+	./$(OBJ_1)
+	./$(OBJ_2)
 
-MEM_PATH=lib/pointer/mem
-MEM_FILE=$(MEM_PATH)/lib.o
-
-run: $(OBJ)
-	./$(OBJ)
-
-build: $(OBJ)
+build: $(OBJ_1) $(OBJ_2)
 	
-$(OBJ): $(SRC) $(TRIE_FILE) $(INT_FILE) $(MEM_FILE)
-	gcc $(FLAGS) -o $(OBJ) $^ 
+.PHONY: $(OBJ_1)
+$(OBJ_1): 
+	$(MAKE) --directory=$(SRC_1)
+
+.PHONY: $(OBJ_2)
+$(OBJ_2): 
+	$(MAKE) --directory=$(SRC_2)
 
 .PHONY: $(TRIE_FILE)
 $(TRIE_FILE):
 	$(MAKE) --directory=$(TRIE_PATH)
 	
-.PHONY: $(INT_FILE)
-$(INT_FILE):
-	$(MAKE) --directory=$(INT_PATH)
-
-.PHONY: $(MEM_FILE)
-$(MEM_FILE):
-	$(MAKE) --directory=$(MEM_PATH)
-
 clean:
-	rm -rf $(OBJ)
+	rm -rf $(BIN)/*.o
 	$(MAKE) clean --directory=lib
 
 rebuild:

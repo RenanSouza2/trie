@@ -670,8 +670,6 @@ root_p root_init(pointer_info_p pi, int len, int max)
 
 void root_insert(root_p r, char const arr[], value_p value)
 {
-    assert(strlen(arr) == r->len);
-
     char arr_input[r->len];
     for(int i=0; i<r->len; i++)
         arr_input[i] = key_to_value(arr[i]);
@@ -683,8 +681,6 @@ void root_insert(root_p r, char const arr[], value_p value)
 
 void root_delete(root_p r, char const arr[])
 {
-    assert(strlen(arr) == r->len);
-
     char arr_input[r->len];
     for(int i=0; i<r->len; i++)
         arr_input[i] = key_to_value(arr[i]);
@@ -694,8 +690,6 @@ void root_delete(root_p r, char const arr[])
 
 handler_p root_querie(root_p r, char const arr[])
 {
-    assert(strlen(arr) == r->len);
-
     char arr_input[r->len];
     for(int i=0; i<r->len; i++)
         arr_input[i] = key_to_value(arr[i]);
