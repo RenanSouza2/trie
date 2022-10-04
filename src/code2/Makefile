@@ -15,6 +15,9 @@ HASH_PATH=../../lib/pointer/hash
 HASH_FILE=$(HASH_PATH)/lib.o
 
 build: $(OBJ)
+
+run: $(OBJ)
+	./$(OBJ)
 	
 $(OBJ): $(SRC) libs.o
 	gcc $(FLAGS) -o $(OBJ) $^ -lcrypto

@@ -12,7 +12,7 @@ int main()
     setbuf(stdout, NULL);
     
     pointer_info_p pi = get_hash_info();
-    root_p r = root_init(pi, 64, 16);
+    root_p r = root_init(pi, 8, 16);
 
     value_p value = set_int(1);
     root_insert(r, "12345678", value);

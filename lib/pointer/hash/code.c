@@ -5,6 +5,7 @@
 #include <openssl/sha.h>
 
 #include "../../base/header/pointer.h"
+#include "../../base/header/value.h"
 #include "../../base/trie/header.h"
 #include "../mem/header.h"
 
@@ -31,9 +32,7 @@ extern int leaf_free;
 #define DEC(INT)
 #endif
 
-typedef char hash_t[65];
-
-root_p get_database()
+root_p get_root()
 {
     static root_p r = NULL;
     if(r) return r;
@@ -43,18 +42,25 @@ root_p get_database()
     return r;
 }
 
-void hash_func(hash_t out, unsigned char in[], int size)
+pointer_p hash_func( unsigned char in[], int size)
 {
     unsigned char *out_heap = SHA256(in, size, NULL);
+
+    char* p = malloc(65);
+    assert(p);
+
+
     for(int i=0; i<32; i++)
-        sprintf(&out[2*i], "%02x", out_heap[i]);
-    out[64] = '\0';
+        sprintf(&p[2*i], "%02x", out_heap[i]);
+    p[8] = '\0';
+
+    return (pointer_p)p;
 }
 
 
 handler_p hash_get(pointer_p p)
 {
-    root_p r = get_database();
+    root_p r = get_root();
     return root_querie(r, (char*)p);
 }
 
@@ -66,22 +72,21 @@ void hash_display(pointer_p p)
         return;
     }
     
-    hash_t hash;
-    memcpy(hash, p, sizeof(hash));
-    hash[64] = '\0';
-    printf("%s", hash);
+    printf("%s", (char*)p);
 }
 
 pointer_p hash_set(handler_p h, int size)
 {
-    hash_t hash;
-    hash_func(hash, h, size);
-    pointer_p p = malloc(sizeof(handler_p));
-    assert(p);
-    INC(pointer);
+    pointer_p path = hash_func(h, size);
 
-    *(handler_p*)p = h;
-    return p;
+    value_p value = malloc(sizeof(value_t));
+    assert(value);
+    *value = (value_t){size, h};
+
+    root_p r = get_root();
+    root_insert(r, (char*)path, value);
+
+    return path;
 }
 
 void hash_free(pointer_p p)
@@ -111,7 +116,7 @@ pointer_info_p get_hash_info()
     assert(pi);
 
     *pi = (pointer_info_t) {
-        64,
+        8,
 
         hash_display,
 
