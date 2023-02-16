@@ -1,4 +1,4 @@
-FLAGS = -c -Wall -Werror -Wfatal-errors -lcr
+FLAGS = -c -Wall -Werror -Wfatal-errors
 
 LIBS = pointer/mem base/trie value/int
 

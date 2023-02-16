@@ -1,4 +1,4 @@
-FLAGS = -Wall -Werror -Wfatal-errors
+FLAGS = -Wall -Werror -Wfatal-errors -lcrypto
 DEBUG_FILE = ../debug.o
 
 test: test.o

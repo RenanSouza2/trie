@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdbool.h>
 
+#include "../debug.h"
 #include "../../../value/int/header.h"
 #include "../../../pointer/mem/header.h"
-#include "../code.c"
+#include "../../../utils/string/debug.h"
 
 pointer_info_p pi;
 trie_info_p ti;
@@ -227,7 +229,7 @@ void test_joinable()
 
     pointer_p tp = trie_fork_create(ti, 8, tp_next);
     trie_p t = PI->get(tp);
-    assert(trie_joinnable(t) == TRUE);
+    assert(trie_joinnable(t) == true);
 
     /////////////////////////////////
     printf("\n\t\ttest_joinable_2\t\t");
@@ -235,7 +237,7 @@ void test_joinable()
     ptr = 2;
     tp_next = get_pointer(ptr);
     tp = trie_fork_connect(ti, tp, 6, tp_next);
-    assert(trie_joinnable(t) == FALSE);
+    assert(trie_joinnable(t) == false);
     PI->free(tp);
 
     /////////////////////////////////
@@ -247,7 +249,7 @@ void test_joinable()
     tp = trie_path_create(ti, 2, arr, tp_next);
     t  = PI->get(tp);
     int res = trie_joinnable(t);
-    assert(res == TRUE);
+    assert(res == true);
     PI->free(tp);
 
     /////////////////////////////////
@@ -256,7 +258,7 @@ void test_joinable()
     int value = 1;
     value_p vp = set_int(value);
     tp = trie_leaf_create(ti, vp);
-    assert(trie_joinnable(t) == FALSE);
+    assert(trie_joinnable(t) == false);
     PI->free(tp);
     
     assert_memory();
