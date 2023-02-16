@@ -1,6 +1,6 @@
-FLAGS = -c -Wall -Werror -Wfatal-errors
+FLAGS = -c -Wall -Werror -Wfatal-errors -lcr
 
-LIBS = pointer/mem
+LIBS = pointer/mem base/trie value/int
 
 LIB_ROOT = ../..
 LIB_DIR = $(foreach LIB,$(LIBS),$(LIB_ROOT)/$(LIB))
