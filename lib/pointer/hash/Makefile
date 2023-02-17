@@ -1,6 +1,6 @@
 FLAGS = -c -Wall -Werror -Wfatal-errors
 
-LIBS = pointer/mem base/trie value/int
+LIBS = pointer/mem
 
 LIB_ROOT = ../..
 LIB_DIR = $(foreach LIB,$(LIBS),$(LIB_ROOT)/$(LIB))
@@ -16,7 +16,7 @@ lib.o: tmp.o $(LIB_FILES)
 
 .INTERMEDIATE: tmp.o
 tmp.o: code.c
-	gcc $(FLAGS) -o $@ $^
+	gcc -o $@ $^ $(FLAGS)
 
 .PHONY: $(LIB_FILES)
 $(LIB_FILES):

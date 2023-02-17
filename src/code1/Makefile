@@ -2,9 +2,9 @@ FLAGS = -Wall -Werror -Wfatal-errors
 
 LIBS = base/trie value/int pointer/mem
 
-ROOT = ../..
-LIB_PATH = $(ROOT)/lib
-LIB_FILES = $(foreach LIB,$(LIBS),$(LIB_PATH)/$(LIB)/lib.o)
+LIB_ROOT = ../../lib
+LIB_DIR = $(foreach LIB,$(LIBS),$(LIB_ROOT)/$(LIB))
+LIB_FILES = $(foreach LIB,$(LIB_DIR),$(LIB)/lib.o)
 
 run: main.o
 	./main.o
@@ -20,3 +20,6 @@ $(LIB_FILES):
 
 clean:
 	rm -rf *.o
+	for DIR in $(LIB_DIR) ; do \
+		$(MAKE) clean --directory=$$DIR ; \
+	done

@@ -1,46 +1,25 @@
-SRC=main.c
-OBJ=../../bin/code2.o
+FLAGS = -Wall -Werror -Wfatal-errors -lcrypto
 
-FLAGS=-Wall -Wall -Werror -Wfatal-errors
+LIBS = base/trie value/int pointer/hash
 
-LIBS=lib_trie lib_my_string
+LIB_ROOT = ../../lib
+LIB_DIR = $(foreach LIB,$(LIBS),$(LIB_ROOT)/$(LIB))
+LIB_FILES = $(foreach LIB,$(LIB_DIR),$(LIB)/lib.o)
 
-TRIE_PATH=../../lib/base/trie
-TRIE_FILE=$(TRIE_PATH)/lib.o
+run: main.o
+	./main.o
 
-INT_PATH=../../lib/value/int
-INT_FILE=$(INT_PATH)/lib.o
+build: main.o
 
-HASH_PATH=../../lib/pointer/hash
-HASH_FILE=$(HASH_PATH)/lib.o
+main.o: main.c $(LIB_FILES)
+	gcc -o $@ $^ $(FLAGS)
 
-build: $(OBJ)
-
-run: $(OBJ)
-	./$(OBJ)
-	
-$(OBJ): $(SRC) libs.o
-	gcc $(FLAGS) -o $(OBJ) $^ -lcrypto
-
-.INTERMEDIARY: libs.o
-libs.o: $(TRIE_FILE) $(INT_FILE) $(HASH_FILE)
-	ld -r -o $@ $^ 
-
-.PHONY: $(TRIE_FILE)
-$(TRIE_FILE):
-	$(MAKE) --directory=$(TRIE_PATH)
-	
-.PHONY: $(INT_FILE)
-$(INT_FILE):
-	$(MAKE) --directory=$(INT_PATH)
-
-.PHONY: $(HASH_FILE)
-$(HASH_FILE):
-	$(MAKE) --directory=$(HASH_PATH)
+.PHONY: $(LIB_FILES)
+$(LIB_FILES):
+	$(MAKE) --directory=$(dir $@)
 
 clean:
-	$(MAKE) clean --directory=../../
-
-rebuild:
-	$(MAKE) clean 
-	$(MAKE) build
+	rm -rf *.o
+	for DIR in $(LIB_DIR) ; do \
+		$(MAKE) clean --directory=$$DIR ; \
+	done
