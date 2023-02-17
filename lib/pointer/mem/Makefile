@@ -30,7 +30,7 @@ debug.o: dbg.o $(DBG_FILES)
 
 .INTERMEDIATE: dbg.o
 dbg.o: code.c
-	gcc $(FLAGS) -o $@ $^
+	gcc $(FLAGS) -o $@ $^ -D DEBUG
 
 .PHONY: $(DBG_FILES)
 $(DBG_FILES):

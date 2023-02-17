@@ -76,12 +76,6 @@ void snapshot_complete(char s[])
     PRINT(path);
     PRINT(leaf);
 }
-
-int decrease(int created, int freed)
-{
-    assert(created > freed);
-    return freed + 1;
-}
 #endif
 
 int memory_is_null(handler_p h, int len)

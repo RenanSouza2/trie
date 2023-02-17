@@ -36,14 +36,17 @@ DEF_H(fork);
 DEF_H(path);
 DEF_H(leaf);
 
-int decrease(int created, int freed);
 void assert_memory();
 
-#define INC(INT) INT##_created++
-#define DEC(INT) INT##_freed = decrease(INT##_created, INT##_freed)
+#define INC(TYPE) TYPE##_created++
+#define DEC(TYPE) \
+    {   \
+        assert(TYPE##_created > TYPE##_freed);    \
+        TYPE##_freed++;   \
+    }
 #else
-#define INC(INT)
-#define DEC(INT)
+#define INC(TYPE)
+#define DEC(TYPE)
 #endif
 
 pointer_p pointer_copy(pointer_info_p pi, pointer_p p);

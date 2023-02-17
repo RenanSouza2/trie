@@ -7,22 +7,24 @@
 
 #ifdef DEBUG
 
-int decrease(int created, int freed);
-
 extern int pointer_created;
-extern int pointer_free;
+extern int pointer_freed;
 
 extern int fork_created;
-extern int fork_free;
+extern int fork_freed;
 
 extern int path_created;
-extern int path_free;
+extern int path_freed;
 
 extern int leaf_created;
-extern int leaf_free;
+extern int leaf_freed;
 
 #define INC(INT) INT##_created++;
-#define DEC(INT) INT##_free = decrease(INT##_created, INT##_free)
+#define DEC(INT) \
+    {   \
+        assert(INT##_created > INT##_freed); \
+        INT##_freed++; \
+    }
 #else
 #define INC(INT)
 #define DEC(INT)
