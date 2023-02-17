@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #include "debug.h"
 #include "../../utils/string/header.h"
@@ -15,9 +16,6 @@
 #define FORK_SIZE (sizeof(trie_t) + ti->max * PI->size)
 #define PATH_SIZE(LENGTH) (sizeof(trie_t) + PI->size + string_size(LENGTH))
 #define LEAF_SIZE(SIZE) (sizeof(trie_t) + SIZE)
-
-#define FALSE 0
-#define TRUE  1
 
 
 
@@ -82,9 +80,9 @@ int memory_is_null(handler_p h, int len)
 {
     for(int i=0; i<len; i++)
         if(((char*)h)[i])
-            return FALSE;
+            return false;
 
-    return TRUE;
+    return true;
 }
 
 pointer_p pointer_copy(pointer_info_p pi, pointer_p p)
@@ -104,7 +102,7 @@ int trie_fork_first_key(trie_info_p ti, trie_p t)
         pointer_p next = FN(t, i);
         if(!PTR_NULL(next)) return i;
     }
-    assert(FALSE);
+    assert(false);
 }
 
 void char_display(unsigned char c)
@@ -387,8 +385,8 @@ pointer_p trie_leaf_set_value(trie_info_p ti, pointer_p tp, value_p value)
 
 int trie_joinnable(trie_p t)
 {
-    if(t->type == PATH) return TRUE;
-    if(t->type == LEAF) return FALSE;
+    if(t->type == PATH) return true;
+    if(t->type == LEAF) return false;
     return t->connected == 1;
 }
 
@@ -569,7 +567,7 @@ handler_p trie_querie(trie_info_p ti, pointer_p tp, char arr[])
         case LEAF:
         return LV(t);
     }
-    assert(FALSE);
+    assert(false);
 }
 
 void trie_free(trie_info_p ti, pointer_p tp)
@@ -605,9 +603,9 @@ char key_to_value(char key)
     switch (key)
     {
         case '0' ... '9' : return key - '0';
-        case 'a' ... 'z' : return key - 'a';
-        case 'A' ... 'Z' : return key - 'A';
-        default: assert(FALSE);
+        case 'a' ... 'z' : return key + 10 - 'a';
+        case 'A' ... 'Z' : return key + 10 - 'A';
+        default: assert(false);
     }
 }
 

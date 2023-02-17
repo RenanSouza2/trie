@@ -419,6 +419,7 @@ void test_unit()
 void test_insert()
 {
     printf("\n\ttest_insert\t\t");
+
     char arr[8] = {0, 1, 2, 3, 4, 5, 6, 7};
     root_p r = root_init(pi, 8, 10);
 
@@ -487,6 +488,27 @@ void test_insert()
     t = PI->get(tp_aux);
     assert_leaf(PN(t), 5);
 
+    root_free(r);
+    assert_memory();
+}
+
+void test_insert_2()
+{
+    printf("\n\ttest insert 2\t\t");
+
+    root_p r = root_init(pi, 8, 16);
+
+    value_p value = set_int(1);
+    root_insert(r, "11234567", value);
+
+    value = set_int(2);
+    root_insert(r, "A1234567", value);
+    assert_fork(r->tp, 0xA, 0);
+
+    value = set_int(3);
+    root_insert(r, "b1234567", value);
+    assert_fork(r->tp, 0xB, 0);
+    
     root_free(r);
     assert_memory();
 }
@@ -649,6 +671,8 @@ void test_integration()
 {
     printf("\n\ntest_integration\t\t");
     test_insert();
+    test_insert_2();
+
     test_querie();
 
     test_delete_1();
@@ -671,9 +695,7 @@ void test_trie()
 
 int main() 
 {
-    
     setbuf(stdout, NULL);
-
     pi = get_mem_info();
     ti = get_trie_info(10, pi);
 
