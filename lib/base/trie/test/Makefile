@@ -1,42 +1,24 @@
-FLAGS=-Wall -Werror -Wfatal-errors -D DEBUG
+FLAGS = -Wall -Werror -Wfatal-errors
+DEBUG_FILE = ../debug.o
 
-STR_PATH=../../../utils/string
-STR_FILE=$(STR_PATH)/debug.o
+LIBS = value/int pointer/mem
 
-INT_PATH=../../../value/int
-INT_FILE=$(INT_PATH)/debug.o
-
-MEM_PATH=../../../pointer/mem
-MEM_FILE=$(MEM_PATH)/debug.o
+LIB_ROOT = ../../..
+LIB_DIR = $(foreach LIB,$(LIBS),$(LIB_ROOT)/$(LIB))
+DBG_FILES = $(foreach LIB,$(LIB_DIR),$(LIB)/debug.o)
 
 test: test.o
 	./test.o 
 
-build: test.o
+test.o: test.c $(DEBUG_FILE) $(DBG_FILES)
+	gcc $(FLAGS) -o $@ $^ -D DEBUG
 
-test.o: tmp.o lib_tmp.o
-	gcc $(FLAGS) -o test.o $^
+.PHONY: $(DEBUG_FILE) $(DBG_FILES)
+$(DEBUG_FILE) $(DBG_FILES):
+	$(MAKE) debug.o --directory=$(dir $@)
 
-.INTERMEDIATE: tmp.o
-tmp.o: test.c ../code.c
-	gcc -c $(FLAGS) -o tmp.o test.c
-
-.INTERMEDIATE: lib_tmp.o
-lib_tmp.o: $(STR_FILE) $(INT_FILE) $(MEM_FILE)
-	ld -o lib_tmp.o $^ -r
-
-.PHONY: $(STR_FILE)
-$(STR_FILE):
-	$(MAKE) debug.o --directory=$(STR_PATH)
-
-.PHONY: $(INT_FILE)
-$(INT_FILE):
-	$(MAKE) debug.o --directory=$(INT_PATH)
-
-.PHONY: $(MEM_FILE)
-$(MEM_FILE):
-	$(MAKE) debug.o --directory=$(MEM_PATH)
-
-.PHONY: clean
 clean:
 	rm -f *.o
+	for DIR in $(LIB_DIR) ; do \
+		$(MAKE) clean --directory=$$DIR ; \
+	done

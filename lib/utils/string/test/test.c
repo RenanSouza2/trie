@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "../code.c"
+#include "../debug.h"
 
 void test_string_cmp()
 {

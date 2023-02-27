@@ -1,9 +1,13 @@
-clean:
-	$(MAKE) clean --directory=base
-	$(MAKE) clean --directory=pointer
-	$(MAKE) clean --directory=utils
-	$(MAKE) clean --directory=value
+DIRS := $(wildcard */.)
 
+.PHONY: clean
+clean:
+	for DIR in $(DIRS) ; do \
+		( $(MAKE) clean --directory=$$DIR ) || exit $$? \
+	done
+
+.PHONY: test
 test:
-	$(MAKE) test --directory=utils
-	$(MAKE) test --directory=base
+	for DIR in $(DIRS) ; do \
+		( $(MAKE) test --directory=$$DIR ) || exit $$? ; \
+	done

@@ -2,20 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 
-#include "header.h"
+#include "debug.h"
 #include "../../utils/string/header.h"
-#include "../header/trie.h"
-#include "../header/pointer.h"
-#include "../header/value.h"
 
-#define PI ti->pi
 
-#define HP(POINTER) ((char*)(((trie_p)(POINTER))+1))
-#define FN(POINTER, INDEX) ((pointer_p)(HP(POINTER) + (INDEX) * PI->size))
-#define PS(POINTER) ((string_p)(HP(POINTER) + PI->size))
-#define PN(POINTER) ((pointer_p)HP(POINTER))
-#define LV(POINTER) ((handler_p)HP(POINTER))
 
 #define PTR_CPY(POINTER1, POINTER2) (memcpy(POINTER1, POINTER2, PI->size));
 #define PTR_CLEAN(POINTER) (memset(POINTER, 0, PI->size))
@@ -25,46 +17,28 @@
 #define PATH_SIZE(LENGTH) (sizeof(trie_t) + PI->size + string_size(LENGTH))
 #define LEAF_SIZE(SIZE) (sizeof(trie_t) + SIZE)
 
-#define FALSE 0
-#define TRUE  1
-
-#define FORK 0
-#define PATH 1
-#define LEAF 2
-
-
-
-STRUCT(trie)
-{
-    int type, connected;
-};
-
 
 
 #ifdef DEBUG
-int value_created = 0;
-int value_free = 0;
 
-int pointer_created;
-int pointer_free = 0;
+#define DEF_C(TYPE) \
+    int TYPE##_created = 0; \
+    int TYPE##_freed = 0
 
-int fork_created = 0;
-int fork_free = 0;
+DEF_C(value);
+DEF_C(pointer);
+DEF_C(fork);
+DEF_C(path);
+DEF_C(leaf);
 
-int path_created = 0;
-int path_free = 0;
-
-int leaf_created = 0;
-int leaf_free = 0;
-
-#define DIFF(TYPE) (TYPE##_created - TYPE##_free)
+#define DIFF(TYPE) (TYPE##_created - TYPE##_freed)
 
 #define PRINT_DIFF(TYPE) printf("\n%s_diff\t: %3d\t", #TYPE, DIFF(TYPE))
 
 #define PRINT(TYPE) {                                           \
         printf("\n");                                           \
         printf("\n%s_created : %3d"  , #TYPE, TYPE##_created);  \
-        printf("\n%s_freed   : %3d\t", #TYPE, TYPE##_free);     \
+        printf("\n%s_freed   : %3d\t", #TYPE, TYPE##_freed);    \
         printf("\n----------------------");                     \
         printf("\n%s_diff    : %3d\t", #TYPE, DIFF(TYPE));      \
     }
@@ -100,27 +74,15 @@ void snapshot_complete(char s[])
     PRINT(path);
     PRINT(leaf);
 }
-
-int decrease(int created, int freed)
-{
-    assert(created > freed);
-    return freed + 1;
-}
-
-#define INC(INT) INT##_created++;
-#define DEC(INT) INT##_free = decrease(INT##_created, INT##_free)
-#else
-#define INC(INT)
-#define DEC(INT)
 #endif
 
 int memory_is_null(handler_p h, int len)
 {
     for(int i=0; i<len; i++)
         if(((char*)h)[i])
-            return FALSE;
+            return false;
 
-    return TRUE;
+    return true;
 }
 
 pointer_p pointer_copy(pointer_info_p pi, pointer_p p)
@@ -140,7 +102,7 @@ int trie_fork_first_key(trie_info_p ti, trie_p t)
         pointer_p next = FN(t, i);
         if(!PTR_NULL(next)) return i;
     }
-    assert(FALSE);
+    assert(false);
 }
 
 void char_display(unsigned char c)
@@ -423,8 +385,8 @@ pointer_p trie_leaf_set_value(trie_info_p ti, pointer_p tp, value_p value)
 
 int trie_joinnable(trie_p t)
 {
-    if(t->type == PATH) return TRUE;
-    if(t->type == LEAF) return FALSE;
+    if(t->type == PATH) return true;
+    if(t->type == LEAF) return false;
     return t->connected == 1;
 }
 
@@ -605,7 +567,7 @@ handler_p trie_querie(trie_info_p ti, pointer_p tp, char arr[])
         case LEAF:
         return LV(t);
     }
-    assert(FALSE);
+    assert(false);
 }
 
 void trie_free(trie_info_p ti, pointer_p tp)
@@ -641,9 +603,9 @@ char key_to_value(char key)
     switch (key)
     {
         case '0' ... '9' : return key - '0';
-        case 'a' ... 'z' : return key - 'a';
-        case 'A' ... 'Z' : return key - 'A';
-        default: assert(FALSE);
+        case 'a' ... 'z' : return key + 10 - 'a';
+        case 'A' ... 'Z' : return key + 10 - 'A';
+        default: assert(false);
     }
 }
 

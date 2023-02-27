@@ -1,7 +1,7 @@
 #ifndef LIB_MY_STRING
 #define LIB_MY_STRING
 
-#include "../../utils/struct.h"
+#include "../struct.h"
 
 STRUCT(string)
 {
